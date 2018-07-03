@@ -66,7 +66,7 @@ train_set, test_set = houses.partition { |h| h.sold_at < split_date }
 Next, decide what to do with outliers and missing data. There are a number of methods for handling them, but the easiest is to remove them.
 
 ```ruby
-train_set.reject! { |h| h.bedrooms.nil? || h.price < 0 }
+train_set.reject! { |h| h.bedrooms.nil? || h.price < 10000 }
 ```
 
 ### Feature Engineering
