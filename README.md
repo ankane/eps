@@ -7,6 +7,8 @@ Linear regression for Ruby
 - Automatically handles categorical variables
 - No external dependencies
 
+[![Build Status](https://travis-ci.org/ankane/eps.svg?branch=master)](https://travis-ci.org/ankane/eps)
+
 ## Installation
 
 Add this line to your application’s Gemfile:
