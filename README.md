@@ -119,7 +119,7 @@ model.evaluate(test_data)
 
 This returns:
 
-- RSME - Root mean square error
+- RMSE - Root mean square error
 - MAE - Mean absolute error
 - ME - Mean error
 
