@@ -1,8 +1,14 @@
 language: ruby
 rvm: 2.5.1
-sudo: false
-before_install: gem install bundler
+sudo: required
+before_install:
+  - gem install bundler
+  - sudo apt-get update
+  - sudo apt-get install -y libgsl0-dev
 script: bundle exec rake test
+env:
+  -
+  - GSL=t
 notifications:
   email:
     on_success: never
