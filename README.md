@@ -6,6 +6,7 @@ Linear regression for Ruby
 - Serve models built in Ruby, Python, R, and more
 - Automatically handles categorical variables
 - No external dependencies
+- Works great with the SciRuby ecosystem (Daru & IRuby)
 
 [![Build Status](https://travis-ci.org/ankane/eps.svg?branch=master)](https://travis-ci.org/ankane/eps)
 
@@ -58,6 +59,14 @@ If your data has a time associated with it, we recommend splitting on this.
 ```ruby
 split_date = Date.parse("2018-06-01")
 train_set, test_set = houses.partition { |h| h.sold_at < split_date }
+```
+
+### Outliers and Missing Data
+
+Next, decide what to do with outliers and missing data. There are a number of methods for dealing with outliers, but the easiest is to remove them.
+
+```ruby
+train_set.reject { |h| h.price < 0 }
 ```
 
 ### Feature Engineering
@@ -327,6 +336,10 @@ When importing data from CSV files, be sure to convert numeric fields. The `tabl
 ```ruby
 CSV.table("data.csv").map { |row| row.to_h }
 ```
+
+## Jupyter & IRuby
+
+You can use [IRuby](https://github.com/SciRuby/iruby) to run Eps in [Jupyter](https://jupyter.org/) notebooks. Here’s how to get [IRuby working with Rails](https://github.com/ankane/shorts/blob/master/Jupyter-Rails.md).
 
 ## Reference
 
