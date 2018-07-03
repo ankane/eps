@@ -1,0 +1,12 @@
+language: ruby
+rvm: 2.5.1
+sudo: false
+before_install: gem install bundler
+script: bundle exec rake test
+env:
+  -
+  - GSL=t
+notifications:
+  email:
+    on_success: never
+    on_failure: change
