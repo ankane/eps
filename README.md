@@ -105,6 +105,8 @@ end
 train_features = train_set.map { |h| features(h) }
 ```
 
+> We use a method for features so it can be used across training, evaluation, and prediction
+
 We also need to prepare the target variable.
 
 ```ruby
