@@ -98,12 +98,11 @@ def features(house)
   {
     bedrooms: house.bedrooms,
     city_id: house.city_id.to_s,
-    month: house.sold_at.strftime("%b"),
-    price: house.price
+    month: house.sold_at.strftime("%b")
   }
 end
 
-train_data = train_set.map { |h| features(h) }
+train_features = train_set.map { |h| features(h) }
 ```
 
 ### Training
@@ -111,7 +110,8 @@ train_data = train_set.map { |h| features(h) }
 Once we have some features, let’s train the model.
 
 ```ruby
-model = Eps::Regressor.new(train_data, target: :price)
+train_target = train_set.map { |h| h.price }
+model = Eps::Regressor.new(train_features, train_target)
 puts model.summary
 ```
 
@@ -122,8 +122,9 @@ The summary includes the coefficients and their significance. The lower the p-va
 When you’re happy with the model, see how well it performs on the test set. This gives us an idea of how well it’ll perform on unseen data.
 
 ```ruby
-test_data = test_set.map { |h| features(h) }
-model.evaluate(test_data)
+test_features = test_set.map { |h| features(h) }
+test_target = test_set.map { |h| h.price }
+model.evaluate(test_features, test_target)
 ```
 
 This returns:
