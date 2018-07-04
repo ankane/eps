@@ -72,9 +72,11 @@ module Eps
     # pmml
 
     def self.load_pmml(data)
-      require "nokogiri"
+      if data.is_a?(String)
+        require "nokogiri"
+        data = Nokogiri::XML(data)
+      end
 
-      data = Nokogiri::XML(data) if data.is_a?(String)
       # TODO more validation
       node = data.css("RegressionTable")
       coefficients = {
