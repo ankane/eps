@@ -101,19 +101,7 @@ module Eps
     end
 
     def evaluate(data, y = nil)
-      actual = y
-
-      actual ||=
-        if daru?(data)
-          data[@target].to_a
-        else
-          data.map { |v| v[@target] }
-        end
-
-      actual = prep_y(actual)
-
-      estimated = predict(data)
-      Eps.metrics(actual, estimated)
+      super(data, y, target: @target)
     end
 
     # https://people.richland.edu/james/ictcm/2004/multiple.html
@@ -152,27 +140,6 @@ module Eps
 
     def constant?(arr)
       arr.all? { |x| x == arr[0] }
-    end
-
-    # determine if target is a string or symbol
-    def prep_target(target, data)
-      if daru?(data)
-        data.has_vector?(target) ? target : flip_target(target)
-      else
-        x = data[0] || {}
-        x[target] ? target : flip_target(target)
-      end
-    end
-
-    def flip_target(target)
-      target.is_a?(String) ? target.to_sym : target.to_s
-    end
-
-    def prep_y(y)
-      y.each do |yi|
-        raise "Target missing in data" if yi.nil?
-      end
-      y.map(&:to_f)
     end
 
     # add epsilon for perfect fits

@@ -24,6 +24,22 @@ module Eps
       singular ? pred[0] : pred
     end
 
+    def evaluate(data, y = nil, target: nil)
+      raise ArgumentError, "missing target" if !target && !y
+
+      actual = y
+      actual ||=
+        if daru?(data)
+          data[target].to_a
+        else
+          data.map { |v| v[target] }
+        end
+
+      actual = prep_y(actual)
+      estimated = predict(data)
+      Eps.metrics(actual, estimated)
+    end
+
     # ruby
 
     def self.load(data)
@@ -94,7 +110,7 @@ module Eps
       BaseRegressor.new(coefficients: coefficients)
     end
 
-    private
+    protected
 
     def daru?(x)
       defined?(Daru) && x.is_a?(Daru::DataFrame)
@@ -186,6 +202,27 @@ module Eps
 
     def matrix_arr(matrix)
       matrix.to_a.map { |xi| xi[0].to_f }
+    end
+
+    # determine if target is a string or symbol
+    def prep_target(target, data)
+      if daru?(data)
+        data.has_vector?(target) ? target : flip_target(target)
+      else
+        x = data[0] || {}
+        x[target] ? target : flip_target(target)
+      end
+    end
+
+    def flip_target(target)
+      target.is_a?(String) ? target.to_sym : target.to_s
+    end
+
+    def prep_y(y)
+      y.each do |yi|
+        raise "Target missing in data" if yi.nil?
+      end
+      y.map(&:to_f)
     end
   end
 end
