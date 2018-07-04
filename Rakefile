@@ -18,7 +18,7 @@ task :benchmark do
   data = []
   1000.times do
     row = {}
-    100.times do |i|
+    20.times do |i|
       row[:"x#{i}"] = rand(100)
     end
     row[:y] = rand(100)

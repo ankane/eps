@@ -52,8 +52,9 @@ module Eps
             # haven't found an efficient way to do QR-factorization in Ruby
             # the extendmatrix gem has householder and givens (givens has bug)
             # but methods are too slow
+            xt = x.t
             begin
-              @xtxi = (x.t * x).inverse
+              @xtxi = (xt * x).inverse
             rescue ExceptionForMatrix::ErrNotRegular
               constant = {}
               (1...x.column_count).each do |i|
@@ -77,15 +78,16 @@ module Eps
                 vectors.delete_at(i)
               end
               x = Matrix.columns(vectors)
+              xt = x.t
 
               # try again
               begin
-                @xtxi = (x.t * x).inverse
+                @xtxi = (xt * x).inverse
               rescue ExceptionForMatrix::ErrNotRegular
                 raise "Multiple solutions - GSL is needed to select one"
               end
             end
-            v2 = matrix_arr(@xtxi * x.t * y)
+            v2 = matrix_arr(@xtxi * xt * y)
 
             # add back removed
             removed.sort.each do |i|
