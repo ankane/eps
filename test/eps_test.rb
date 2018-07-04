@@ -185,6 +185,16 @@ class EpsTest < Minitest::Test
     assert_equal "Missing data", error.message
   end
 
+  def test_predict_missing_extra_data
+    data = [1, 2, 3, 4, 5].map { |xi| {x: xi, y: 3 + xi * 5} }
+    model = Eps::Regressor.new(data, target: :y)
+    predictions = model.predict([{x: 6, y: nil}, {x: 7, y: nil}])
+    coefficients = model.coefficients
+
+    assert_in_delta 33, predictions[0]
+    assert_in_delta 38, predictions[1]
+  end
+
   def test_few_samples
     data = [
       {bedrooms: 1, bathrooms: 1, price: 100000},

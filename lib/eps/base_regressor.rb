@@ -132,6 +132,10 @@ module Eps
         xi.each do |k, v|
           key = v.is_a?(String) ? [k.to_sym, v] : k.to_sym
           v2 = v.is_a?(String) ? 1 : v
+
+          # TODO make more efficient
+          next if !train && !coefficients.key?(symbolize_coef(key))
+
           raise "Missing data" if v2.nil?
 
           unless cache[key]
@@ -167,13 +171,17 @@ module Eps
       end
 
       # flatten keys
-      c = [:_intercept] + cache.sort_by { |_, v| v }.map { |k, _| (k.is_a?(Array) ? k.join("") : k).to_sym }
+      c = [:_intercept] + cache.sort_by { |_, v| v }.map { |k, _| symbolize_coef(k) }
 
       if c.size != c.uniq.size
         raise "Overlapping coefficients"
       end
 
       [ret2, c]
+    end
+
+    def symbolize_coef(k)
+      (k.is_a?(Array) ? k.join("") : k).to_sym
     end
 
     def matrix_arr(matrix)
