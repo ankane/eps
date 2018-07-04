@@ -16,9 +16,9 @@ task :benchmark do
   require "gsl" if ENV["GSL"]
 
   data = []
-  1000.times do
+  10000.times do
     row = {}
-    20.times do |i|
+    30.times do |i|
       row[:"x#{i}"] = rand(100)
     end
     row[:y] = rand(100)

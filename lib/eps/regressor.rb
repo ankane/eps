@@ -87,7 +87,9 @@ module Eps
                 raise "Multiple solutions - GSL is needed to select one"
               end
             end
-            v2 = matrix_arr(@xtxi * xt * y)
+            # huge performance boost
+            # by multiplying xt * y first
+            v2 = matrix_arr(@xtxi * (xt * y))
 
             # add back removed
             removed.sort.each do |i|
