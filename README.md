@@ -213,7 +213,7 @@ data = File.read("model.pmml")
 model = Eps::Regressor.load_pmml(data)
 ```
 
-> PMML requires Nokogiri to be installed
+> Loading PMML requires Nokogiri to be installed
 
 [PFA](http://dmg.org/pfa/) - Portable Format for Analytics
 
