@@ -146,6 +146,18 @@ This returns:
 
 We want to minimize the RMSE and MAE and keep the ME around 0.
 
+### Finalize
+
+Now that we have an idea of how the model will perform, we want to retrain the model with all of our data.
+
+```ruby
+all_features = houses.map { |h| features(h) }
+all_target = houses.map { |h| target(h) }
+model = Eps::Regressor.new(all_features, all_target)
+```
+
+We now have a model that’s ready to serve.
+
 ## Serving Models
 
 Once the model is trained, all we need are the coefficients to make predictions. You can dump them as a Ruby object or JSON. For Ruby, use:
