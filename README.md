@@ -105,12 +105,21 @@ end
 train_features = train_set.map { |h| features(h) }
 ```
 
-### Training
-
-Once we have some features, let’s train the model.
+We also need to prepare the target variable.
 
 ```ruby
-train_target = train_set.map { |h| h.price }
+def target(house)
+  house.price
+end
+
+train_target = train_set.map { |h| target(h) }
+```
+
+### Training
+
+Now, let’s train the model.
+
+```ruby
 model = Eps::Regressor.new(train_features, train_target)
 puts model.summary
 ```
@@ -123,7 +132,7 @@ When you’re happy with the model, see how well it performs on the test set. Th
 
 ```ruby
 test_features = test_set.map { |h| features(h) }
-test_target = test_set.map { |h| h.price }
+test_target = test_set.map { |h| target(h) }
 model.evaluate(test_features, test_target)
 ```
 
