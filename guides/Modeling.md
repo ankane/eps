@@ -21,7 +21,8 @@ And run:
 library(jsonlite)
 
 model <- lm(dist ~ speed, cars)
-toJSON(list(coefficients=as.list(coef(model))), auto_unbox=TRUE)
+data <- toJSON(list(coefficients=as.list(coef(model))), auto_unbox=TRUE)
+write(data, file="model.json")
 ```
 
 ## R PMML
@@ -38,7 +39,8 @@ And run:
 library(pmml)
 
 model <- lm(dist ~ speed,  cars)
-toString(pmml(model))
+data <- toString(pmml(model))
+write(data, file="model.pmml")
 ```
 
 ## R PFA
@@ -55,7 +57,7 @@ And run:
 library(aurelius)
 
 model <- lm(dist ~ speed,  cars)
-write_pfa(pfa(model))
+write_pfa(pfa(model), file="model.pfa")
 ```
 
 ## Python JSON
@@ -80,15 +82,19 @@ coefficients = {'_intercept': model.intercept_}
 for i, c in enumerate(model.coef_):
     coefficients[features[i]] = c
 
-print(json.dumps({'coefficients': coefficients}))
+
+data = json.dumps({'coefficients': coefficients})
+
+with open('model.json', 'w') as f:
+    f.write(data)
 ```
 
 ## Python PMML
 
-Install the [sklearn2pmml](https://github.com/jpmml/sklearn2pmml) package
+Install the [scikit2pmml](https://github.com/vaclavcadek/scikit2pmml) package
 
 ```sh
-pip install sklearn2pmml
+pip install scikit2pmml
 ```
 
 And run:
@@ -103,7 +109,7 @@ y = [5 * xi + 3 for xi in x]
 model = linear_model.LinearRegression()
 model.fit([[xi] for xi in x], y)
 
-scikit2pmml(estimator=model, file='pymodel.pmml')
+scikit2pmml(estimator=model, file='model.pmml')
 ```
 
 ## Python PFA
@@ -139,5 +145,8 @@ action:
 
     return pfaDocument
 
-json.dumps(pfa(model))
+data = json.dumps(pfa(model))
+
+with open('model.pfa', 'w') as f:
+    f.write(data)
 ```
