@@ -21,7 +21,7 @@ And run:
 library(jsonlite)
 
 model <- lm(dist ~ speed, cars)
-data <- toJSON(list(coefficients=as.list(coef(model))), digits=10, auto_unbox=TRUE)
+data <- toJSON(list(coefficients=as.list(coef(model))), digits=NA, auto_unbox=TRUE)
 write(data, file="model.json")
 ```
 
