@@ -148,7 +148,7 @@ We want to minimize the RMSE and MAE and keep the ME around 0.
 
 ### Finalize
 
-Now that we have an idea of how the model will perform, we want to retrain the model with all of our data.
+Now that we have an idea of how the model will perform, we want to retrain the model with all of our data. Treat outliers and missing data the same as you did with the training set.
 
 ```ruby
 all_features = houses.map { |h| features(h) }
