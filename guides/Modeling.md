@@ -21,6 +21,8 @@ And run:
 library(jsonlite)
 
 model <- lm(dist ~ speed, cars)
+
+# save model
 data <- toJSON(list(coefficients=as.list(coef(model))), digits=NA, auto_unbox=TRUE)
 write(data, file="model.json")
 ```
@@ -39,6 +41,8 @@ And run:
 library(pmml)
 
 model <- lm(dist ~ speed,  cars)
+
+# save model
 data <- toString(pmml(model))
 write(data, file="model.pmml")
 ```
@@ -57,6 +61,8 @@ And run:
 library(aurelius)
 
 model <- lm(dist ~ speed,  cars)
+
+# save model
 write_pfa(pfa(model), file="model.pfa")
 ```
 
@@ -78,10 +84,10 @@ features = ['x']
 model = linear_model.LinearRegression()
 model.fit(df[features], df['y'])
 
+# save model
 coefficients = {'_intercept': model.intercept_}
 for i, c in enumerate(model.coef_):
     coefficients[features[i]] = c
-
 
 data = json.dumps({'coefficients': coefficients})
 
@@ -109,6 +115,7 @@ y = [5 * xi + 3 for xi in x]
 model = linear_model.LinearRegression()
 model.fit([[xi] for xi in x], y)
 
+# save model
 scikit2pmml(estimator=model, file='model.pmml')
 ```
 
@@ -127,6 +134,7 @@ y = [5 * xi + 3 for xi in x]
 model = linear_model.LinearRegression()
 model.fit([[xi] for xi in x], y)
 
+# save model
 def pfa(estimator):
     pfaDocument = titus.prettypfa.jsonNode('''
 types:
