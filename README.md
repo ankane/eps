@@ -151,6 +151,10 @@ We want to minimize the RMSE and MAE and keep the ME around 0.
 Now that we have an idea of how the model will perform, we want to retrain the model with all of our data. Treat outliers and missing data the same as you did with the training set.
 
 ```ruby
+# outliers and missing data
+houses.reject! { |h| h.bedrooms.nil? || h.price < 10000 }
+
+# training
 all_features = houses.map { |h| features(h) }
 all_target = houses.map { |h| target(h) }
 model = Eps::Regressor.new(all_features, all_target)
