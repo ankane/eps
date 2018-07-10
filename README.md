@@ -314,7 +314,7 @@ module PriceModel
   extend self # make all methods class methods
 
   def train
-    houses = House.all
+    houses = House.all.to_a
 
     # divide into training and test set
     rng = Random.new(1)
@@ -383,7 +383,9 @@ Train with:
 PriceModel.train
 ```
 
-And predict with:
+This saves your model to `app/stats_models/price.json`. Be sure to check this into your source control.
+
+Predict with:
 
 ```ruby
 PriceModel.predict(house)
