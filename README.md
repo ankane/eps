@@ -305,6 +305,88 @@ Eps.metrics(actual, estimated)
 
 This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0.
 
+## Rails
+
+In Rails, we recommend storing models in the `app/stats_models` directory. Be sure to restart Spring after creating it so files are autoloaded. Here’s what a complete model may look like:
+
+```ruby
+class PriceModel
+  def train
+    houses = House.all
+
+    # divide into training and test set
+    rng = Random.new(1)
+    train_set, test_set = houses.partition { rng.rand < 0.7 }
+
+    # handle outliers and missing values
+    train_set = preprocess(train_set)
+
+    # train
+    train_features = train_set.map { |v| features(v) }
+    train_target = train_set.map { |v| target(v) }
+    model = Eps::Regressor.new(train_features, train_target)
+    puts model.summary
+
+    # evaluate
+    test_features = test_set.map { |v| features(v) }
+    test_target = test_set.map { |v| target(v) }
+    metrics = model.evaluate(test_features, test_target)
+    puts "Test RMSE: #{metrics[:rmse]}"
+
+    # finalize
+    houses = preprocess(houses)
+    all_features = houses.map { |h| features(h) }
+    all_target = houses.map { |h| target(h) }
+    model = Eps::Regressor.new(all_features, all_target)
+
+    # save
+    File.open(model_file, "w") { |f| f.write(model.json) }
+  end
+
+  def predict(house)
+    model.predict(features(house))
+  end
+
+  private
+
+  def model
+    @model ||= Eps::Regressor.load_json(File.read(model_file))
+  end
+
+  def model_file
+    @model_file ||= Rails.root.join("app", "stats_models", "price.json")
+  end
+
+  def preprocess(train_set)
+    train_set.reject { |h| h.bedrooms.nil? || h.price < 10000 }
+  end
+
+  def features(house)
+    {
+      bedrooms: house.bedrooms,
+      city_id: house.city_id.to_s,
+      month: house.sold_at.strftime("%b")
+    }
+  end
+
+  def target(house)
+    house.price
+  end
+end
+```
+
+Train with:
+
+```ruby
+PriceModel.new.train
+```
+
+And predict with:
+
+```ruby
+PriceModel.new.predict(house)
+```
+
 ## Training Performance
 
 Speed up training on large datasets with GSL.
