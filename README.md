@@ -311,8 +311,6 @@ In Rails, we recommend storing models in the `app/stats_models` directory. Be su
 
 ```ruby
 module PriceModel
-  extend self # make all methods class methods
-
   def build
     houses = House.all.to_a
 
@@ -374,6 +372,8 @@ module PriceModel
   def model_file
     Rails.root.join("app", "stats_models", "price_model.json")
   end
+
+  extend self # make all methods class methods
 end
 ```
 
