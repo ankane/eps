@@ -313,7 +313,7 @@ In Rails, we recommend storing models in the `app/stats_models` directory. Be su
 module PriceModel
   extend self # make all methods class methods
 
-  def train
+  def build
     houses = House.all.to_a
 
     # divide into training and test set
@@ -377,13 +377,13 @@ module PriceModel
 end
 ```
 
-Train with:
+Build the model with:
 
 ```ruby
-PriceModel.train
+PriceModel.build
 ```
 
-This saves your model to `app/stats_models/price.json`. Be sure to check this into your source control.
+This saves the model to `app/stats_models/price.json`. Be sure to check this into source control.
 
 Predict with:
 
