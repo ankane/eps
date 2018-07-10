@@ -187,13 +187,13 @@ Another option that works well is writing the model to file in your app.
 
 ```ruby
 json = model.to_json
-File.open("app/stats_models/housing_price.json", "w") { |f| f.write(json) }
+File.open("app/stats_models/price_model.json", "w") { |f| f.write(json) }
 ```
 
 To load it, use:
 
 ```ruby
-json = File.read("app/stats_models/housing_price.json")
+json = File.read("app/stats_models/price_model.json")
 model = Eps::Regressor.load_json(json)
 ```
 
@@ -282,14 +282,14 @@ rails g model Model key:string:uniq data:text
 Store the model with:
 
 ```ruby
-store = Model.where(key: "housing_price").first_or_initialize
+store = Model.where(key: "price").first_or_initialize
 store.update(data: model.to_json)
 ```
 
 Load the model with:
 
 ```ruby
-data = Model.find_by!(key: "housing_price").data
+data = Model.find_by!(key: "price").data
 model = Eps::Regressor.load_json(data)
 ```
 
