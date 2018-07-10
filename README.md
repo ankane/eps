@@ -372,7 +372,7 @@ module PriceModel
   end
 
   def model_file
-    Rails.root.join("app", "stats_models", "price.json")
+    Rails.root.join("app", "stats_models", "price_model.json")
   end
 end
 ```
@@ -383,7 +383,7 @@ Build the model with:
 PriceModel.build
 ```
 
-This saves the model to `app/stats_models/price.json`. Be sure to check this into source control.
+This saves the model to `app/stats_models/price_model.json`. Be sure to check this into source control.
 
 Predict with:
 
