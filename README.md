@@ -187,13 +187,13 @@ Another option that works well is writing the model to file in your app.
 
 ```ruby
 json = model.to_json
-File.open("app/stats_models/price_model.json", "w") { |f| f.write(json) }
+File.open("model.json", "w") { |f| f.write(json) }
 ```
 
 To load it, use:
 
 ```ruby
-json = File.read("app/stats_models/price_model.json")
+json = File.read("model.json")
 model = Eps::Regressor.load_json(json)
 ```
 
