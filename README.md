@@ -356,7 +356,7 @@ module PriceModel
   end
 
   def model_file
-    @model_file ||= Rails.root.join("app", "stats_models", "price.json")
+    Rails.root.join("app", "stats_models", "price.json")
   end
 
   def preprocess(train_set)
