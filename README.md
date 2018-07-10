@@ -310,7 +310,9 @@ This returns the same evaluation metrics as model building. For RMSE and MAE, al
 In Rails, we recommend storing models in the `app/stats_models` directory. Be sure to restart Spring after creating the directory so files are autoloaded. Here’s what a complete model in `app/stats_models/price_model.rb` may look like:
 
 ```ruby
-class PriceModel
+module PriceModel
+  extend self # make all methods class methods
+
   def train
     houses = House.all
 
@@ -337,10 +339,10 @@ class PriceModel
     houses = preprocess(houses)
     all_features = houses.map { |h| features(h) }
     all_target = houses.map { |h| target(h) }
-    model = Eps::Regressor.new(all_features, all_target)
+    @model = Eps::Regressor.new(all_features, all_target)
 
     # save
-    File.open(model_file, "w") { |f| f.write(model.json) }
+    File.open(model_file, "w") { |f| f.write(@model.json) }
   end
 
   def predict(house)
@@ -378,13 +380,13 @@ end
 Train with:
 
 ```ruby
-PriceModel.new.train
+PriceModel.train
 ```
 
 And predict with:
 
 ```ruby
-PriceModel.new.predict(house)
+PriceModel.predict(house)
 ```
 
 ## Training Performance
