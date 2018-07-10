@@ -351,14 +351,6 @@ module PriceModel
 
   private
 
-  def model
-    @model ||= Eps::Regressor.load_json(File.read(model_file))
-  end
-
-  def model_file
-    Rails.root.join("app", "stats_models", "price.json")
-  end
-
   def preprocess(train_set)
     train_set.reject { |h| h.bedrooms.nil? || h.price < 10000 }
   end
@@ -373,6 +365,14 @@ module PriceModel
 
   def target(house)
     house.price
+  end
+
+  def model
+    @model ||= Eps::Regressor.load_json(File.read(model_file))
+  end
+
+  def model_file
+    Rails.root.join("app", "stats_models", "price.json")
   end
 end
 ```
