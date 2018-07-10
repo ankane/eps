@@ -307,7 +307,7 @@ This returns the same evaluation metrics as model building. For RMSE and MAE, al
 
 ## Rails
 
-In Rails, we recommend storing models in the `app/stats_models` directory. Be sure to restart Spring after creating it so files are autoloaded. Here’s what a complete model may look like:
+In Rails, we recommend storing models in the `app/stats_models` directory. Be sure to restart Spring after creating the directory so files are autoloaded. Here’s what a complete model may look like:
 
 ```ruby
 class PriceModel
