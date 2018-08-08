@@ -36,7 +36,7 @@ module Eps
           raise "Number of samples must be at least two more than number of features"
         end
 
-        v =
+        v3 =
           if @gsl
             x = GSL::Matrix.alloc(*x)
             y = GSL::Vector.alloc(@y)
@@ -65,9 +65,9 @@ module Eps
               removed = constant.select { |_, v| v }.keys
 
               # remove non-independent columns
-              constant.select { |_, v| !v }.keys.combination(2) do |c|
-                if !x.column(c[0]).independent?(x.column(c[1]))
-                  removed << c[1]
+              constant.select { |_, v| !v }.keys.combination(2) do |c2|
+                if !x.column(c2[0]).independent?(x.column(c2[1]))
+                  removed << c2[1]
                 end
               end
 
@@ -100,7 +100,7 @@ module Eps
             v2
           end
 
-        Hash[@coefficient_names.zip(v)]
+        Hash[@coefficient_names.zip(v3)]
       end
     end
 
