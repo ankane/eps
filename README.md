@@ -455,7 +455,7 @@ CSV.table("data.csv").map { |row| row.to_h }
 
 ## Jupyter & IRuby
 
-You can use [IRuby](https://github.com/SciRuby/iruby) to run Eps in [Jupyter](https://jupyter.org/) notebooks. Here’s how to get [IRuby working with Rails](https://github.com/ankane/shorts/blob/master/Jupyter-Rails.md).
+You can use [IRuby](https://github.com/SciRuby/iruby) to run Eps in [Jupyter](https://jupyter.org/) notebooks. Here’s how to get [IRuby working with Rails](https://ankane.org/jupyter-rails).
 
 ## Reference
 
