@@ -8,6 +8,8 @@ Linear regression for Ruby
 - No external dependencies
 - Works great with the SciRuby ecosystem (Daru & IRuby)
 
+Check out [this post](https://ankane.org/rails-meet-data-science) for more info on data science with Rails
+
 [![Build Status](https://travis-ci.org/ankane/eps.svg?branch=master)](https://travis-ci.org/ankane/eps)
 
 ## Installation
@@ -199,7 +201,7 @@ model = Eps::Regressor.load_json(json)
 
 To continuously train models, we recommend [storing them in your database](#database-storage).
 
-### Beyond Ruby
+### Other Languages
 
 Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language. Eps can load models in:
 
