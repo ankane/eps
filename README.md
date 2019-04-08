@@ -52,15 +52,15 @@ model.predict(bedrooms: 2, bathrooms: 1)
 When building models, it’s a good idea to hold out some data so you can see how well the model will perform on unseen data. To do this, we split our data into two sets: training and test. We build the model with the training set and later evaluate it on the test set.
 
 ```ruby
-rng = Random.new(1) # seed random number generator
-train_set, test_set = houses.partition { rng.rand < 0.7 }
-```
-
-If your data has a time associated with it, we recommend splitting on this.
-
-```ruby
 split_date = Date.parse("2018-06-01")
 train_set, test_set = houses.partition { |h| h.sold_at < split_date }
+```
+
+If your data doesn’t have a time associated with it, you can split it randomly.
+
+```ruby
+rng = Random.new(1) # seed random number generator
+train_set, test_set = houses.partition { rng.rand < 0.7 }
 ```
 
 ### Outliers and Missing Data
