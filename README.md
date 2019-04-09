@@ -317,8 +317,8 @@ module PriceModel
     houses = House.all.to_a
 
     # divide into training and test set
-    rng = Random.new(1)
-    train_set, test_set = houses.partition { rng.rand < 0.7 }
+    split_date = Date.parse("2018-06-01")
+    train_set, test_set = houses.partition { |h| h.sold_at < split_date }
 
     # handle outliers and missing values
     train_set = preprocess(train_set)
