@@ -81,7 +81,7 @@ Selecting features for a model is extremely important for performance. Features 
 
 > Categorical features generate coefficients for each distinct value except for one
 
-Convert any ids to strings as well so they are treated as categorical features.
+Convert any ids to strings so they’re treated as categorical features.
 
 ```ruby
 {city_id: city_id.to_s}
