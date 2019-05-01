@@ -81,10 +81,10 @@ Selecting features for a model is extremely important for performance. Features 
 
 > Categorical features generate coefficients for each distinct value except for one
 
-You should do this for any ids in your data.
+Convert any ids to strings as well so they are treated as categorical features.
 
 ```ruby
-{city_id: "123"}
+{city_id: city_id.to_s}
 ```
 
 For times, create features like day of week and hour of day with:
