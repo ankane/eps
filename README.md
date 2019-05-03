@@ -281,6 +281,18 @@ Predict with:
 PriceModel.predict(house)
 ```
 
+## Monitoring
+
+We recommend monitoring how well your models perform over time. To do this, save your predictions to the database. Then, compare them with:
+
+```ruby
+actual = houses.map(&:price)
+estimated = houses.map(&:estimated_price)
+Eps.metrics(actual, estimated)
+```
+
+This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0.
+
 ## Other Languages
 
 Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language. Eps can load models in:
@@ -374,18 +386,6 @@ Load the model with:
 data = Model.find_by!(key: "price").data
 model = Eps::Regressor.load_json(data)
 ```
-
-## Monitoring
-
-We recommend monitoring how well your models perform over time. To do this, save your predictions to the database. Then, compare them with:
-
-```ruby
-actual = houses.map(&:price)
-estimated = houses.map(&:estimated_price)
-Eps.metrics(actual, estimated)
-```
-
-This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0.
 
 ## Training Performance
 
