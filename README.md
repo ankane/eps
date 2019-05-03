@@ -166,30 +166,10 @@ We now have a model that’s ready to serve.
 
 ## Serving Models
 
-Once the model is trained, all we need are the coefficients to make predictions. You can dump them as a Ruby object or JSON. For Ruby, use:
+Once the model is trained, all we need are the coefficients to make predictions. A great option is to write the model to a file with:
 
 ```ruby
-model.dump
-```
-
-Then hardcode the result into your app.
-
-```ruby
-data = {:coefficients=>{:_intercept=>63500.0, :bedrooms=>26000.0, :bathrooms=>10000.0}}
-model = Eps::Regressor.load(data)
-```
-
-Now we can use it to make predictions.
-
-```ruby
-model.predict(bedrooms: 2, bathrooms: 1)
-```
-
-Another option that works well is writing the model to file in your app.
-
-```ruby
-json = model.to_json
-File.write("model.json", json)
+File.write("model.json", model.to_json)
 ```
 
 To load it, use:
@@ -197,6 +177,12 @@ To load it, use:
 ```ruby
 json = File.read("model.json")
 model = Eps::Regressor.load_json(json)
+```
+
+Now we can use it to make predictions.
+
+```ruby
+model.predict(bedrooms: 2, bathrooms: 1)
 ```
 
 To continuously train models, we recommend [storing them in your database](#database-storage).
@@ -295,7 +281,7 @@ Predict with:
 PriceModel.predict(house)
 ```
 
-### Other Languages
+## Other Languages
 
 Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language. Eps can load models in:
 
@@ -363,7 +349,7 @@ CSV.foreach("predictions.csv", headers: true) do |row|
 end
 ```
 
-### Database Storage
+## Database Storage
 
 The database is another place you can store models. It’s good if you retrain models automatically.
 
