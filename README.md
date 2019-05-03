@@ -189,7 +189,7 @@ Another option that works well is writing the model to file in your app.
 
 ```ruby
 json = model.to_json
-File.open("model.json", "w") { |f| f.write(json) }
+File.write("model.json", json)
 ```
 
 To load it, use:
@@ -244,7 +244,7 @@ module PriceModel
     @model = Eps::Regressor.new(all_features, all_target)
 
     # save
-    File.open(model_file, "w") { |f| f.write(@model.to_json) }
+    File.write(model_file, @model.to_json)
   end
 
   def predict(house)
