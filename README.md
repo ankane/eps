@@ -201,6 +201,100 @@ model = Eps::Regressor.load_json(json)
 
 To continuously train models, we recommend [storing them in your database](#database-storage).
 
+## Full Example
+
+We recommend putting all the model code in a single file. This makes it easy to rebuild the model as needed.
+
+In Rails, we recommend creating a `app/stats_models` directory. Be sure to restart Spring after creating the directory so files are autoloaded.
+
+```sh
+bin/spring stop
+```
+
+Here’s what a complete model in `app/stats_models/price_model.rb` may look like:
+
+```ruby
+module PriceModel
+  def build
+    houses = House.all.to_a
+
+    # divide into training and test set
+    split_date = Date.parse("2018-06-01")
+    train_set, test_set = houses.partition { |h| h.sold_at < split_date }
+
+    # handle outliers and missing values
+    train_set = preprocess(train_set)
+
+    # train
+    train_features = train_set.map { |v| features(v) }
+    train_target = train_set.map { |v| target(v) }
+    model = Eps::Regressor.new(train_features, train_target)
+    puts model.summary
+
+    # evaluate
+    test_features = test_set.map { |v| features(v) }
+    test_target = test_set.map { |v| target(v) }
+    metrics = model.evaluate(test_features, test_target)
+    puts "Test RMSE: #{metrics[:rmse]}"
+
+    # finalize
+    houses = preprocess(houses)
+    all_features = houses.map { |h| features(h) }
+    all_target = houses.map { |h| target(h) }
+    @model = Eps::Regressor.new(all_features, all_target)
+
+    # save
+    File.open(model_file, "w") { |f| f.write(@model.to_json) }
+  end
+
+  def predict(house)
+    model.predict(features(house))
+  end
+
+  private
+
+  def preprocess(train_set)
+    train_set.reject { |h| h.bedrooms.nil? || h.price < 10000 }
+  end
+
+  def features(house)
+    {
+      bedrooms: house.bedrooms,
+      city_id: house.city_id.to_s,
+      month: house.sold_at.strftime("%b")
+    }
+  end
+
+  def target(house)
+    house.price
+  end
+
+  def model
+    @model ||= Eps::Regressor.load_json(File.read(model_file))
+  end
+
+  def model_file
+    File.join(__dir__, "price_model.json")
+  end
+
+  extend self # make all methods class methods
+end
+```
+
+Build the model with:
+
+```ruby
+PriceModel.build
+```
+
+This saves the model to `price_model.json`. Be sure to check this into source control.
+
+Predict with:
+
+```ruby
+PriceModel.predict(house)
+```
+
 ### Other Languages
 
 Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language. Eps can load models in:
@@ -306,98 +400,6 @@ Eps.metrics(actual, estimated)
 ```
 
 This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0.
-
-## Rails
-
-In Rails, we recommend storing models in the `app/stats_models` directory. Be sure to restart Spring after creating the directory so files are autoloaded.
-
-```sh
-bin/spring stop
-```
-
-Here’s what a complete model in `app/stats_models/price_model.rb` may look like:
-
-```ruby
-module PriceModel
-  def build
-    houses = House.all.to_a
-
-    # divide into training and test set
-    split_date = Date.parse("2018-06-01")
-    train_set, test_set = houses.partition { |h| h.sold_at < split_date }
-
-    # handle outliers and missing values
-    train_set = preprocess(train_set)
-
-    # train
-    train_features = train_set.map { |v| features(v) }
-    train_target = train_set.map { |v| target(v) }
-    model = Eps::Regressor.new(train_features, train_target)
-    puts model.summary
-
-    # evaluate
-    test_features = test_set.map { |v| features(v) }
-    test_target = test_set.map { |v| target(v) }
-    metrics = model.evaluate(test_features, test_target)
-    puts "Test RMSE: #{metrics[:rmse]}"
-
-    # finalize
-    houses = preprocess(houses)
-    all_features = houses.map { |h| features(h) }
-    all_target = houses.map { |h| target(h) }
-    @model = Eps::Regressor.new(all_features, all_target)
-
-    # save
-    File.open(model_file, "w") { |f| f.write(@model.to_json) }
-  end
-
-  def predict(house)
-    model.predict(features(house))
-  end
-
-  private
-
-  def preprocess(train_set)
-    train_set.reject { |h| h.bedrooms.nil? || h.price < 10000 }
-  end
-
-  def features(house)
-    {
-      bedrooms: house.bedrooms,
-      city_id: house.city_id.to_s,
-      month: house.sold_at.strftime("%b")
-    }
-  end
-
-  def target(house)
-    house.price
-  end
-
-  def model
-    @model ||= Eps::Regressor.load_json(File.read(model_file))
-  end
-
-  def model_file
-    Rails.root.join("app", "stats_models", "price_model.json")
-  end
-
-  extend self # make all methods class methods
-end
-```
-
-Build the model with:
-
-```ruby
-PriceModel.build
-```
-
-This saves the model to `app/stats_models/price_model.json`. Be sure to check this into source control.
-
-Predict with:
-
-```ruby
-PriceModel.predict(house)
-```
 
 ## Training Performance
 
