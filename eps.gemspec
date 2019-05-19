@@ -6,7 +6,7 @@ require "eps/version"
 Gem::Specification.new do |spec|
   spec.name          = "eps"
   spec.version       = Eps::VERSION
-  spec.summary       = "Linear regression for Ruby"
+  spec.summary       = "Machine learning for Ruby. Supports regression (linear regression) and classification (naive Bayes)"
   spec.homepage      = "https://github.com/ankane/eps"
   spec.license       = "MIT"
 
@@ -16,7 +16,7 @@ Gem::Specification.new do |spec|
   spec.files         = Dir["*.{md,txt}", "{lib}/**/*"]
   spec.require_path  = "lib"
 
-  spec.required_ruby_version = ">= 2.2"
+  spec.required_ruby_version = ">= 2.4"
 
   spec.add_development_dependency "bundler"
   spec.add_development_dependency "daru"

@@ -1,11 +1,11 @@
 # Eps
 
-Linear regression for Ruby
+Machine learning for Ruby
 
-- Build models quickly and easily
+- Build predictive models quickly and easily
 - Serve models built in Ruby, Python, R, and more
-- Automatically handles categorical variables
-- No external dependencies
+- Supports regression (linear regression) and classification (naive Bayes)
+- Automatically handles categorical features
 - Works great with the SciRuby ecosystem (Daru & IRuby)
 
 Check out [this post](https://ankane.org/rails-meet-data-science) for more info on data science with Rails
@@ -33,7 +33,7 @@ data = [
   {bedrooms: 2, bathrooms: 2, price: 135000},
   {bedrooms: 3, bathrooms: 2, price: 162000}
 ]
-model = Eps::Regressor.new(data, target: :price)
+model = Eps::Model.new(data, target: :price)
 puts model.summary
 ```
 
@@ -44,6 +44,8 @@ model.predict(bedrooms: 2, bathrooms: 1)
 ```
 
 > Pass an array of hashes make multiple predictions at once
+
+The target can be numeric (regression) or categorical (classification).
 
 ## Building Models
 
@@ -124,11 +126,11 @@ train_target = train_set.map { |h| target(h) }
 Now, let’s train the model.
 
 ```ruby
-model = Eps::Regressor.new(train_features, train_target)
+model = Eps::Model.new(train_features, train_target)
 puts model.summary
 ```
 
-The summary includes the coefficients and their significance. The lower the p-value, the more significant the feature is. p-values below 0.05 are typically considered significant. It also shows the adjusted r-squared, which is a measure of how well the model fits the data. The higher the number, the better the fit. Here’s a good explanation of why it’s [better than r-squared](https://www.quora.com/What-is-the-difference-between-R-squared-and-Adjusted-R-squared).
+For regression, the summary includes the coefficients and their significance. The lower the p-value, the more significant the feature is. p-values below 0.05 are typically considered significant. It also shows the adjusted r-squared, which is a measure of how well the model fits the data. The higher the number, the better the fit. Here’s a good explanation of why it’s [better than r-squared](https://www.quora.com/What-is-the-difference-between-R-squared-and-Adjusted-R-squared).
 
 ### Evaluation
 
@@ -140,13 +142,19 @@ test_target = test_set.map { |h| target(h) }
 model.evaluate(test_features, test_target)
 ```
 
-This returns:
+For regression, this returns:
 
 - RMSE - Root mean square error
 - MAE - Mean absolute error
 - ME - Mean error
 
 We want to minimize the RMSE and MAE and keep the ME around 0.
+
+For classification, this returns:
+
+- Accuracy
+
+We want to maximize the accuracy.
 
 ### Finalize
 
@@ -159,24 +167,26 @@ houses.reject! { |h| h.bedrooms.nil? || h.price < 10000 }
 # training
 all_features = houses.map { |h| features(h) }
 all_target = houses.map { |h| target(h) }
-model = Eps::Regressor.new(all_features, all_target)
+model = Eps::Model.new(all_features, all_target)
 ```
 
 We now have a model that’s ready to serve.
 
 ## Serving Models
 
-Once the model is trained, all we need are the coefficients to make predictions. A great option is to write the model to a file with:
+Once the model is trained, we need to store it. Eps uses PMML - [Predictive Model Markup Language]((https://en.wikipedia.org/wiki/Predictive_Model_Markup_Language) - a standard for storing models. A great option is to write the model to a file with:
 
 ```ruby
-File.write("model.json", model.to_json)
+File.write("model.pmml", model.to_pmml)
 ```
 
-To load it, use:
+> You may need to add `nokogiri` to your Gemfile
+
+To load a model, use:
 
 ```ruby
-json = File.read("model.json")
-model = Eps::Regressor.load_json(json)
+pmml = File.read("model.pmml")
+model = Eps::Model.load_pmml(pmml)
 ```
 
 Now we can use it to make predictions.
@@ -191,16 +201,16 @@ To continuously train models, we recommend [storing them in your database](#data
 
 We recommend putting all the model code in a single file. This makes it easy to rebuild the model as needed.
 
-In Rails, we recommend creating a `app/stats_models` directory. Be sure to restart Spring after creating the directory so files are autoloaded.
+In Rails, we recommend creating a `app/ml_models` directory. Be sure to restart Spring after creating the directory so files are autoloaded.
 
 ```sh
 bin/spring stop
 ```
 
-Here’s what a complete model in `app/stats_models/price_model.rb` may look like:
+Here’s what a complete model in `app/ml_models/price_model.rb` may look like:
 
 ```ruby
-module PriceModel
+class PriceModel < Eps::Base
   def build
     houses = House.all.to_a
 
@@ -214,7 +224,7 @@ module PriceModel
     # train
     train_features = train_set.map { |v| features(v) }
     train_target = train_set.map { |v| target(v) }
-    model = Eps::Regressor.new(train_features, train_target)
+    model = Eps::Model.new(train_features, train_target)
     puts model.summary
 
     # evaluate
@@ -222,15 +232,17 @@ module PriceModel
     test_target = test_set.map { |v| target(v) }
     metrics = model.evaluate(test_features, test_target)
     puts "Test RMSE: #{metrics[:rmse]}"
+    # for classification, use:
+    # puts "Test accuracy: #{metrics[:accuracy]}"
 
     # finalize
     houses = preprocess(houses)
     all_features = houses.map { |h| features(h) }
     all_target = houses.map { |h| target(h) }
-    @model = Eps::Regressor.new(all_features, all_target)
+    @model = Eps::Model.new(all_features, all_target)
 
     # save
-    File.write(model_file, @model.to_json)
+    File.write(model_file, @model.to_pmml)
   end
 
   def predict(house)
@@ -256,14 +268,12 @@ module PriceModel
   end
 
   def model
-    @model ||= Eps::Regressor.load_json(File.read(model_file))
+    @model ||= Eps::Model.load_pmml(File.read(model_file))
   end
 
   def model_file
-    File.join(__dir__, "price_model.json")
+    File.join(__dir__, "price_model.pmml")
   end
-
-  extend self # make all methods class methods
 end
 ```
 
@@ -273,7 +283,7 @@ Build the model with:
 PriceModel.build
 ```
 
-This saves the model to `price_model.json`. Be sure to check this into source control.
+This saves the model to `price_model.pmml`. Be sure to check this into source control.
 
 Predict with:
 
@@ -291,43 +301,85 @@ estimated = houses.map(&:estimated_price)
 Eps.metrics(actual, estimated)
 ```
 
-This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0.
+This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0. For accuracy, alert if it drops below a certain threshold.
 
 ## Other Languages
 
-Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language. Eps can load models in:
+Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language.
 
-JSON
+Eps can serve linear regression and Naive bayes models. Check out [Scoruby](https://github.com/asafschers/scoruby) to serve other models.
 
-```ruby
-data = File.read("model.json")
-model = Eps::Regressor.load_json(data)
+### R
+
+To create a model in R, install the [pmml](https://cran.r-project.org/package=pmml) package
+
+```r
+install.packages("pmml")
 ```
 
-[PMML](https://en.wikipedia.org/wiki/Predictive_Model_Markup_Language) - Predictive Model Markup Language
+For regression, run:
 
-```ruby
-data = File.read("model.pmml")
-model = Eps::Regressor.load_pmml(data)
+```r
+library(pmml)
+
+model <- lm(dist ~ speed,  cars)
+
+# save model
+data <- toString(pmml(model))
+write(data, file="model.pmml")
 ```
 
-> Loading PMML requires Nokogiri to be installed
+For classification, run:
 
-[PFA](http://dmg.org/pfa/) - Portable Format for Analytics
+```r
+library(pmml)
+library(e1071)
 
-```ruby
-data = File.read("model.pfa")
-model = Eps::Regressor.load_pfa(data)
+model <- naiveBayes(Species ~ .,  iris)
+
+# save model
+data <- toString(pmml(model, predictedField="Species"))
+write(data, file="model.pmml")
 ```
 
-Here are examples for how to dump models in each:
+### Python
 
-- [R JSON](guides/Modeling.md#r-json)
-- [R PMML](guides/Modeling.md#r-pmml)
-- [R PFA](guides/Modeling.md#r-pfa)
-- [Python JSON](guides/Modeling.md#python-json)
-- [Python PMML](guides/Modeling.md#python-pmml)
-- [Python PFA](guides/Modeling.md#python-pfa)
+To create a model in Python, install the [sklearn2pmml](https://github.com/jpmml/sklearn2pmml) package
+
+```sh
+pip install sklearn2pmml
+```
+
+For regression, run:
+
+```python
+from sklearn2pmml import sklearn2pmml, make_pmml_pipeline
+from sklearn.linear_model import LinearRegression
+
+x = [1, 2, 3, 5, 6]
+y = [5 * xi + 3 for xi in x]
+
+model = LinearRegression()
+model.fit([[xi] for xi in x], y)
+
+# save model
+sklearn2pmml(make_pmml_pipeline(model), "model.pmml")
+```
+
+For classification, run:
+
+```python
+from sklearn2pmml import sklearn2pmml, make_pmml_pipeline
+from sklearn.naive_bayes import GaussianNB
+
+x = [1, 2, 3, 5, 6]
+y = ["ham", "ham", "ham", "spam", "spam"]
+
+model = GaussianNB()
+model.fit([[xi] for xi in x], y)
+
+sklearn2pmml(make_pmml_pipeline(model), "model.pmml")
+```
 
 ### Verifying
 
@@ -342,20 +394,19 @@ house_id | prediction
 Once the model is implemented in Ruby, confirm the predictions match.
 
 ```ruby
-model = Eps::Regressor.load_json("model.json")
+model = Eps::Model.load_pmml("model.pmml")
 
 # preload houses to prevent n+1
 houses = House.all.index_by(&:id)
 
-CSV.foreach("predictions.csv", headers: true) do |row|
-  house = houses[row["house_id"].to_i]
-  expected = row["prediction"].to_f
+CSV.foreach("predictions.csv", headers: true, converters: :numeric) do |row|
+  house = houses[row["house_id"]]
+  expected = row["prediction"]
 
   actual = model.predict(bedrooms: house.bedrooms, bathrooms: house.bathrooms)
 
-  unless (actual - expected).abs < 0.001
-    raise "Bad prediction for house #{house.id} (exp: #{expected}, act: #{actual})"
-  end
+  success = actual.is_a?(String) ? actual == expected : (actual - expected).abs < 0.001
+  raise "Bad prediction for house #{house.id} (exp: #{expected}, act: #{actual})" unless success
 
   putc "✓"
 end
@@ -377,14 +428,14 @@ Store the model with:
 
 ```ruby
 store = Model.where(key: "price").first_or_initialize
-store.update(data: model.to_json)
+store.update(data: model.to_pmml)
 ```
 
 Load the model with:
 
 ```ruby
 data = Model.find_by!(key: "price").data
-model = Eps::Regressor.load_json(data)
+model = Eps::Model.load_pmml(data)
 ```
 
 ## Training Performance
@@ -405,6 +456,8 @@ gem 'gsl', group: :development
 
 It only needs to be available in environments used to build the model.
 
+> This only speeds up regression, not classification
+
 ## Data
 
 A number of data formats are supported. You can pass the target variable separately.
@@ -412,7 +465,7 @@ A number of data formats are supported. You can pass the target variable separat
 ```ruby
 x = [{x: 1}, {x: 2}, {x: 3}]
 y = [1, 2, 3]
-Eps::Regressor.new(x, y)
+Eps::Model.new(x, y)
 ```
 
 Or pass arrays of arrays
@@ -420,7 +473,7 @@ Or pass arrays of arrays
 ```ruby
 x = [[1, 2], [2, 0], [3, 1]]
 y = [1, 2, 3]
-Eps::Regressor.new(x, y)
+Eps::Model.new(x, y)
 ```
 
 ## Daru
@@ -429,7 +482,7 @@ Eps works well with Daru data frames.
 
 ```ruby
 df = Daru::DataFrame.from_csv("houses.csv")
-Eps::Regressor.new(df, target: "price")
+Eps::Model.new(df, target: "price")
 ```
 
 To split into training and test sets, use:
@@ -455,17 +508,29 @@ You can use [IRuby](https://github.com/SciRuby/iruby) to run Eps in [Jupyter](ht
 
 ## Reference
 
-Get coefficients
-
-```ruby
-model.coefficients
-```
-
 Get an extended summary with standard error, t-values, and r-squared
 
 ```ruby
 model.summary(extended: true)
 ```
+
+## Upgrading
+
+## 0.2.0
+
+Eps 0.2.0 brings a number of improvements, including support for classification.
+
+We recommend:
+
+1. Changing `Eps::Regressor` to `Eps::Model`
+2. Converting models from JSON to PMML
+
+  ```ruby
+  model = Eps::Model.load_json("model.json")
+  File.write("model.pmml", model.to_pmml)
+  ```
+
+3. Renaming `app/stats_models` to `app/ml_models`
 
 ## History
 

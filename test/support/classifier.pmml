@@ -1,0 +1,93 @@
+<PMML version="4.3" xmlns="http://www.dmg.org/PMML-4_3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.dmg.org/PMML-4_3 http://www.dmg.org/pmml/v4-3/pmml-4-3.xsd">
+ <Header copyright="Copyright (c) 2019 andrew" description="NaiveBayes Model">
+  <Extension name="user" value="andrew" extender="Rattle/PMML"/>
+  <Application name="Rattle/PMML" version="1.4"/>
+  <Timestamp>2019-05-03 23:55:53</Timestamp>
+ </Header>
+ <DataDictionary numberOfFields="4">
+  <DataField name="boom" optype="categorical" dataType="string">
+   <Value value="blue"/>
+   <Value value="green"/>
+   <Value value="red"/>
+  </DataField>
+  <DataField name="bedrooms" optype="continuous" dataType="double"/>
+  <DataField name="bathrooms" optype="continuous" dataType="double"/>
+  <DataField name="state" optype="categorical" dataType="string">
+   <Value value="CA"/>
+   <Value value="OR"/>
+   <Value value="WA"/>
+  </DataField>
+ </DataDictionary>
+ <NaiveBayesModel modelName="naiveBayes_Model" functionName="classification" threshold="0.001">
+  <MiningSchema>
+   <MiningField name="boom" usageType="predicted" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="bedrooms" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="bathrooms" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="state" usageType="active" invalidValueTreatment="returnInvalid"/>
+  </MiningSchema>
+  <Output>
+   <OutputField name="Predicted_boom" optype="categorical" dataType="string" feature="predictedValue"/>
+   <OutputField name="Probability_blue" optype="continuous" dataType="double" feature="probability" value="blue"/>
+   <OutputField name="Probability_green" optype="continuous" dataType="double" feature="probability" value="green"/>
+   <OutputField name="Probability_red" optype="continuous" dataType="double" feature="probability" value="red"/>
+  </Output>
+  <BayesInputs>
+   <BayesInput fieldName="bedrooms">
+    <TargetValueStats>
+     <TargetValueStat value="blue">
+      <GaussianDistribution mean="3.04" variance="1.95666666666667"/>
+     </TargetValueStat>
+     <TargetValueStat value="green">
+      <GaussianDistribution mean="3.41176470588235" variance="2.00735294117647"/>
+     </TargetValueStat>
+     <TargetValueStat value="red">
+      <GaussianDistribution mean="2.625" variance="1.69642857142857"/>
+     </TargetValueStat>
+    </TargetValueStats>
+   </BayesInput>
+   <BayesInput fieldName="bathrooms">
+    <TargetValueStats>
+     <TargetValueStat value="blue">
+      <GaussianDistribution mean="2.16" variance="0.64"/>
+     </TargetValueStat>
+     <TargetValueStat value="green">
+      <GaussianDistribution mean="1.82352941176471" variance="0.529411764705882"/>
+     </TargetValueStat>
+     <TargetValueStat value="red">
+      <GaussianDistribution mean="1.75" variance="0.785714285714286"/>
+     </TargetValueStat>
+    </TargetValueStats>
+   </BayesInput>
+   <BayesInput fieldName="state">
+    <PairCounts value="CA">
+     <TargetValueCounts>
+      <TargetValueCount value="blue" count="9"/>
+      <TargetValueCount value="green" count="6"/>
+      <TargetValueCount value="red" count="3"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="OR">
+     <TargetValueCounts>
+      <TargetValueCount value="blue" count="8"/>
+      <TargetValueCount value="green" count="4"/>
+      <TargetValueCount value="red" count="3"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="WA">
+     <TargetValueCounts>
+      <TargetValueCount value="blue" count="8"/>
+      <TargetValueCount value="green" count="7"/>
+      <TargetValueCount value="red" count="2"/>
+     </TargetValueCounts>
+    </PairCounts>
+   </BayesInput>
+  </BayesInputs>
+  <BayesOutput fieldName="boom">
+   <TargetValueCounts>
+    <TargetValueCount value="blue" count="25"/>
+    <TargetValueCount value="green" count="17"/>
+    <TargetValueCount value="red" count="8"/>
+   </TargetValueCounts>
+  </BayesOutput>
+ </NaiveBayesModel>
+</PMML>
