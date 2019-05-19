@@ -496,7 +496,7 @@ module Eps
         xi.each do |k, v|
           categorical = column_types[k.to_sym] == "categorical" || (!supports_categorical && categorical?(v))
 
-          key = categorical ? [k.to_sym, v] : k.to_sym
+          key = categorical ? [k.to_sym, v.to_s] : k.to_sym
           v2 = categorical ? 1 : v
 
           # TODO make more efficient

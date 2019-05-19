@@ -10,6 +10,8 @@ module Eps
     def train(*args)
       super
 
+      @y = @y.map { |yi| yi.to_s }
+
       prior = group_count(@y)
       conditional = {}
 
@@ -220,7 +222,7 @@ module Eps
     end
 
     def group_count(arr)
-      r = arr.inject(Hash.new(0)) { |h, e| h[e] += 1 ; h }
+      r = arr.inject(Hash.new(0)) { |h, e| h[e.to_s] += 1 ; h }
       r.default = nil
       r
     end

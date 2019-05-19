@@ -53,7 +53,7 @@ module Eps
     private
 
     def categorical?(v)
-      v.is_a?(String) || v == true || v == false
+      !v.is_a?(Numeric)
     end
 
     def daru?(x)

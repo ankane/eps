@@ -24,7 +24,11 @@ class ModelTest < Minitest::Test
       {x: "Monday", y: false}
     ]
 
+    # treat boolean values as strings
     model = Eps::Model.new(data, target: :y)
-    assert !model.predict(x: "Monday")
+    assert_equal "false", model.predict(x: "Monday")
+
+    model = Eps::Model.load_pmml(model.to_pmml)
+    assert_equal "false", model.predict(x: "Monday")
   end
 end
