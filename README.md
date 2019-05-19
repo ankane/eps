@@ -239,10 +239,11 @@ class PriceModel < Eps::Base
     houses = preprocess(houses)
     all_features = houses.map { |h| features(h) }
     all_target = houses.map { |h| target(h) }
-    @model = Eps::Model.new(all_features, all_target)
+    model = Eps::Model.new(all_features, all_target)
 
     # save
-    File.write(model_file, @model.to_pmml)
+    File.write(model_file, model.to_pmml)
+    @model = nil # reset for future predictions
   end
 
   def predict(house)
