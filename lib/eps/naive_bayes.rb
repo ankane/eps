@@ -3,8 +3,8 @@ module Eps
     attr_reader :probabilities
 
     def initialize(probabilities: nil, target: nil)
-      @probabilities = probabilities if probabilities
-      @target = target if target
+      @probabilities = probabilities
+      @target = target
     end
 
     def train(*args)

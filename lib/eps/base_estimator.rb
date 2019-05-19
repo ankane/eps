@@ -12,15 +12,13 @@ module Eps
 
       y = prep_y(y.to_a)
 
-      @target = target || "target"
-
       if x.size != y.size
         raise "Number of samples differs from target"
       end
 
       @x = x
       @y = y
-      @target = target
+      @target = target || "target"
     end
 
     def predict(x)
