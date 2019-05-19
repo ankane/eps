@@ -174,7 +174,7 @@ We now have a model that’s ready to serve.
 
 ## Serving Models
 
-Once the model is trained, we need to store it. Eps uses PMML - [Predictive Model Markup Language]((https://en.wikipedia.org/wiki/Predictive_Model_Markup_Language) - a standard for storing models. A great option is to write the model to a file with:
+Once the model is trained, we need to store it. Eps uses PMML - [Predictive Model Markup Language](https://en.wikipedia.org/wiki/Predictive_Model_Markup_Language) - a standard for storing models. A great option is to write the model to a file with:
 
 ```ruby
 File.write("model.pmml", model.to_pmml)
