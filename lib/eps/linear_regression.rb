@@ -349,7 +349,7 @@ module Eps
     end
 
     def degrees_of_freedom
-      @y.size - coefficients.size
+      @y.size - @coefficients.size
     end
 
     def mean(arr)
