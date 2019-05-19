@@ -1,3 +1,7 @@
+## 0.2.1 [unreleased]
+
+- Fixed error with `summary`
+
 ## 0.2.0
 
 - Added support for classification

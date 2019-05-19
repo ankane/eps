@@ -133,6 +133,9 @@ class RegressionTest < Minitest::Test
 
     assert_in_delta 3, coefficients[:_intercept]
     assert_in_delta 2, coefficients[:xMonday]
+
+    assert_includes model.summary, "adjusted r2:"
+    assert_includes model.summary(extended: true), "stderr"
   end
 
   def test_boolean

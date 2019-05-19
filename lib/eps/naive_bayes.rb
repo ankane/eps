@@ -48,15 +48,13 @@ module Eps
 
     # TODO better summary
     def summary(extended: false)
-      @summary_str ||= begin
-        str = String.new("")
-        probabilities[:prior].each do |k, v|
-          str += "#{k}: #{v}\n"
-        end
-        str += "\n"
-        str += "accuracy: %d%%\n" % [(100 * accuracy).round]
-        str
+      str = String.new("")
+      probabilities[:prior].each do |k, v|
+        str += "#{k}: #{v}\n"
       end
+      str += "\n"
+      str += "accuracy: %d%%\n" % [(100 * accuracy).round]
+      str
     end
 
     def accuracy
