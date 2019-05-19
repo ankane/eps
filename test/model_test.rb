@@ -15,4 +15,16 @@ class ModelTest < Minitest::Test
       Eps::Model.load_pmml("bad")
     end
   end
+
+  def test_boolean_target
+    data = [
+      {x: "Sunday", y: true},
+      {x: "Sunday", y: true},
+      {x: "Monday", y: false},
+      {x: "Monday", y: false}
+    ]
+
+    model = Eps::Model.new(data, target: :y)
+    assert model.probabilities
+  end
 end
