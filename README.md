@@ -8,7 +8,7 @@ Machine learning for Ruby
 - Automatically handles categorical features
 - Works great with the SciRuby ecosystem (Daru & IRuby)
 
-Check out [this post](https://ankane.org/rails-meet-data-science) for more info on data science with Rails
+Check out [this post](https://ankane.org/rails-meet-data-science) for more info on machine learning with Rails
 
 [![Build Status](https://travis-ci.org/ankane/eps.svg?branch=master)](https://travis-ci.org/ankane/eps)
 

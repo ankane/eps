@@ -1,4 +1,4 @@
-## 0.2.0 [unreleased]
+## 0.2.0
 
 - Added support for classification
 - Added `to_pmml` method
