@@ -193,11 +193,11 @@ module Eps
     def calculate_class_probabilities(x)
       prob = {}
       probabilities[:prior].each do |c, cv|
-        prob[c] = cv.to_f / sum(probabilities[:prior].values)
+        prob[c] = cv.to_f / probabilities[:prior].values.sum
         probabilities[:conditional].each do |k, v|
           if !v[c][:mean]
             # TODO compute ahead of time
-            p2 = v[c][x[k]].to_f / sum(v[c].values)
+            p2 = v[c][x[k]].to_f / v[c].values.sum
 
             # assign very small probability if probability is 0
             # TODO use proper smoothing instead
@@ -225,12 +225,8 @@ module Eps
       r
     end
 
-    def sum(arr)
-      arr.inject(0, &:+)
-    end
-
     def mean(arr)
-      sum(arr) / arr.size.to_f
+      arr.sum / arr.size.to_f
     end
 
     def stdev(arr)

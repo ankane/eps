@@ -332,13 +332,13 @@ module Eps
 
     # total sum of squares
     def sst
-      @sst ||= sum(@y.map { |y| (y - y_bar)**2 })
+      @sst ||= @y.map { |y| (y - y_bar)**2 }.sum
     end
 
     # sum of squared errors of prediction
     # not to be confused with "explained sum of squares"
     def sse
-      @sse ||= sum(@y.zip(y_hat).map { |y, yh| (y - yh)**2 })
+      @sse ||= @y.zip(y_hat).map { |y, yh| (y - yh)**2 }.sum
     end
 
     def mst
@@ -353,12 +353,8 @@ module Eps
       @y.size - coefficients.size
     end
 
-    def sum(arr)
-      arr.inject(0, &:+)
-    end
-
     def mean(arr)
-      sum(arr) / arr.size.to_f
+      arr.sum / arr.size.to_f
     end
 
     ### Extracted from https://github.com/estebanz01/ruby-statistics
