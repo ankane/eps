@@ -186,7 +186,7 @@ module Eps
       x.map do |xi|
         probs = calculate_class_probabilities(xi)
         # deterministic for equal probabilities
-        probs.sort_by { |k, v| [-v, k] }[0][0]
+        probs.sort_by { |k, v| [-v, k.to_s] }[0][0]
       end
     end
 

@@ -25,6 +25,7 @@ class ModelTest < Minitest::Test
     ]
 
     model = Eps::Model.new(data, target: :y)
-    assert model.probabilities
+    model.predict(x: "Monday")
+    model.predict(x: "Tuesday")
   end
 end
