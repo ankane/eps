@@ -233,7 +233,7 @@ class PriceModel < Eps::Base
     metrics = model.evaluate(test_features, test_target)
     puts "Test RMSE: #{metrics[:rmse]}"
     # for classification, use:
-    # puts "Test accuracy: #{metrics[:accuracy]}"
+    # puts "Test accuracy: #{(100 * metrics[:accuracy]).round}%"
 
     # finalize
     houses = preprocess(houses)
