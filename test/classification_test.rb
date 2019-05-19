@@ -14,6 +14,20 @@ class ClassificationTest < Minitest::Test
     assert_includes model.summary, "accuracy:"
   end
 
+  # this is where smoothing is needed
+  def test_unknown_categorical_value
+    data = [
+      {x: "Sunday", y: "red"},
+      {x: "Sunday", y: "red"},
+      {x: "Sunday", y: "red"},
+      {x: "Monday", y: "blue"},
+      {x: "Monday", y: "blue"},
+    ]
+
+    model = Eps::Model.new(data, target: :y)
+    # assert_equal "red", model.predict(x: "Tuesday")
+  end
+
   def test_load_pmml
     data = File.read("test/support/classifier.pmml")
     model = Eps::Model.load_pmml(data)

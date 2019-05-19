@@ -25,7 +25,6 @@ class ModelTest < Minitest::Test
     ]
 
     model = Eps::Model.new(data, target: :y)
-    model.predict(x: "Monday")
-    model.predict(x: "Tuesday")
+    assert !model.predict(x: "Monday")
   end
 end
