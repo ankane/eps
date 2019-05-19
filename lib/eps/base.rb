@@ -1,12 +1,12 @@
 module Eps
   class Base
     class << self
-      def build
-        instance.build
+      def build(*args)
+        instance.build(*args)
       end
 
-      def predict
-        instance.predict
+      def predict(*args)
+        instance.predict(*args)
       end
 
       private

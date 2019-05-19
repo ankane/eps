@@ -1,6 +1,7 @@
 ## 0.2.1 [unreleased]
 
 - Fixed error with `summary`
+- Fixed error with `predict` in `Eps::Base`
 
 ## 0.2.0
 
