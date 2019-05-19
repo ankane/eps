@@ -135,6 +135,21 @@ class RegressionTest < Minitest::Test
     assert_in_delta 2, coefficients[:xMonday]
   end
 
+  def test_boolean
+    data = [
+      {x: true, y: 3},
+      {x: true, y: 3},
+      {x: false, y: 5},
+      {x: false, y: 5}
+    ]
+
+    model = Eps::Model.new(data, target: :y)
+    coefficients = model.coefficients
+
+    assert_in_delta 3, coefficients[:_intercept]
+    assert_in_delta 2, coefficients[:xfalse]
+  end
+
   def test_both
     data = [
       {x: 1, weekday: "Sunday", y: 12},

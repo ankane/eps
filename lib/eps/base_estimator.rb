@@ -52,6 +52,10 @@ module Eps
 
     private
 
+    def categorical?(v)
+      v.is_a?(String) || v == true || v == false
+    end
+
     def daru?(x)
       defined?(Daru) && x.is_a?(Daru::DataFrame)
     end

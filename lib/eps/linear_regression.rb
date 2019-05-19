@@ -466,7 +466,7 @@ module Eps
         if x.any?
           row = x.first
           row.each do |k, v|
-            column_types[k] = v.is_a?(String) ? "categorical" : "numeric"
+            column_types[k] = categorical?(v) ? "categorical" : "numeric"
           end
         end
       else
@@ -498,7 +498,7 @@ module Eps
       x.each do |xi|
         row = {}
         xi.each do |k, v|
-          categorical = column_types[k.to_sym] == "categorical" || (!supports_categorical && v.is_a?(String))
+          categorical = column_types[k.to_sym] == "categorical" || (!supports_categorical && categorical?(v))
 
           key = categorical ? [k.to_sym, v] : k.to_sym
           v2 = categorical ? 1 : v

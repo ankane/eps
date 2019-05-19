@@ -24,7 +24,7 @@ module Eps
           x.group_by { |xi| xi[@target] }.each do |group, xs|
             v = xs.map { |xi| xi[k] }
 
-            if v[0].is_a?(String)
+            if categorical?(v[0])
               # TODO apply smoothing
               # apply smoothing only to
               # 1. categorical features
