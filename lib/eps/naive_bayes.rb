@@ -22,7 +22,7 @@ module Eps
           xi[@target] = @y[i]
         end
         keys.each do |k|
-          conditional[k] = {}
+          conditional[k.to_s] = {}
           x.group_by { |xi| xi[@target] }.each do |group, xs|
             v = xs.map { |xi| xi[k] }
 
@@ -32,9 +32,9 @@ module Eps
               # 1. categorical features
               # 2. conditional probabilities
               # TODO more efficient count
-              conditional[k][group] = group_count(v)
+              conditional[k.to_s][group] = group_count(v)
             else
-              conditional[k][group] = {mean: mean(v), stdev: stdev(v)}
+              conditional[k.to_s][group] = {mean: mean(v), stdev: stdev(v)}
             end
           end
         end
@@ -184,7 +184,7 @@ module Eps
 
     def _predict(x)
       x.map do |xi|
-        probs = calculate_class_probabilities(xi)
+        probs = calculate_class_probabilities(stringify_keys(xi))
         # deterministic for equal probabilities
         probs.sort_by { |k, v| [-v, k.to_s] }[0][0]
       end
@@ -233,6 +233,14 @@ module Eps
       m = mean(arr)
       sum = arr.inject(0) { |accum, i| accum + (i - m)**2 }
       Math.sqrt(sum / (arr.length - 1).to_f)
+    end
+
+    def stringify_keys(h)
+      o = {}
+      h.each do |k, v|
+        o[k.to_s] = v
+      end
+      o
     end
   end
 end
