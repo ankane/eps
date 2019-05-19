@@ -198,6 +198,13 @@ module Eps
           if !v[c][:mean]
             # TODO compute ahead of time
             p2 = v[c][x[k]].to_f / sum(v[c].values)
+
+            # assign very small probability if probability is 0
+            # TODO use proper smoothing instead
+            if p2 == 0
+              p2 = 0.0001
+            end
+
             prob[c] *= p2
           else
             prob[c] *= calculate_probability(x[k], v[c][:mean], v[c][:stdev])

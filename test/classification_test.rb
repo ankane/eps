@@ -25,7 +25,7 @@ class ClassificationTest < Minitest::Test
     ]
 
     model = Eps::Model.new(data, target: :y)
-    # assert_equal "red", model.predict(x: "Tuesday")
+    assert_equal "red", model.predict(x: "Tuesday")
   end
 
   def test_load_pmml
