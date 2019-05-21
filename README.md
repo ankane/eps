@@ -298,8 +298,8 @@ We recommend monitoring how well your models perform over time. To do this, save
 
 ```ruby
 actual = houses.map(&:price)
-estimated = houses.map(&:estimated_price)
-Eps.metrics(actual, estimated)
+predicted = houses.map(&:predicted_price)
+Eps.metrics(actual, predicted)
 ```
 
 This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0. For accuracy, alert if it drops below a certain threshold.
