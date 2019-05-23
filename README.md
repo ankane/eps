@@ -2,11 +2,9 @@
 
 Machine learning for Ruby
 
+- No previous knowledge of machine learning required :tada:
 - Build predictive models quickly and easily
 - Serve models built in Ruby, Python, R, and more
-- Supports regression (linear regression) and classification (naive Bayes)
-- Automatically handles categorical features
-- Works great with the SciRuby ecosystem (Daru & IRuby)
 
 Check out [this post](https://ankane.org/rails-meet-data-science) for more info on machine learning with Rails
 
