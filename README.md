@@ -2,9 +2,9 @@
 
 Machine learning for Ruby
 
-- No previous knowledge of machine learning required :tada:
 - Build predictive models quickly and easily
 - Serve models built in Ruby, Python, R, and more
+- No previous knowledge of machine learning required :tada:
 
 Check out [this post](https://ankane.org/rails-meet-data-science) for more info on machine learning with Rails
 
@@ -43,7 +43,7 @@ model.predict(bedrooms: 2, bathrooms: 1)
 
 > Pass an array of hashes make multiple predictions at once
 
-The target can be numeric (regression) or categorical (classification).
+The target can be numeric (regression) or categorical (classification). Eps (short for “epsilon”) uses linear regression for regression and naive Bayes for classification.
 
 ## Building Models
 
