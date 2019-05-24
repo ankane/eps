@@ -4,7 +4,7 @@ Machine learning for Ruby
 
 - Build predictive models quickly and easily
 - Serve models built in Ruby, Python, R, and more
-- No previous knowledge of machine learning required :tada:
+- No prior knowledge of machine learning required :tada:
 
 Check out [this post](https://ankane.org/rails-meet-data-science) for more info on machine learning with Rails
 
