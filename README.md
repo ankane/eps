@@ -52,6 +52,7 @@ The target can be numeric (regression) or categorical (classification). Eps (sho
 When building models, it’s a good idea to hold out some data so you can see how well the model will perform on unseen data. To do this, we split our data into two sets: training and test. We build the model with the training set and later evaluate it on the test set.
 
 ```ruby
+houses = House.all
 split_date = Date.parse("2018-06-01")
 train_set, test_set = houses.partition { |h| h.sold_at < split_date }
 ```
