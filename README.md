@@ -54,7 +54,7 @@ When building models, it’s a good idea to hold out some data so you can see ho
 ```ruby
 houses = House.all
 split_date = Date.parse("2018-06-01")
-train_set, test_set = houses.partition { |h| h.sold_at < split_date }
+train_set, test_set = houses.partition { |h| h.listed_at < split_date }
 ```
 
 If your data doesn’t have a time associated with it, you can split it randomly.
@@ -85,13 +85,13 @@ Selecting features for a model is extremely important for performance. Features 
 Convert any ids to strings so they’re treated as categorical features.
 
 ```ruby
-{city_id: city_id.to_s}
+{city_id: house.city_id.to_s}
 ```
 
 For times, create features like day of week and hour of day with:
 
 ```ruby
-{weekday: time.wday.to_s, hour: time.hour.to_s}
+{weekday: house.listed_at.wday.to_s, hour: house.listed_at.hour.to_s}
 ```
 
 In practice, your code may look like:
@@ -101,7 +101,7 @@ def features(house)
   {
     bedrooms: house.bedrooms,
     city_id: house.city_id.to_s,
-    month: house.sold_at.strftime("%b")
+    month: house.listed_at.strftime("%b")
   }
 end
 
@@ -215,7 +215,7 @@ class PriceModel < Eps::Base
 
     # divide into training and test set
     split_date = Date.parse("2018-06-01")
-    train_set, test_set = houses.partition { |h| h.sold_at < split_date }
+    train_set, test_set = houses.partition { |h| h.listed_at < split_date }
 
     # handle outliers and missing values
     train_set = preprocess(train_set)
@@ -259,7 +259,7 @@ class PriceModel < Eps::Base
     {
       bedrooms: house.bedrooms,
       city_id: house.city_id.to_s,
-      month: house.sold_at.strftime("%b")
+      month: house.listed_at.strftime("%b")
     }
   end
 
