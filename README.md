@@ -138,7 +138,7 @@ When you’re happy with the model, see how well it performs on the test set. Th
 ```ruby
 test_features = test_set.map { |h| features(h) }
 test_target = test_set.map { |h| target(h) }
-model.evaluate(test_features, test_target)
+puts model.evaluate(test_features, test_target)
 ```
 
 For regression, this returns:
