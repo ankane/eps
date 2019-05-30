@@ -22,11 +22,13 @@ module Eps
           xi[@target] = @y[i]
         end
         keys.each do |k|
+          categorical = categorical?(x[0][k])
+
           conditional[k.to_s] = {}
           x.group_by { |xi| xi[@target] }.each do |group, xs|
             v = xs.map { |xi| xi[k] }
 
-            if categorical?(v[0])
+            if categorical
               # TODO apply smoothing
               # apply smoothing only to
               # 1. categorical features
