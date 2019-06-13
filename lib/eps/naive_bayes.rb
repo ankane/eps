@@ -115,7 +115,7 @@ module Eps
         end
       end
 
-      builder = Nokogiri::XML::Builder.new do |xml|
+      Nokogiri::XML::Builder.new do |xml|
         xml.PMML(version: "4.3", xmlns: "http://www.dmg.org/PMML-4_3", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
           xml.Header
           xml.DataDictionary do

@@ -35,7 +35,7 @@ class ClassificationTest < Minitest::Test
 
   def test_load_pmml
     data = File.read("test/support/classifier.pmml")
-    model = Eps::Model.load_pmml(data)
+    Eps::Model.load_pmml(data)
   end
 
   def test_to_pmml

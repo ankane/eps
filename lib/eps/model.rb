@@ -42,8 +42,8 @@ module Eps
       new(estimator: Eps::LinearRegression.load_json(data))
     end
 
-    def to_json
-      @estimator ? @estimator.to_json : super
+    def to_json(**options)
+      @estimator ? @estimator.to_json(**options) : super
     end
 
     # pfa - legacy

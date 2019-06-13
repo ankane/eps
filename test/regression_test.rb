@@ -311,6 +311,7 @@ class RegressionTest < Minitest::Test
     data = File.read("test/support/modelcat.pmml")
     model = Eps::Model.load_pmml(data)
     assert_includes model.to_json, "weekdaySunday"
+    assert_includes JSON.generate(model), "weekdaySunday"
   end
 
   def test_to_pmml
