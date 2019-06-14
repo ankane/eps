@@ -112,8 +112,8 @@ module Eps
       new(coefficients: coefficients)
     end
 
-    def to_json(**options)
-      JSON.generate(dump, **options)
+    def to_json(opts = {})
+      JSON.generate(dump, opts)
     end
 
     # pmml
