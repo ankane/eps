@@ -307,7 +307,7 @@ This returns the same evaluation metrics as model building. For RMSE and MAE, al
 
 Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language.
 
-Eps can serve linear regression and Naive bayes models. Check out [Scoruby](https://github.com/asafschers/scoruby) to serve other models.
+Eps can serve linear regression and naive Bayes models. Check out [Scoruby](https://github.com/asafschers/scoruby) to serve other models.
 
 ### R
 
