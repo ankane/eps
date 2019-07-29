@@ -30,6 +30,15 @@ module Eps
       new(estimator: estimator_class.load_pmml(data))
     end
 
+    def to_pmml
+      if @estimator
+        require "nokogiri"
+        @estimator.to_pmml
+      else
+        super
+      end
+    end
+
     # ruby - legacy
 
     def self.load(data)
