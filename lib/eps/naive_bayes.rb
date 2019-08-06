@@ -192,11 +192,12 @@ module Eps
       end
     end
 
-    # TODO use log to prevent underflow
+    # use log to prevent underflow
+    # https://www.antoniomallia.it/lets-implement-a-gaussian-naive-bayes-classifier-in-python.html
     def calculate_class_probabilities(x)
       prob = {}
       probabilities[:prior].each do |c, cv|
-        prob[c] = cv.to_f / probabilities[:prior].values.sum
+        prob[c] = Math.log(cv.to_f / probabilities[:prior].values.sum)
         probabilities[:conditional].each do |k, v|
           if !v[c][:mean]
             # TODO compute ahead of time
@@ -208,9 +209,9 @@ module Eps
               p2 = 0.0001
             end
 
-            prob[c] *= p2
+            prob[c] += Math.log(p2)
           else
-            prob[c] *= calculate_probability(x[k], v[c][:mean], v[c][:stdev])
+            prob[c] += Math.log(calculate_probability(x[k], v[c][:mean], v[c][:stdev]))
           end
         end
       end
