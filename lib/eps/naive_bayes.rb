@@ -192,6 +192,7 @@ module Eps
       end
     end
 
+    # TODO use log to prevent underflow
     def calculate_class_probabilities(x)
       prob = {}
       probabilities[:prior].each do |c, cv|
