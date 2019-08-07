@@ -10,6 +10,7 @@ module Eps
         x.each { |r| r.delete(target) } if target
       end
 
+      x = normalize_x(x)
       y = y.to_a
       check_missing(y)
 
@@ -26,6 +27,7 @@ module Eps
       singular = !(x.is_a?(Array) || daru?(x))
       x = [x] if singular
 
+      x = normalize_x(x)
       pred = _predict(x)
 
       singular ? pred[0] : pred

@@ -440,8 +440,6 @@ module Eps
     def prep_x(x, train: true)
       coefficients = @coefficients
 
-      x = normalize_x(x)
-
       # get column types
       if train
         column_types = {}
