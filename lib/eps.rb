@@ -8,6 +8,7 @@ require "eps/base_estimator"
 require "eps/linear_regression"
 require "eps/model"
 require "eps/naive_bayes"
+require "eps/statistics"
 require "eps/version"
 
 module Eps
