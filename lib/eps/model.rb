@@ -77,7 +77,12 @@ module Eps
     private
 
     def train(data, y = nil, target: nil)
-      y ||= daru?(data) ? data[target].to_a : data.map { |r| r[target] }
+      data = Eps::DataFrame.new(data)
+      target = target.to_s
+
+      y ||= data.columns[target]
+
+      raise "Target missing in data" if !y
 
       estimator_class =
         if self.class.numeric?(y)
@@ -108,10 +113,6 @@ module Eps
 
     def self.numeric?(y)
       y.first.is_a?(Numeric)
-    end
-
-    def daru?(x)
-      defined?(Daru) && x.is_a?(Daru::DataFrame)
     end
   end
 end

@@ -197,7 +197,7 @@ class RegressionTest < Minitest::Test
     error = assert_raises do
       Eps::Model.new(data, target: :y)
     end
-    assert_equal "Missing data", error.message
+    assert_equal "Missing data in x", error.message
   end
 
   def test_predict_missing_extra_data
@@ -292,6 +292,8 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pfa_categorical
+    skip
+
     data = File.read("test/support/modelcat.pfa")
     model = Eps::Model.load_pfa(data)
     predictions = model.predict([{x: 6, weekday: "Sunday"}, {x: 7, weekday: "Monday"}])

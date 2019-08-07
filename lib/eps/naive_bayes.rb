@@ -2,8 +2,9 @@ module Eps
   class NaiveBayes < BaseEstimator
     attr_reader :probabilities
 
-    def initialize(probabilities: nil, target: nil)
+    def initialize(probabilities: nil, features: nil, target: nil)
       @probabilities = probabilities
+      @features = features
       @target = target
     end
 
@@ -11,35 +12,51 @@ module Eps
       super
 
       @y = @y.map { |yi| yi.to_s }
+      x = @x
 
-      prior = group_count(@y)
+      x.columns[@target] = @y
+
+      indexes = {}
+      @y.each_with_index do |yi, i|
+        (indexes[yi] ||= []) << i
+      end
+
+      grouped = {}
+      indexes.each do |k, v|
+        grouped[k] = x.rows(v)
+      end
+
+      prior = {}
+      grouped.each do |k, v|
+        prior[k] = v.size
+      end
+
       conditional = {}
+      @features.each do |k, type|
+        prob = {}
 
-      if @x.any?
-        x = @x
-        keys = x.first.keys
-        x.each_with_index do |xi, i|
-          xi[@target] = @y[i]
-        end
-        keys.each do |k|
-          categorical = categorical?(x[0][k])
+        prior.keys.each do |group|
+          xs = grouped[group]
 
-          conditional[k.to_s] = {}
-          x.group_by { |xi| xi[@target] }.each do |group, xs|
-            v = xs.map { |xi| xi[k] }
+          # TODO handle this case
+          next unless xs
 
-            if categorical
+          values = xs.columns[k]
+
+          prob[group] =
+            if type == "categorical"
               # TODO apply smoothing
               # apply smoothing only to
               # 1. categorical features
               # 2. conditional probabilities
               # TODO more efficient count
-              conditional[k.to_s][group] = group_count(v)
+              group_count(values)
             else
-              conditional[k.to_s][group] = {mean: mean(v), stdev: stdev(v)}
+              {mean: mean(values), stdev: stdev(values)}
             end
-          end
         end
+
+        conditional[k] = prob
       end
 
       @probabilities = {
@@ -75,8 +92,11 @@ module Eps
       end
 
       conditional = {}
+      features = {}
       node.css("BayesInput").each do |n|
         prob = {}
+
+        # numeric
         n.css("TargetValueStat").each do |n2|
           n3 = n2.css("GaussianDistribution")
           prob[n2.attribute("value").value] = {
@@ -84,6 +104,8 @@ module Eps
             stdev: Math.sqrt(n3.attribute("variance").value.to_f)
           }
         end
+
+        # categorical
         n.css("PairCounts").each do |n2|
           boom = {}
           n2.css("TargetValueCount").each do |n3|
@@ -91,7 +113,10 @@ module Eps
           end
           prob[n2.attribute("value").value] = boom
         end
-        conditional[n.attribute("fieldName").value] = prob
+
+        name = n.attribute("fieldName").value
+        conditional[name] = prob
+        features[name] = n.css("TargetValueStat").any? ? "numeric" : "categorical"
       end
 
       @target = node.css("BayesOutput").attribute("fieldName").value
@@ -101,14 +126,14 @@ module Eps
         conditional: conditional
       }
 
-      new(probabilities: probabilities, target: @target)
+      new(probabilities: probabilities, features: features, target: @target)
     end
 
     def to_pmml
       data_fields = {}
       data_fields[@target] = probabilities[:prior].keys
       probabilities[:conditional].each do |k, v|
-        if !v.values[0][:mean]
+        if @features[k] == "categorical"
           data_fields[k] = v.keys
         else
           data_fields[k] = nil
@@ -140,7 +165,7 @@ module Eps
             xml.BayesInputs do
               probabilities[:conditional].each do |k, v|
                 xml.BayesInput(fieldName: k) do
-                  if !v.values[0][:mean]
+                  if @features[k] == "categorical"
                     v.each do |k2, v2|
                       xml.PairCounts(value: k2) do
                         xml.TargetValueCounts do
@@ -184,11 +209,12 @@ module Eps
 
     private
 
+    # TODO vectorize
     def _predict(x)
       x.map do |xi|
-        probs = calculate_class_probabilities(stringify_keys(xi))
+        probs = calculate_class_probabilities(xi)
         # deterministic for equal probabilities
-        probs.sort_by { |k, v| [-v, k.to_s] }[0][0]
+        probs.sort_by { |k, v| [-v, k] }[0][0]
       end
     end
 
@@ -199,7 +225,7 @@ module Eps
       probabilities[:prior].each do |c, cv|
         prob[c] = Math.log(cv.to_f / probabilities[:prior].values.sum)
         probabilities[:conditional].each do |k, v|
-          if !v[c][:mean]
+          if @features[k] == "categorical"
             # TODO compute ahead of time
             p2 = v[c][x[k]].to_f / v[c].values.sum
 
@@ -224,7 +250,7 @@ module Eps
     end
 
     def group_count(arr)
-      r = arr.inject(Hash.new(0)) { |h, e| h[e.to_s] += 1 ; h }
+      r = arr.inject(Hash.new(0)) { |h, e| h[e] += 1; h }
       r.default = nil
       r
     end
@@ -237,14 +263,6 @@ module Eps
       m = mean(arr)
       sum = arr.inject(0) { |accum, i| accum + (i - m)**2 }
       Math.sqrt(sum / (arr.length - 1).to_f)
-    end
-
-    def stringify_keys(h)
-      o = {}
-      h.each do |k, v|
-        o[k.to_s] = v
-      end
-      o
     end
   end
 end

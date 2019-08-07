@@ -1,7 +1,15 @@
 module Eps
   class LinearRegression < BaseEstimator
-    def initialize(coefficients: nil, gsl: nil)
+    def initialize(coefficients: nil, features: nil, gsl: nil)
       @coefficients = Hash[coefficients.map { |k, v| [k.is_a?(Array) ? [k[0].to_sym, k[1]] : k.to_sym, v] }] if coefficients
+      @features = features
+
+      # legacy
+      if @coefficients && !@features
+        @features = Hash[@coefficients.keys.map { |k| [k.to_s, "numeric"] }]
+        @features.delete("_intercept")
+      end
+
       @gsl = gsl.nil? ? defined?(GSL) : gsl
     end
 
@@ -124,13 +132,18 @@ module Eps
       coefficients = {
         _intercept: node.attribute("intercept").value.to_f
       }
+      features = {}
       node.css("NumericPredictor").each do |n|
-        coefficients[n.attribute("name").value] = n.attribute("coefficient").value.to_f
+        name = n.attribute("name").value
+        coefficients[name] = n.attribute("coefficient").value.to_f
+        features[name] = "numeric"
       end
       node.css("CategoricalPredictor").each do |n|
-        coefficients[[n.attribute("name").value.to_sym, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
+        name = n.attribute("name").value
+        coefficients[[name, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
+        features[name] = "categorical"
       end
-      new(coefficients: coefficients)
+      new(coefficients: coefficients, features: features)
     end
 
     def to_pmml
@@ -256,6 +269,7 @@ module Eps
 
     def _predict(x)
       x, c = prep_x(x, train: false)
+
       coef = c.map do |v|
         # use 0 if coefficient does not exist
         # this can happen for categorical features
@@ -357,101 +371,57 @@ module Eps
     end
 
     def prep_x(x, train: true)
-      coefficients = @coefficients
+      matrix = []
+      column_names = []
 
-      # get column types
-      if train
-        column_types = {}
-        if x.any?
-          row = x.first
-          row.each do |k, v|
-            column_types[k] = categorical?(v) ? "categorical" : "numeric"
+      # intercept
+      x.size.times do
+        matrix << [1]
+      end
+      column_names << :_intercept
+
+      @features.each do |k, type|
+        # if type == "numeric" && !train && !@features.any? { |k, v| v == "categorical" } && !x.first[k].is_a?(Numeric)
+        #   # legacy could be categorical
+        #   type = "categorical"
+        # end
+
+        raise "Missing data in #{k}" if !x.columns[k] || x.columns[k].any?(&:nil?)
+
+        if type == "numeric"
+          x.columns[k].zip(matrix) do |xi, mi|
+            mi << xi
           end
-        end
-      else
-        # get column types for prediction
-        column_types = {}
-        coefficients.keys.each do |k|
-          next if k == :_intercept
-          if k.is_a?(Array)
-            column_types[k.first] = "categorical"
+          column_names << k.to_sym
+        else
+          if train
+            values = x.columns[k].uniq
+            # n - 1 dummy variables
+            values.shift if train
           else
-            column_types[k] = "numeric"
+            # get from coefficients
+            values = @coefficients.select { |k2, _| k2.is_a?(Array) && k2[0].to_s == k }.map { |k2, _| k2[1] }
           end
+
+          # get index to set
+          indexes = {}
+          offset = column_names.size
+          values.each do |v|
+            indexes[v] = offset
+            offset += 1
+          end
+
+          zeros = [0] * values.size
+          x.columns[k].zip(matrix) do |xi, mi|
+            mi.concat(zeros)
+            off = indexes[xi]
+            mi[off] = 1 if off
+          end
+          column_names.concat(values.map { |v| [k.to_sym, v] })
         end
       end
 
-      # if !train && x.any?
-      #   # check first row against coefficients
-      #   ckeys = coefficients.keys.map(&:to_s)
-      #   bad_keys = x[0].keys.map(&:to_s).reject { |k| ckeys.any? { |c| c.start_with?(k) } }
-      #   raise "Unknown keys: #{bad_keys.join(", ")}" if bad_keys.any?
-      # end
-
-      supports_categorical = train || coefficients.any? { |k, _| k.is_a?(Array) }
-
-      cache = {}
-      first_key = {}
-      i = 0
-      rows = []
-      x.each do |xi|
-        row = {}
-        xi.each do |k, v|
-          categorical = column_types[k.to_sym] == "categorical" || (!supports_categorical && categorical?(v))
-
-          key = categorical ? [k.to_sym, v.to_s] : k.to_sym
-          v2 = categorical ? 1 : v
-
-          # TODO make more efficient
-          check_key = supports_categorical ? key : symbolize_coef(key)
-          next if !train && !coefficients.key?(check_key)
-
-          raise "Missing data" if v2.nil?
-
-          unless cache[key]
-            cache[key] = i
-            first_key[k] ||= key if categorical
-            i += 1
-          end
-
-          row[key] = v2
-        end
-        rows << row
-      end
-
-      if train
-        # remove one degree of freedom
-        first_key.values.each do |v|
-          num = cache.delete(v)
-          cache.each do |k, v2|
-            cache[k] -= 1 if v2 > num
-          end
-        end
-      end
-
-      ret2 = []
-      rows.each do |row2|
-        ret = [0] * cache.size
-        row2.each do |k, v|
-          if cache[k]
-            ret[cache[k]] = v
-          end
-        end
-        ret2 << ([1] + ret)
-      end
-
-      # flatten keys
-      c = [:_intercept] + cache.sort_by { |_, v| v }.map(&:first)
-
-      unless supports_categorical
-        c = c.map { |v| symbolize_coef(v) }
-      end
-
-      [ret2, c]
-    end
-
-    def symbolize_coef(k)
-      (k.is_a?(Array) ? k.join("") : k).to_sym
+      [matrix, column_names]
     end
 
     def matrix_arr(matrix)

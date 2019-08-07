@@ -5,6 +5,7 @@ require "json"
 # modules
 require "eps/base"
 require "eps/base_estimator"
+require "eps/data_frame"
 require "eps/linear_regression"
 require "eps/model"
 require "eps/naive_bayes"
