@@ -86,7 +86,7 @@ module Eps
 
       df = Eps::DataFrame.new
 
-      cols.each do |c|
+      cols.map(&:to_s).each do |c|
         raise "Undefined column: #{c}" unless columns.include?(c)
 
         df.columns[c] = columns[c].values_at(*rows)
