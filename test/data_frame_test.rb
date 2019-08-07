@@ -18,17 +18,17 @@ class DataFrameTest < Minitest::Test
     assert_equal Eps::DataFrame.new(c1: ["a", "c"], c2: [1, 3]), df[[0, 2]]
 
     error = assert_raises do
-      df[0.., "c3"]
+      df[0..nil, "c3"]
     end
     assert_equal "Undefined column: c3", error.message
 
     error = assert_raises do
-      df[0.., "c1".."c3"]
+      df[0..nil, "c1".."c3"]
     end
     assert_equal "Undefined column: c3", error.message
 
     error = assert_raises do
-      df[0.., "c3".."c2"]
+      df[0..nil, "c3".."c2"]
     end
     assert_equal "Undefined column: c3", error.message
   end
