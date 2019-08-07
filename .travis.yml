@@ -1,11 +1,11 @@
+dist: xenial
 language: ruby
-rvm: 2.5.1
-sudo: required
-before_install:
-  - gem install bundler
-  - sudo apt-get update
-  - sudo apt-get install -y libgsl0-dev
+rvm: 2.6.3
 script: bundle exec rake test
+addons:
+  apt:
+    packages:
+    - libgsl0-dev
 env:
   -
   - GSL=t
