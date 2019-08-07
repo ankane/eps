@@ -6,5 +6,9 @@ class DataFrameTest < Minitest::Test
     assert_equal df, df[0..]
     assert_equal Eps::DataFrame.new(c1: ["b"], c2: [2]), df[1]
     assert_equal Eps::DataFrame.new(c2: [2, 3]), df[1.., "c2"]
+    error = assert_raises do
+      df[0.., "c3"]
+    end
+    assert_equal "Undefined column: c3", error.message
   end
 end
