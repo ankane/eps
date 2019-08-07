@@ -380,11 +380,27 @@ module Eps
       end
       column_names << :_intercept
 
+      legacy = false
+
       @features.each do |k, type|
-        # if type == "numeric" && !train && !@features.any? { |k, v| v == "categorical" } && !x.first[k].is_a?(Numeric)
-        #   # legacy could be categorical
-        #   type = "categorical"
-        # end
+        # legacy format
+        if !x.columns[k] && type == "numeric" && !train && !@features.any? { |k, v| v == "categorical" }
+          legacy = true
+
+          # expand categorical features
+          x.columns.keys.each do |k2|
+            v2 = x.columns[k2]
+            if v2[0].is_a?(String)
+              v2.uniq.each do |v3|
+                x.columns["#{k2}#{v3}"] = [0] * v2.size
+              end
+              v2.each_with_index do |v3, i|
+                x.columns["#{k2}#{v3}"][i] = 1
+              end
+              x.columns.delete(k2)
+            end
+          end
+        end
 
         raise "Missing data in #{k}" if !x.columns[k] || x.columns[k].any?(&:nil?)
 
@@ -419,6 +435,10 @@ module Eps
           end
           column_names.concat(values.map { |v| [k.to_sym, v] })
         end
+      end
+
+      if legacy
+        warn "[eps] DEPRECATION WARNING: Thanks for being an early adopter!\nUnfortunately, this model is stored in a legacy format.\nIt will stop working with Eps 0.3.0.\nPlease retrain the model and store as PMML."
       end
 
       [matrix, column_names]

@@ -292,8 +292,6 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pfa_categorical
-    skip
-
     data = File.read("test/support/modelcat.pfa")
     model = Eps::Model.load_pfa(data)
     predictions = model.predict([{x: 6, weekday: "Sunday"}, {x: 7, weekday: "Monday"}])
