@@ -1,6 +1,8 @@
 module Eps
   class BaseEstimator
     def train(data, y, target: nil, **options)
+      # y is normalized in model class
+
       # TODO more performant conversion
       if daru?(data)
         x = data.dup
