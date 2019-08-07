@@ -54,8 +54,19 @@ module Eps
     end
 
     def [](rows, cols = nil)
-      if rows.is_a?(Range) && rows.end.nil?
-        rows = Range.new(rows.begin, size - 1)
+      if cols.nil?
+        if rows.is_a?(String) || (rows.is_a?(Array) && rows.first.is_a?(String))
+          cols = rows
+          rows = 0..-1
+        end
+      end
+
+      if rows.is_a?(Range)
+        if rows.end.nil?
+          rows = Range.new(rows.begin, size - 1)
+        elsif rows.end < 0
+          rows = Range.new(rows.begin, size + rows.end)
+        end
       end
 
       if cols

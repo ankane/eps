@@ -11,6 +11,8 @@ class DataFrameTest < Minitest::Test
     assert_equal df, df[0.., "c1".."c2"]
     refute_equal df, df[0.., "c2".."c1"]
     assert_equal Eps::DataFrame.new(c2: [3], c1: ["c"]), df[2.., "c2".."c1"]
+    assert_equal ["a", "b", "c"], df["c1"]
+    assert_equal Eps::DataFrame.new(c1: ["a", "b", "c"]), df[["c1"]]
 
     error = assert_raises do
       df[0.., "c3"]
