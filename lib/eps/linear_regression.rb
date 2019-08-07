@@ -380,26 +380,13 @@ module Eps
       end
       column_names << :_intercept
 
-      legacy = false
+      legacy_format = false
 
       @features.each do |k, type|
         # legacy format
         if !x.columns[k] && type == "numeric" && !train && !@features.any? { |k, v| v == "categorical" }
-          legacy = true
-
-          # expand categorical features
-          x.columns.keys.each do |k2|
-            v2 = x.columns[k2]
-            if v2[0].is_a?(String)
-              v2.uniq.each do |v3|
-                x.columns["#{k2}#{v3}"] = [0] * v2.size
-              end
-              v2.each_with_index do |v3, i|
-                x.columns["#{k2}#{v3}"][i] = 1
-              end
-              x.columns.delete(k2)
-            end
-          end
+          legacy_format = true
+          expand_legacy_format(x)
         end
 
         raise "Missing data in #{k}" if !x.columns[k] || x.columns[k].any?(&:nil?)
@@ -437,7 +424,8 @@ module Eps
         end
       end
 
-      if legacy
+      if legacy_format
+        # only warn when method completes successfully
         warn "[eps] DEPRECATION WARNING: Thanks for being an early adopter!\nUnfortunately, this model is stored in a legacy format.\nIt will stop working with Eps 0.3.0.\nPlease retrain the model and store as PMML."
       end
 
@@ -446,6 +434,22 @@ module Eps
 
     def matrix_arr(matrix)
       matrix.to_a.map { |xi| xi[0].to_f }
+    end
+
+    # expand categorical features
+    def expand_legacy_format(x)
+      x.columns.keys.each do |k2|
+        v2 = x.columns[k2]
+        if v2[0].is_a?(String)
+          v2.uniq.each do |v3|
+            x.columns["#{k2}#{v3}"] = [0] * v2.size
+          end
+          v2.each_with_index do |v3, i|
+            x.columns["#{k2}#{v3}"][i] = 1
+          end
+          x.columns.delete(k2)
+        end
+      end
     end
   end
 end
