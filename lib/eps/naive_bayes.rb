@@ -23,7 +23,7 @@ module Eps
 
       grouped = {}
       indexes.each do |k, v|
-        grouped[k] = x.rows(v)
+        grouped[k] = x[v]
       end
 
       prior = {}

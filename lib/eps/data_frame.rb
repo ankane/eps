@@ -9,6 +9,10 @@ module Eps
         data.to_h.each do |k, v|
           @columns[k.to_s] = v.to_a
         end
+      elsif data.is_a?(Hash)
+        data.each do |k, v|
+          @columns[k.to_s] = v.to_a
+        end
       else
         if data.any?
           row = data[0]
@@ -40,16 +44,6 @@ module Eps
       @columns.any?
     end
 
-    def rows(idx)
-      df = Eps::DataFrame.new
-
-      self.columns.each do |k, v|
-        df.columns[k] = v.values_at(*idx)
-      end
-
-      df
-    end
-
     # TODO remove
     def map
       if @columns.any?
@@ -57,6 +51,25 @@ module Eps
           yield Hash[@columns.map { |k, v| [k, v[i]] }]
         end
       end
+    end
+
+    def [](rows, cols = nil)
+      df = Eps::DataFrame.new
+
+      cols = cols ? Array(cols) : columns.keys
+      if rows.is_a?(Range) && rows.end.nil?
+        rows = Range.new(rows.begin, size - 1)
+      end
+
+      cols.each do |c|
+        df.columns[c] = columns[c].values_at(*rows)
+      end
+
+      df
+    end
+
+    def ==(other)
+      columns == other.columns
     end
 
     private
