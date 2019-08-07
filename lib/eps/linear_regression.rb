@@ -440,20 +440,7 @@ module Eps
     def prep_x(x, train: true)
       coefficients = @coefficients
 
-      if daru?(x)
-        x = x.to_a[0]
-      else
-        x = x.map do |xi|
-          case xi
-          when Hash
-            xi
-          when Array
-            Hash[xi.map.with_index { |v, i| [:"x#{i}", v] }]
-          else
-            {x0: xi}
-          end
-        end
-      end
+      x = normalize_x(x)
 
       # get column types
       if train

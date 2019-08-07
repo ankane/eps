@@ -16,8 +16,8 @@ module Eps
       conditional = {}
 
       if @x.any?
-        keys = @x.first.keys
-        x = @x.dup
+        x = normalize_x(@x)
+        keys = x.first.keys
         x.each_with_index do |xi, i|
           xi[@target] = @y[i]
         end
@@ -185,6 +185,7 @@ module Eps
     private
 
     def _predict(x)
+      x = normalize_x(x)
       x.map do |xi|
         probs = calculate_class_probabilities(stringify_keys(xi))
         # deterministic for equal probabilities

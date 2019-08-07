@@ -20,8 +20,6 @@ module Eps
       @x = x
       @y = y
       @target = target || "target"
-
-
     end
 
     def predict(x)
@@ -78,6 +76,23 @@ module Eps
       else
         x = data[0] || {}
         x[target] ? target : flip_target(target)
+      end
+    end
+
+    def normalize_x(x)
+      if daru?(x)
+        x.to_a[0]
+      else
+        x.map do |xi|
+          case xi
+          when Hash
+            xi
+          when Array
+            Hash[xi.map.with_index { |v, i| [:"x#{i}", v] }]
+          else
+            {x0: xi}
+          end
+        end
       end
     end
   end

@@ -19,6 +19,14 @@ class ClassificationTest < Minitest::Test
     assert_empty errors
   end
 
+  def test_daru
+    df = Daru::DataFrame.from_csv("test/support/houses.csv")
+    df = df["bedrooms", "bathrooms", "state", "color"]
+
+    model = Eps::Model.new(df, target: "color")
+    model.predict(df)
+  end
+
   # this is where smoothing is needed
   def test_unknown_categorical_value
     data = [
