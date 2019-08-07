@@ -10,7 +10,8 @@ module Eps
         x.each { |r| r.delete(target) } if target
       end
 
-      y = prep_y(y.to_a)
+      y = y.to_a
+      check_missing(y)
 
       if x.size != y.size
         raise "Number of samples differs from target"
@@ -19,6 +20,8 @@ module Eps
       @x = x
       @y = y
       @target = target || "target"
+
+
     end
 
     def predict(x)
@@ -42,7 +45,9 @@ module Eps
           data.map { |v| v[target] }
         end
 
-      actual = prep_y(actual)
+      actual = actual.to_a
+      check_missing(actual)
+
       estimated = predict(data)
 
       self.class.metrics(actual, estimated)
@@ -62,11 +67,8 @@ module Eps
       target.is_a?(String) ? target.to_sym : target.to_s
     end
 
-    def prep_y(y)
-      y.each do |yi|
-        raise "Target missing in data" if yi.nil?
-      end
-      y
+    def check_missing(y)
+      raise "Target missing in data" if y.any?(&:nil?)
     end
 
     # determine if target is a string or symbol
