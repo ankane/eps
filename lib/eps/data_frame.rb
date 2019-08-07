@@ -65,7 +65,7 @@ module Eps
         if rows.end.nil?
           rows = Range.new(rows.begin, size - 1)
         elsif rows.end < 0
-          rows = Range.new(rows.begin, size + rows.end)
+          rows = Range.new(rows.begin, size + rows.end, rows.exclude_end?)
         end
       end
 
@@ -85,7 +85,7 @@ module Eps
             start_index, end_index = end_index, start_index
           end
 
-          cols = c[start_index..end_index]
+          cols = c[Range.new(start_index, end_index, cols.exclude_end?)]
           cols.reverse! if reverse
         elsif !cols.is_a?(Array)
           singular = true
