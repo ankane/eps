@@ -54,12 +54,20 @@ module Eps
     end
 
     def [](rows, cols = nil)
-      df = Eps::DataFrame.new
-
-      cols = cols ? Array(cols) : columns.keys
       if rows.is_a?(Range) && rows.end.nil?
         rows = Range.new(rows.begin, size - 1)
       end
+
+      if cols
+        unless cols.is_a?(Array)
+          singular = true
+          cols = [cols]
+        end
+      else
+        cols = columns.keys
+      end
+
+      df = Eps::DataFrame.new
 
       cols.each do |c|
         raise "Undefined column: #{c}" unless columns.include?(c)
@@ -67,7 +75,7 @@ module Eps
         df.columns[c] = columns[c].values_at(*rows)
       end
 
-      df
+      singular ? df.columns[cols[0]] : df
     end
 
     def ==(other)
