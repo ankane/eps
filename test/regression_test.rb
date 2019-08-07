@@ -321,7 +321,7 @@ class RegressionTest < Minitest::Test
     model = Eps::Model.load_pmml(data)
     pmml = model.to_pmml
 
-    xsd = Nokogiri::XML::Schema(File.read("test/support/pmml-4-3.xsd"))
+    xsd = Nokogiri::XML::Schema(File.read("test/support/pmml-4-4.xsd"))
     doc = Nokogiri::XML(pmml)
 
     assert_includes pmml, "RegressionModel"

@@ -141,7 +141,7 @@ module Eps
       end
 
       Nokogiri::XML::Builder.new do |xml|
-        xml.PMML(version: "4.3", xmlns: "http://www.dmg.org/PMML-4_3", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
+        xml.PMML(version: "4.4", xmlns: "http://www.dmg.org/PMML-4_4", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
           xml.Header
           xml.DataDictionary do
             data_fields.each do |k, vs|
