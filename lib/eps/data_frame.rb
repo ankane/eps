@@ -59,7 +59,24 @@ module Eps
       end
 
       if cols
-        unless cols.is_a?(Array)
+        if cols.is_a?(Range)
+          c = columns.keys
+
+          start_index = c.index(cols.begin)
+          raise "Undefined column: #{cols.begin}" unless start_index
+
+          end_index = c.index(cols.end)
+          raise "Undefined column: #{cols.end}" unless end_index
+
+          reverse = false
+          if start_index > end_index
+            reverse = true
+            start_index, end_index = end_index, start_index
+          end
+
+          cols = c[start_index..end_index]
+          cols.reverse! if reverse
+        elsif !cols.is_a?(Array)
           singular = true
           cols = [cols]
         end
@@ -79,7 +96,7 @@ module Eps
     end
 
     def ==(other)
-      columns == other.columns
+      columns.keys == other.columns.keys && columns == other.columns
     end
 
     private

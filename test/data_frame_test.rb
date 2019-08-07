@@ -8,8 +8,22 @@ class DataFrameTest < Minitest::Test
     assert_equal Eps::DataFrame.new(c2: [2, 3]), df[1.., ["c2"]]
     assert_equal Eps::DataFrame.new(c1: ["c"], c2: [3]), df[-1]
     assert_equal [2, 3], df[1.., "c2"]
+    assert_equal df, df[0.., "c1".."c2"]
+    refute_equal df, df[0.., "c2".."c1"]
+    assert_equal Eps::DataFrame.new(c2: [3], c1: ["c"]), df[2.., "c2".."c1"]
+
     error = assert_raises do
       df[0.., "c3"]
+    end
+    assert_equal "Undefined column: c3", error.message
+
+    error = assert_raises do
+      df[0.., "c1".."c3"]
+    end
+    assert_equal "Undefined column: c3", error.message
+
+    error = assert_raises do
+      df[0.., "c3".."c2"]
     end
     assert_equal "Undefined column: c3", error.message
   end
