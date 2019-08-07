@@ -209,39 +209,51 @@ module Eps
 
     private
 
-    # TODO vectorize
     def _predict(x)
-      x.map do |xi|
-        probs = calculate_class_probabilities(xi)
-        # deterministic for equal probabilities
-        probs.sort_by { |k, v| [-v, k] }[0][0]
+      probs = calculate_class_probabilities(x)
+      probs.map do |xp|
+        xp.sort_by { |k, v| [-v, k] }[0][0]
       end
     end
 
     # use log to prevent underflow
     # https://www.antoniomallia.it/lets-implement-a-gaussian-naive-bayes-classifier-in-python.html
     def calculate_class_probabilities(x)
-      prob = {}
+      probs = Eps::DataFrame.new
+
+      total = probabilities[:prior].values.sum.to_f
       probabilities[:prior].each do |c, cv|
-        prob[c] = Math.log(cv.to_f / probabilities[:prior].values.sum)
-        probabilities[:conditional].each do |k, v|
-          if @features[k] == "categorical"
-            # TODO compute ahead of time
-            p2 = v[c][x[k]].to_f / v[c].values.sum
+        prior = Math.log(cv / total)
+        px = [prior] * x.size
 
-            # assign very small probability if probability is 0
-            # TODO use proper smoothing instead
-            if p2 == 0
-              p2 = 0.0001
+        @features.each do |k, type|
+          vc = probabilities[:conditional][k][c]
+
+          if type == "categorical"
+            vc_sum = vc.values.sum
+
+            x.columns[k].each_with_index do |xi, i|
+              p2 = vc[xi].to_f / vc_sum
+
+              # assign very small probability if probability is 0
+              # TODO use proper smoothing instead
+              if p2 == 0
+                p2 = 0.0001
+              end
+
+              px[i] += Math.log(p2)
             end
-
-            prob[c] += Math.log(p2)
           else
-            prob[c] += Math.log(calculate_probability(x[k], v[c][:mean], v[c][:stdev]))
+            x.columns[k].each_with_index do |xi, i|
+              px[i] += Math.log(calculate_probability(xi, vc[:mean], vc[:stdev]))
+            end
           end
+
+          probs.columns[c] = px
         end
       end
-      prob
+
+      probs
     end
 
     def calculate_probability(x, mean, stdev)
