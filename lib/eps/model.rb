@@ -77,7 +77,7 @@ module Eps
     private
 
     def train(data, y = nil, target: nil)
-      data = Eps::DataFrame.new(data)
+      data = Eps::DataFrame.new(data) unless data.is_a?(Eps::DataFrame)
       target = target.to_s
 
       y ||= data.columns[target]
