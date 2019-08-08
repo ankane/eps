@@ -35,10 +35,11 @@ module Eps
       target ||= @target
       raise ArgumentError, "missing target" if !target && !y
 
-      actual = y || Eps::DataFrame.new(data).columns[target.to_s]
+      data = Eps::DataFrame.new(data)
+      actual = y || data.columns[target.to_s]
 
       # check data
-      # raise "No data" if data.empty?
+      raise "No data" if data.empty?
       raise "Number of samples differs from target" if data.size != actual.size
       check_missing(actual)
 
