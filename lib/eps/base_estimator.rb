@@ -3,11 +3,7 @@ module Eps
     def train(data, y, target: nil, **options)
       x = normalize_x(data)
       y = y.to_a
-
-      # check data
-      raise "No data" if x.empty?
-      raise "Number of samples differs from target" if x.size != y.size
-      check_missing(y)
+      check_data(x, y)
 
       @x = x
       @y = y
@@ -35,13 +31,9 @@ module Eps
       target ||= @target
       raise ArgumentError, "missing target" if !target && !y
 
-      data = Eps::DataFrame.new(data)
+      data = normalize_x(data)
       actual = y || data.columns[target.to_s]
-
-      # check data
-      raise "No data" if data.empty?
-      raise "Number of samples differs from target" if data.size != actual.size
-      check_missing(actual)
+      check_data(data, actual)
 
       estimated = predict(data)
 
@@ -50,7 +42,9 @@ module Eps
 
     private
 
-    def check_missing(y)
+    def check_data(x, y)
+      raise "No data" if x.empty?
+      raise "Number of samples differs from target" if x.size != y.size
       raise "Target missing in data" if y.any?(&:nil?)
     end
 
