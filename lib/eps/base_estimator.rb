@@ -49,9 +49,7 @@ module Eps
     end
 
     def normalize_x(x)
-      return x if x.is_a?(Eps::DataFrame)
-
-      Eps::DataFrame.new(x)
+      x.is_a?(Eps::DataFrame) ? x : Eps::DataFrame.new(x)
     end
   end
 end
