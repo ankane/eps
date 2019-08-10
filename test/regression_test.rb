@@ -318,12 +318,8 @@ class RegressionTest < Minitest::Test
     data = File.read("test/support/modelcat.pmml")
     model = Eps::Model.load_pmml(data)
     pmml = model.to_pmml
-
-    xsd = Nokogiri::XML::Schema(File.read("test/support/pmml-4-4.xsd"))
-    doc = Nokogiri::XML(pmml)
-
     assert_includes pmml, "RegressionModel"
-    assert_empty xsd.validate(doc)
+    assert_valid_pmml pmml
   end
 
   def test_daru
