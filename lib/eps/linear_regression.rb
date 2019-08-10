@@ -151,7 +151,7 @@ module Eps
 
       data_fields = {}
       predictors.keys.each do |k|
-        if k.is_a?(Array)
+        if @features[k] == "categorical"
           (data_fields[k[0]] ||= []) << k[1]
         else
           data_fields[k] = nil
@@ -163,7 +163,7 @@ module Eps
           xml.Header
           xml.DataDictionary do
             data_fields.each do |k, vs|
-              if vs
+              if @features[k] == "categorical"
                 xml.DataField(name: k, optype: "categorical", dataType: "string") do
                   vs.each do |v|
                     xml.Value(value: v)
@@ -182,7 +182,7 @@ module Eps
             end
             xml.RegressionTable(intercept: @coefficients[:_intercept]) do
               predictors.each do |k, v|
-                if k.is_a?(Array)
+                if @features[k] == "categorical"
                   xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
                 else
                   xml.NumericPredictor(name: k, coefficient: v)
