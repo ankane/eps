@@ -397,14 +397,14 @@ module Eps
           end
           column_names << k.to_sym
         else
-          if train
-            values = x.columns[k].uniq
-            # n - 1 dummy variables
-            values.shift if train
-          else
-            # get from coefficients
-            values = @coefficients.select { |k2, _| k2.is_a?(Array) && k2[0].to_s == k }.map { |k2, _| k2[1] }
-          end
+          values =
+            if train
+              # n - 1 dummy variables
+              x.columns[k].uniq[1..-1]
+            else
+              # get from coefficients
+              @coefficients.select { |k2, _| k2.is_a?(Array) && k2[0].to_s == k }.map { |k2, _| k2[1] }
+            end
 
           # get index to set
           indexes = {}
