@@ -1,12 +1,12 @@
 module Eps
   class LinearRegression < BaseEstimator
     def initialize(coefficients: nil, features: nil, gsl: nil)
-      @coefficients = Hash[coefficients.map { |k, v| [k.is_a?(Array) ? [k[0].to_sym, k[1]] : k.to_sym, v] }] if coefficients
+      @coefficients = Hash[coefficients.map { |k, v| [k.is_a?(Array) ? [k[0].to_s, k[1]] : k.to_s, v] }] if coefficients
       @features = features
 
       # legacy
       if @coefficients && !@features
-        @features = Hash[@coefficients.keys.map { |k| [k.to_s, "numeric"] }]
+        @features = Hash[@coefficients.keys.map { |k| [k, "numeric"] }]
         @features.delete("_intercept")
       end
 
@@ -130,7 +130,7 @@ module Eps
       # TODO more validation
       node = data.css("RegressionTable")
       coefficients = {
-        _intercept: node.attribute("intercept").value.to_f
+        "_intercept" => node.attribute("intercept").value.to_f
       }
       features = {}
       node.css("NumericPredictor").each do |n|
@@ -147,7 +147,8 @@ module Eps
     end
 
     def to_pmml
-      predictors = @coefficients.reject { |k| k == :_intercept }
+      predictors = @coefficients.dup
+      predictors.delete("_intercept")
 
       data_fields = {}
       predictors.keys.each do |k|
@@ -180,7 +181,7 @@ module Eps
                 xml.MiningField(name: k)
               end
             end
-            xml.RegressionTable(intercept: @coefficients[:_intercept]) do
+            xml.RegressionTable(intercept: @coefficients["_intercept"]) do
               predictors.each do |k, v|
                 if @features[k] == "categorical"
                   xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
@@ -206,7 +207,7 @@ module Eps
           init["coeff"].map.with_index { |_, i| "x#{i}" }
         end
       coefficients = {
-        _intercept: init["const"]
+        "_intercept" => init["const"]
       }
       init["coeff"].each_with_index do |c, i|
         name = names[i]
@@ -378,7 +379,7 @@ module Eps
       x.size.times do
         matrix << [1]
       end
-      column_names << :_intercept
+      column_names << "_intercept"
 
       legacy_format = false
 
@@ -395,7 +396,7 @@ module Eps
           x.columns[k].zip(matrix) do |xi, mi|
             mi << xi
           end
-          column_names << k.to_sym
+          column_names << k
         else
           values =
             if train
@@ -420,7 +421,7 @@ module Eps
             off = indexes[xi]
             mi[off] = 1 if off
           end
-          column_names.concat(values.map { |v| [k.to_sym, v] })
+          column_names.concat(values.map { |v| [k, v] })
         end
       end
 
