@@ -5,7 +5,11 @@ module Eps
     def initialize(data = [])
       @columns = {}
 
-      if daru?(data)
+      if data.is_a?(Eps::DataFrame)
+        data.columns.each do |k, v|
+          @columns[k] = v
+        end
+      elsif daru?(data)
         data.to_h.each do |k, v|
           @columns[k.to_s] = v.to_a
         end
