@@ -404,7 +404,7 @@ module Eps
               x.columns[k].uniq[1..-1]
             else
               # get from coefficients
-              @coefficients.select { |k2, _| k2.is_a?(Array) && k2[0].to_s == k }.map { |k2, _| k2[1] }
+              @coefficients.select { |k2, _| k2.is_a?(Array) && k2[0] == k }.map { |k2, _| k2[1] }
             end
 
           # get index to set
