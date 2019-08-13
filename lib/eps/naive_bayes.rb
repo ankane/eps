@@ -221,6 +221,9 @@ module Eps
     def calculate_class_probabilities(x)
       probs = Eps::DataFrame.new
 
+      # assign very small probability if probability is 0
+      tiny_p = 0.0001
+
       total = probabilities[:prior].values.sum.to_f
       probabilities[:prior].each do |c, cv|
         prior = Math.log(cv / total)
@@ -235,17 +238,23 @@ module Eps
             x.columns[k].each_with_index do |xi, i|
               p2 = vc[xi].to_f / vc_sum
 
-              # assign very small probability if probability is 0
               # TODO use proper smoothing instead
-              if p2 == 0
-                p2 = 0.0001
-              end
+              p2 = tiny_p if p2 == 0
 
               px[i] += Math.log(p2)
             end
           else
-            x.columns[k].each_with_index do |xi, i|
-              px[i] += Math.log(calculate_probability(xi, vc[:mean], vc[:stdev]))
+            if vc[:stdev] != 0
+              x.columns[k].each_with_index do |xi, i|
+                px[i] += Math.log(calculate_probability(xi, vc[:mean], vc[:stdev]))
+              end
+            else
+              x.columns[k].each_with_index do |xi, i|
+                if xi != vc[:mean]
+                  # TODO use proper smoothing instead
+                  px[i] += Math.log(tiny_p)
+                end
+              end
             end
           end
 
