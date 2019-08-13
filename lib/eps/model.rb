@@ -64,6 +64,8 @@ module Eps
     # metrics
 
     def self.metrics(actual, estimated)
+      raise "Number of samples differ" if actual.size != estimated.size
+
       estimator_class =
         if numeric?(actual)
           Eps::LinearRegression
