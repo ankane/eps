@@ -74,7 +74,22 @@ train_set.reject! { |h| h.bedrooms.nil? || h.price < 10000 }
 
 ### Feature Engineering
 
-Selecting features for a model is extremely important for performance. Features can be numeric or categorical. For categorical features, there’s no need to create dummy variables - just pass the data as strings.
+Selecting features for a model is extremely important for performance. Features can be:
+
+1. numeric
+2. categorical
+
+#### Numeric
+
+For numeric features, use any numeric type.
+
+```ruby
+{bedrooms: 4, bathrooms: 2.5}
+```
+
+#### Categorical
+
+For categorical features, use strings.
 
 ```ruby
 {state: "CA"}
@@ -85,14 +100,22 @@ Selecting features for a model is extremely important for performance. Features 
 Convert any ids to strings so they’re treated as categorical features.
 
 ```ruby
-{city_id: house.city_id.to_s}
+{city_id: city_id.to_s}
 ```
 
-For times, create features like day of week and hour of day with:
+For dates, create features like day of week and month.
 
 ```ruby
-{weekday: house.listed_at.wday.to_s, hour: house.listed_at.hour.to_s}
+{weekday: sold_on.strftime("%a"), month: sold_on.strftime("%b")}
 ```
+
+For times, create features like day of week and hour of day.
+
+```ruby
+{weekday: listed_at.strftime("%a"), hour: listed_at.hour.to_s}
+```
+
+---
 
 In practice, your code may look like:
 
