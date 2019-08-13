@@ -256,9 +256,12 @@ module Eps
       probs
     end
 
+    SQRT_2PI = Math.sqrt(2 * Math::PI)
+
+    # TODO memoize for performance
     def calculate_probability(x, mean, stdev)
       exponent = Math.exp(-((x - mean)**2) / (2 * (stdev**2)))
-      (1 / (Math.sqrt(2 * Math::PI) * stdev)) * exponent
+      (1 / (SQRT_2PI * stdev)) * exponent
     end
 
     def group_count(arr)
