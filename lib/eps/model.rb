@@ -64,30 +64,21 @@ module Eps
     # metrics
 
     def self.metrics(actual, estimated)
-      raise "Number of samples differ" if actual.size != estimated.size
-
-      estimator_class =
-        if numeric?(actual)
-          Eps::LinearRegression
-        else
-          Eps::NaiveBayes
-        end
-
-      estimator_class.metrics(actual, estimated)
+      Eps.metrics(actual, estimated)
     end
 
     private
 
     def train(data, y = nil, target: nil)
       data = Eps::DataFrame.new(data) unless data.is_a?(Eps::DataFrame)
-      target = target.to_s
+      target = (target || "target").to_s
 
       y ||= data.columns[target]
 
       raise "Target missing in data" if !y
 
       estimator_class =
-        if self.class.numeric?(y)
+        if Utils.column_type(y, target) == "numeric"
           Eps::LinearRegression
         else
           Eps::NaiveBayes
@@ -111,10 +102,6 @@ module Eps
       else
         super
       end
-    end
-
-    def self.numeric?(y)
-      y.first.is_a?(Numeric)
     end
   end
 end

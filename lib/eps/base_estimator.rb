@@ -13,7 +13,7 @@ module Eps
       @features = {}
       x.columns.each do |k, v|
         next if k == target
-        @features[k] = v[0].is_a?(Numeric) ? "numeric" : "categorical"
+        @features[k] = Utils.column_type(v, k)
       end
     end
 
