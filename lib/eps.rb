@@ -1,6 +1,7 @@
 # dependencies
-require "matrix"
 require "json"
+require "matrix"
+require "nokogiri"
 
 # modules
 require "eps/base"

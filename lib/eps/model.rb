@@ -14,7 +14,6 @@ module Eps
 
     def self.load_pmml(data)
       if data.is_a?(String)
-        require "nokogiri"
         data = Nokogiri::XML(data) { |config| config.strict }
       end
 
@@ -32,7 +31,6 @@ module Eps
 
     def to_pmml
       if @estimator
-        require "nokogiri"
         @estimator.to_pmml
       else
         super
