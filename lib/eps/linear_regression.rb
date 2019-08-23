@@ -162,19 +162,7 @@ module Eps
       Nokogiri::XML::Builder.new do |xml|
         xml.PMML(version: "4.4", xmlns: "http://www.dmg.org/PMML-4_4", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
           xml.Header
-          xml.DataDictionary do
-            data_fields.each do |k, vs|
-              if @features[k] == "categorical"
-                xml.DataField(name: k, optype: "categorical", dataType: "string") do
-                  vs.each do |v|
-                    xml.Value(value: v)
-                  end
-                end
-              else
-                xml.DataField(name: k, optype: "continuous", dataType: "double")
-              end
-            end
-          end
+          pmml_data_dictionary(xml, data_fields)
           xml.RegressionModel(functionName: "regression") do
             xml.MiningSchema do
               data_fields.each do |k, _|

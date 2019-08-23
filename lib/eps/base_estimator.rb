@@ -41,6 +41,22 @@ module Eps
 
     private
 
+    def pmml_data_dictionary(xml, data_fields)
+      xml.DataDictionary do
+        data_fields.each do |k, vs|
+          if @features[k] == "categorical"
+            xml.DataField(name: k, optype: "categorical", dataType: "string") do
+              vs.each do |v|
+                xml.Value(value: v)
+              end
+            end
+          else
+            xml.DataField(name: k, optype: "continuous", dataType: "double")
+          end
+        end
+      end
+    end
+
     def check_data(x, y)
       raise "No data" if x.empty?
       raise "Number of samples differs from target" if x.size != y.size
