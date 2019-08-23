@@ -124,31 +124,22 @@ def features(house)
   {
     bedrooms: house.bedrooms,
     city_id: house.city_id.to_s,
-    month: house.listed_at.strftime("%b")
+    month: house.listed_at.strftime("%b"),
+    price: house.price # target
   }
 end
 
 train_features = train_set.map { |h| features(h) }
 ```
 
-> We use a method for features so it can be used across training, evaluation, and prediction
-
-We also need to prepare the target variable.
-
-```ruby
-def target(house)
-  house.price
-end
-
-train_target = train_set.map { |h| target(h) }
-```
+We use a method for features so it can be used across training, evaluation, and prediction.
 
 ### Training
 
 Now, let’s train the model.
 
 ```ruby
-model = Eps::Model.new(train_features, train_target)
+model = Eps::Model.new(train_features, target: :price)
 puts model.summary
 ```
 
@@ -160,8 +151,7 @@ When you’re happy with the model, see how well it performs on the test set. Th
 
 ```ruby
 test_features = test_set.map { |h| features(h) }
-test_target = test_set.map { |h| target(h) }
-puts model.evaluate(test_features, test_target)
+puts model.evaluate(test_features)
 ```
 
 For regression, this returns:
@@ -188,8 +178,7 @@ houses.reject! { |h| h.bedrooms.nil? || h.price < 10000 }
 
 # training
 all_features = houses.map { |h| features(h) }
-all_target = houses.map { |h| target(h) }
-model = Eps::Model.new(all_features, all_target)
+model = Eps::Model.new(all_features, target: :price)
 ```
 
 We now have a model that’s ready to serve.
@@ -245,23 +234,17 @@ class PriceModel < Eps::Base
 
     # train
     train_features = train_set.map { |v| features(v) }
-    train_target = train_set.map { |v| target(v) }
-    model = Eps::Model.new(train_features, train_target)
+    model = Eps::Model.new(train_features, target: :price)
     puts model.summary
 
     # evaluate
     test_features = test_set.map { |v| features(v) }
-    test_target = test_set.map { |v| target(v) }
-    metrics = model.evaluate(test_features, test_target)
-    puts "Test RMSE: #{metrics[:rmse]}"
-    # for classification, use:
-    # puts "Test accuracy: #{(100 * metrics[:accuracy]).round}%"
+    puts model.evaluate(test_features)
 
     # finalize
     houses = preprocess(houses)
     all_features = houses.map { |h| features(h) }
-    all_target = houses.map { |h| target(h) }
-    model = Eps::Model.new(all_features, all_target)
+    model = Eps::Model.new(all_features, target: :price)
 
     # save
     File.write(model_file, model.to_pmml)
@@ -282,12 +265,9 @@ class PriceModel < Eps::Base
     {
       bedrooms: house.bedrooms,
       city_id: house.city_id.to_s,
-      month: house.listed_at.strftime("%b")
+      month: house.listed_at.strftime("%b"),
+      price: house.price
     }
-  end
-
-  def target(house)
-    house.price
   end
 
   def model
