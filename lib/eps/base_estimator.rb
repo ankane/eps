@@ -37,7 +37,7 @@ module Eps
 
       estimated = predict(data)
 
-      self.class.metrics(actual, estimated)
+      Eps.metrics(actual, estimated)
     end
 
     private

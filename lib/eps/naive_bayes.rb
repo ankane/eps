@@ -202,9 +202,7 @@ module Eps
     # metrics
 
     def self.metrics(actual, estimated)
-      {
-        accuracy: actual.zip(estimated).count { |yi, yi2| yi == yi2 } / actual.size.to_f
-      }
+      Eps.metrics(actual, estimated)
     end
 
     private

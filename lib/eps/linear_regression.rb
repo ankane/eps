@@ -221,13 +221,7 @@ module Eps
     # metrics
 
     def self.metrics(actual, estimated)
-      errors = actual.zip(estimated).map { |yi, yi2| yi - yi2 }
-
-      {
-        me: mean(errors),
-        mae: mean(errors.map { |v| v.abs }),
-        rmse: Math.sqrt(mean(errors.map { |v| v**2 }))
-      }
+      Eps.metrics(actual, estimated)
     end
 
     # private
