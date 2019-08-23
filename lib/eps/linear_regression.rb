@@ -159,28 +159,24 @@ module Eps
         end
       end
 
-      Nokogiri::XML::Builder.new do |xml|
-        xml.PMML(version: "4.4", xmlns: "http://www.dmg.org/PMML-4_4", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
-          xml.Header
-          pmml_data_dictionary(xml, data_fields)
-          xml.RegressionModel(functionName: "regression") do
-            xml.MiningSchema do
-              data_fields.each do |k, _|
-                xml.MiningField(name: k)
-              end
+      build_pmml(data_fields) do |xml|
+        xml.RegressionModel(functionName: "regression") do
+          xml.MiningSchema do
+            data_fields.each do |k, _|
+              xml.MiningField(name: k)
             end
-            xml.RegressionTable(intercept: @coefficients["_intercept"]) do
-              predictors.each do |k, v|
-                if @features[k] == "categorical"
-                  xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
-                else
-                  xml.NumericPredictor(name: k, coefficient: v)
-                end
+          end
+          xml.RegressionTable(intercept: @coefficients["_intercept"]) do
+            predictors.each do |k, v|
+              if @features[k] == "categorical"
+                xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
+              else
+                xml.NumericPredictor(name: k, coefficient: v)
               end
             end
           end
         end
-      end.to_xml
+      end
     end
 
     # pfa

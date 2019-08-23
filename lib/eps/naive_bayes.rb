@@ -140,51 +140,47 @@ module Eps
         end
       end
 
-      Nokogiri::XML::Builder.new do |xml|
-        xml.PMML(version: "4.4", xmlns: "http://www.dmg.org/PMML-4_4", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
-          xml.Header
-          pmml_data_dictionary(xml, data_fields)
-          xml.NaiveBayesModel(functionName: "classification", threshold: 0.001) do
-            xml.MiningSchema do
-              data_fields.each do |k, _|
-                xml.MiningField(name: k)
-              end
+      build_pmml(data_fields) do |xml|
+        xml.NaiveBayesModel(functionName: "classification", threshold: 0.001) do
+          xml.MiningSchema do
+            data_fields.each do |k, _|
+              xml.MiningField(name: k)
             end
-            xml.BayesInputs do
-              probabilities[:conditional].each do |k, v|
-                xml.BayesInput(fieldName: k) do
-                  if @features[k] == "categorical"
-                    v.each do |k2, v2|
-                      xml.PairCounts(value: k2) do
-                        xml.TargetValueCounts do
-                          v2.each do |k3, v3|
-                            xml.TargetValueCount(value: k3, count: v3)
-                          end
+          end
+          xml.BayesInputs do
+            probabilities[:conditional].each do |k, v|
+              xml.BayesInput(fieldName: k) do
+                if @features[k] == "categorical"
+                  v.each do |k2, v2|
+                    xml.PairCounts(value: k2) do
+                      xml.TargetValueCounts do
+                        v2.each do |k3, v3|
+                          xml.TargetValueCount(value: k3, count: v3)
                         end
                       end
                     end
-                  else
-                    xml.TargetValueStats do
-                      v.each do |k2, v2|
-                        xml.TargetValueStat(value: k2) do
-                          xml.GaussianDistribution(mean: v2[:mean], variance: v2[:stdev]**2)
-                        end
+                  end
+                else
+                  xml.TargetValueStats do
+                    v.each do |k2, v2|
+                      xml.TargetValueStat(value: k2) do
+                        xml.GaussianDistribution(mean: v2[:mean], variance: v2[:stdev]**2)
                       end
                     end
                   end
                 end
               end
             end
-            xml.BayesOutput(fieldName: "target") do
-              xml.TargetValueCounts do
-                probabilities[:prior].each do |k, v|
-                  xml.TargetValueCount(value: k, count: v)
-                end
+          end
+          xml.BayesOutput(fieldName: "target") do
+            xml.TargetValueCounts do
+              probabilities[:prior].each do |k, v|
+                xml.TargetValueCount(value: k, count: v)
               end
             end
           end
         end
-      end.to_xml
+      end
     end
 
     # metrics

@@ -41,6 +41,23 @@ module Eps
 
     private
 
+    def build_pmml(data_fields)
+      Nokogiri::XML::Builder.new do |xml|
+        xml.PMML(version: "4.4", xmlns: "http://www.dmg.org/PMML-4_4", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
+          pmml_header(xml)
+          pmml_data_dictionary(xml, data_fields)
+          yield xml
+        end
+      end.to_xml
+    end
+
+    def pmml_header(xml)
+      xml.Header do
+        xml.Application(name: "Eps", version: Eps::VERSION)
+        xml.Timestamp Time.now.utc.iso8601
+      end
+    end
+
     def pmml_data_dictionary(xml, data_fields)
       xml.DataDictionary do
         data_fields.each do |k, vs|
