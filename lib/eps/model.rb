@@ -70,10 +70,9 @@ module Eps
     def train(data, y = nil, target: nil)
       data = Eps::DataFrame.new(data) unless data.is_a?(Eps::DataFrame)
       target = (target || "target").to_s
+      y ||= data.columns.delete(target)
 
-      y ||= data.columns[target]
-
-      raise "Target missing in data" if !y
+      check_missing(y, target)
 
       estimator_class =
         if Utils.column_type(y, target) == "numeric"
@@ -84,6 +83,11 @@ module Eps
 
       @estimator = estimator_class.new(**@options)
       @estimator.train(data, y, target: target)
+    end
+
+    def check_missing(c, name)
+      raise ArgumentError, "Missing column: #{name}" if !c
+      raise ArgumentError, "Missing values in column #{name}" if c.any?(&:nil?)
     end
 
     def respond_to_missing?(name, include_private = false)
