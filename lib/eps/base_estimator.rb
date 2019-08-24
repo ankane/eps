@@ -1,6 +1,6 @@
 module Eps
   class BaseEstimator
-    def train(data, y = nil, target: nil, **options)
+    def train(data, y = nil, target: nil, split: false, verbose: nil, **options)
       data, @target = prep_data(data, y, target)
       @target_type = Utils.column_type(data.label, @target)
 
@@ -10,8 +10,54 @@ module Eps
         @features[k] = Utils.column_type(v, k)
       end
 
-      @train_set = data
+      # cross validation
+      if split
+        split_p = 0.7
+        if split == true
+          rng = Random.new(0) # seed random number generator
+          train_idx, test_idx = (0...data.size).to_a.partition { rng.rand < split_p }
+        else
+          split_column = split.to_s
+          times = data.columns.delete(split_column)
+          check_missing(times, split_column)
+          split_index = (times.size * split_p).round
+          split_time = times.sort[split_index]
+          train_idx, test_idx = (0...data.size).to_a.partition { |i| times[i] < split_time }
+        end
+        @train_set = data[train_idx]
+        test_set = data[test_idx]
+      else
+        @train_set = data
+      end
+
       @evaluator = _train
+
+      # reset pmml
+      @pmml = nil
+
+      # summary
+      if verbose != false
+        if test_set
+          y_true = test_set.label
+          y_pred = predict(test_set)
+
+          case @target_type
+          when "numeric"
+            metric_name = "RMSE"
+            v = Metrics.rmse(y_true, y_pred)
+            metric_value = v.round >= 1000 ? v.round.to_s : "%.3g" % v
+          else
+            metric_name = "accuracy"
+            metric_value = "%.1f%%" % (100 * Metrics.accuracy(y_true, y_pred)).round(1)
+          end
+
+          puts "Validation %s: %s"  % [metric_name, metric_value]
+          puts
+        end
+        puts summary
+      end
+
+      nil
     end
 
     def predict(data)

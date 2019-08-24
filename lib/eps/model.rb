@@ -72,7 +72,7 @@ module Eps
         end
 
       @estimator = estimator_class.new(**@options)
-      @estimator.train(data, y, target: target)
+      @estimator.train(data, y, target: target, verbose: false)
     end
 
     def respond_to_missing?(name, include_private = false)
