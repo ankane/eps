@@ -213,22 +213,22 @@ module Eps
       predictors.delete("_intercept")
 
       data_fields = {}
-      predictors.keys.each do |k|
-        if @features[k] == "categorical"
-          (data_fields[k[0]] ||= []) << k[1]
+      @features.each do |k, type|
+        if type == "categorical"
+          data_fields[k] = predictors.keys.select { |k, v| k.is_a?(Array) && k.first == k }.map(&:last)
         end
       end
 
       build_pmml(data_fields) do |xml|
         xml.RegressionModel(functionName: "regression") do
           xml.MiningSchema do
-            data_fields.each do |k, _|
+            @features.each do |k, _|
               xml.MiningField(name: k)
             end
           end
           xml.RegressionTable(intercept: @coefficients["_intercept"]) do
             predictors.each do |k, v|
-              if @features[k] == "categorical"
+              if k.is_a?(Array)
                 xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
               else
                 xml.NumericPredictor(name: k, coefficient: v)
