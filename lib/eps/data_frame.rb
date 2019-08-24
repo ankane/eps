@@ -109,7 +109,7 @@ module Eps
 
       df = Eps::DataFrame.new
 
-      cols.map(&:to_s).each do |c|
+      cols.each do |c|
         raise "Undefined column: #{c}" unless columns.include?(c)
 
         df.columns[c] = columns[c].values_at(*rows)

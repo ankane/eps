@@ -1,5 +1,6 @@
-## 0.2.2 [unreleased]
+## 0.3.0 [unreleased]
 
+- Added text features
 - Prefer `MyModel.train` over `MyModel.build`
 - Fixed error with classification and Daru
 

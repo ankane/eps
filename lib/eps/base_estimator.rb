@@ -1,13 +1,25 @@
 module Eps
   class BaseEstimator
-    def train(data, y = nil, target: nil, split: false, validation_set: nil, verbose: nil, **options)
+    def train(data, y = nil, target: nil, split: false, validation_set: nil, verbose: nil, text_features: nil, **options)
       data, @target = prep_data(data, y, target)
       @target_type = Utils.column_type(data.label, @target)
+
+      # prep text features
+      @text_features = {}
+      (text_features || {}).each do |k, v|
+        # same output as scikit-learn CountVectorizer
+        # except for max_features
+        @text_features[k.to_s] = {
+          tokenizer: /\W+/,
+          min_length: 2,
+          max_features: 100
+        }.merge(v || {})
+      end
 
       # determine feature types
       @features = {}
       data.columns.each do |k, v|
-        @features[k] = Utils.column_type(v, k)
+        @features[k] = @text_features.key?(k) ? "text" : Utils.column_type(v, k)
       end
 
       # cross validation
@@ -27,7 +39,7 @@ module Eps
         @train_set = data[train_idx]
         validation_set = data[test_idx]
       else
-        @train_set = data
+        @train_set = data.dup
         if validation_set
           validation_set = Eps::DataFrame.new(validation_set)
           validation_set.label = validation_set.columns.delete(@target)
@@ -102,6 +114,26 @@ module Eps
       [data, target]
     end
 
+    def prep_text_features(train_set)
+      @text_encoders = {}
+      @text_features.each do |k, v|
+        # TODO determine max features automatically
+        # start based on number of rows
+        encoder = Eps::TextEncoder.new(v)
+        counts = encoder.fit(train_set.columns.delete(k))
+        encoder.vocabulary.each do |word|
+          train_set.columns[[k, word]] = [0] * counts.size
+        end
+        counts.each_with_index do |ci, i|
+          ci.each do |word, count|
+            word_key = [k, word]
+            train_set.columns[word_key][i] = 1 if train_set.columns.key?(word_key)
+          end
+        end
+        @text_encoders[k] = encoder
+      end
+    end
+
     def check_data(data)
       raise "No data" if data.empty?
       raise "Number of samples differs from target" if data.size != data.label.size
@@ -115,6 +147,7 @@ module Eps
         xml.PMML(version: "4.4", xmlns: "http://www.dmg.org/PMML-4_4", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
           pmml_header(xml)
           pmml_data_dictionary(xml, data_fields)
+          pmml_transformation_dictionary(xml)
           yield xml
         end
       end
@@ -130,14 +163,50 @@ module Eps
     def pmml_data_dictionary(xml, data_fields)
       xml.DataDictionary do
         @features.each do |k, type|
-          if type == "categorical"
+          case type
+          when "categorical"
             xml.DataField(name: k, optype: "categorical", dataType: "string") do
               data_fields[k].map(&:to_s).sort.each do |v|
                 xml.Value(value: v)
               end
             end
+          when "text"
+            xml.DataField(name: k, optype: "categorical", dataType: "string")
           else
             xml.DataField(name: k, optype: "continuous", dataType: "double")
+          end
+        end
+      end
+    end
+
+    def pmml_transformation_dictionary(xml)
+      if @text_features.any?
+        xml.TransformationDictionary do
+          @text_features.each do |k, text_options|
+            xml.DefineFunction(name: "#{k}Transform", optype: "continuous") do
+              xml.ParameterField(name: "text")
+              xml.ParameterField(name: "term")
+              xml.TextIndex(textField: "text", localTermWeights: "termFrequency", wordSeparatorCharacterRE: text_options[:tokenizer].source, isCaseSensitive: !!text_options[:case_sensitive]) do
+                xml.FieldRef(field: "term")
+              end
+            end
+          end
+        end
+      end
+    end
+
+    def pmml_local_transformations(xml)
+      if @text_features.any?
+        xml.LocalTransformations do
+          @text_features.each do |k, _|
+            @text_encoders[k].vocabulary.each do |v|
+              xml.DerivedField(name: "#{k}@#{v}", optype: "continuous", dataType: "integer") do
+                xml.Apply(function: "#{k}Transform") do
+                  xml.FieldRef(field: k)
+                  xml.Constant v
+                end
+              end
+            end
           end
         end
       end

@@ -80,6 +80,8 @@ module Eps
 
       data = @train_set
 
+      prep_text_features(data)
+
       # convert boolean to strings
       data.label = data.label.map(&:to_s)
 
@@ -111,13 +113,16 @@ module Eps
           values = xs.columns[k]
 
           prob[group] =
-            if type == "categorical"
+            case type
+            when "categorical"
               # TODO apply smoothing
               # apply smoothing only to
               # 1. categorical features
               # 2. conditional probabilities
               # TODO more efficient count
               group_count(values)
+            when "text"
+              raise "Text features not supported yet for naive Bayes"
             else
               {mean: mean(values), stdev: stdev(values)}
             end

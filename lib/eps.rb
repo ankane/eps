@@ -14,6 +14,7 @@ require "eps/metrics"
 require "eps/model"
 require "eps/naive_bayes"
 require "eps/statistics"
+require "eps/text_encoder"
 require "eps/utils"
 require "eps/version"
 

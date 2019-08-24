@@ -1,9 +1,10 @@
 module Eps
   module Evaluators
     class LinearRegression
-      def initialize(coefficients:, features: nil)
+      def initialize(coefficients:, features: nil, text_features: nil)
         @coefficients = Hash[coefficients.map { |k, v| [k.is_a?(Array) ? [k[0].to_s, k[1]] : k.to_s, v] }]
         @features = features
+        @text_features = text_features || {}
 
         # legacy
         unless @features
@@ -26,9 +27,24 @@ module Eps
 
           raise "Missing data in #{k}" if !x.columns[k] || x.columns[k].any?(&:nil?)
 
-          if type == "categorical"
+          case type
+          when "categorical"
             x.columns[k].each_with_index do |xv, i|
               scores[i] += @coefficients[[k, xv]].to_f
+            end
+          when "text"
+            encoder = TextEncoder.new(@text_features[k])
+            counts = encoder.fit(x.columns[k])
+            coef = {}
+            @coefficients.each do |k2, v|
+              next unless k2.is_a?(Array) && k2.first == k
+              coef[k2.last] = v
+            end
+
+            counts.each_with_index do |xc, i|
+              xc.each do |word, count|
+                scores[i] += coef[word] * count if coef[word]
+              end
             end
           else
             coef = @coefficients[k].to_f

@@ -52,16 +52,32 @@ module Eps
         features = {}
         node.css("NumericPredictor").each do |n|
           name = n.attribute("name").value
+          if name.include?("@")
+            name = name.split("@")
+          else
+            features[name] = "numeric"
+          end
           coefficients[name] = n.attribute("coefficient").value.to_f
-          features[name] = "numeric"
         end
         node.css("CategoricalPredictor").each do |n|
           name = n.attribute("name").value
           coefficients[[name, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
           features[name] = "categorical"
         end
+        data.css("LocalTransformations FieldRef").map { |n| n.attribute("field").value }.uniq.each do |name|
+          features[name] = "text"
+        end
+        text_features = {}
+        data.css("TransformationDictionary DefineFunction").each do |n|
+          name = n.attribute("name").value.sub(/Transform\z/, "")
+          text_index = n.css("TextIndex")
+          text_features[name] = {
+            tokenizer: Regexp.new(text_index.attribute("wordSeparatorCharacterRE").value),
+            case_sensitive: text_index.attribute("isCaseSensitive").value == "true"
+          }
+        end
 
-        Evaluators::LinearRegression.new(coefficients: coefficients, features: features)
+        Evaluators::LinearRegression.new(coefficients: coefficients, features: features, text_features: text_features)
       end
     end
 
@@ -205,7 +221,7 @@ module Eps
 
       @coefficient_names = ["_intercept"] + data.columns.keys
       @coefficients = Hash[@coefficient_names.zip(v3)]
-      Evaluators::LinearRegression.new(coefficients: @coefficients)
+      Evaluators::LinearRegression.new(coefficients: @coefficients, features: @features, text_features: @text_features)
     end
 
     def generate_pmml
@@ -226,10 +242,15 @@ module Eps
               xml.MiningField(name: k)
             end
           end
+          pmml_local_transformations(xml)
           xml.RegressionTable(intercept: @coefficients["_intercept"]) do
             predictors.each do |k, v|
               if k.is_a?(Array)
-                xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
+                if @features[k.first] == "text"
+                  xml.NumericPredictor(name: k.join("@"), coefficient: v)
+                else
+                  xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
+                end
               else
                 xml.NumericPredictor(name: k, coefficient: v)
               end
@@ -250,11 +271,12 @@ module Eps
           end
         end
       end
+      prep_text_features(x)
       x
     end
 
     def display_field(k)
-      k.is_a?(Array) ? k.join("") : k
+      k.is_a?(Array) ? k.join("@") : k
     end
 
     def constant?(arr)

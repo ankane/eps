@@ -78,7 +78,7 @@ Selecting features for a model is extremely important for performance. Features 
 
 1. numeric
 2. categorical
-3. text (coming soon)
+3. text
 
 #### Numeric
 
@@ -114,6 +114,28 @@ For times, create features like day of week and hour of day.
 
 ```ruby
 {weekday: listed_at.strftime("%a"), hour: listed_at.hour.to_s}
+```
+
+#### Text [master, experimental]
+
+For text features, use:
+
+```ruby
+Eps::Model.new(data, target: :price, text_features: [:description])
+```
+
+This creates features based on word count (term frequency). You can set advanced options with:
+
+```ruby
+text_features: {
+  description: {
+    min_occurences: 5,
+    max_features: 1000,
+    min_length: 1,
+    case_sensitive: true,
+    tokenizer: /\s+/
+  }
+}
 ```
 
 ---
