@@ -1,8 +1,7 @@
 module Eps
   class Model
-    def initialize(data = nil, y = nil, target: nil, estimator: nil, pmml: nil, **options)
+    def initialize(data = nil, y = nil, target: nil, estimator: nil, **options)
       @options = options
-      @pmml = pmml
 
       if estimator
         @estimator = estimator
@@ -27,11 +26,7 @@ module Eps
           raise "Unknown model"
         end
 
-      new(estimator: estimator_class.load_pmml(data), pmml: data)
-    end
-
-    def to_pmml
-      (@pmml ||= @estimator.to_pmml).to_xml
+      new(estimator: estimator_class.load_pmml(data))
     end
 
     # ruby - legacy

@@ -85,60 +85,62 @@ module Eps
     # pmml
 
     def self.load_pmml(data)
-      # TODO more validation
-      node = data.css("NaiveBayesModel")
+      super do |data|
+        # TODO more validation
+        node = data.css("NaiveBayesModel")
 
-      prior = {}
-      node.css("BayesOutput TargetValueCount").each do |n|
-        prior[n.attribute("value").value] = n.attribute("count").value.to_f
-      end
-
-      conditional = {}
-      features = {}
-      node.css("BayesInput").each do |n|
-        prob = {}
-
-        # numeric
-        n.css("TargetValueStat").each do |n2|
-          n3 = n2.css("GaussianDistribution")
-          prob[n2.attribute("value").value] = {
-            mean: n3.attribute("mean").value.to_f,
-            stdev: Math.sqrt(n3.attribute("variance").value.to_f)
-          }
+        prior = {}
+        node.css("BayesOutput TargetValueCount").each do |n|
+          prior[n.attribute("value").value] = n.attribute("count").value.to_f
         end
 
-        # categorical
-        n.css("PairCounts").each do |n2|
-          boom = {}
-          n2.css("TargetValueCount").each do |n3|
-            boom[n3.attribute("value").value] = n3.attribute("count").value.to_f
+        conditional = {}
+        features = {}
+        node.css("BayesInput").each do |n|
+          prob = {}
+
+          # numeric
+          n.css("TargetValueStat").each do |n2|
+            n3 = n2.css("GaussianDistribution")
+            prob[n2.attribute("value").value] = {
+              mean: n3.attribute("mean").value.to_f,
+              stdev: Math.sqrt(n3.attribute("variance").value.to_f)
+            }
           end
-          prob[n2.attribute("value").value] = boom
+
+          # categorical
+          n.css("PairCounts").each do |n2|
+            boom = {}
+            n2.css("TargetValueCount").each do |n3|
+              boom[n3.attribute("value").value] = n3.attribute("count").value.to_f
+            end
+            prob[n2.attribute("value").value] = boom
+          end
+
+          name = n.attribute("fieldName").value
+          conditional[name] = prob
+          features[name] = n.css("TargetValueStat").any? ? "numeric" : "categorical"
         end
 
-        name = n.attribute("fieldName").value
-        conditional[name] = prob
-        features[name] = n.css("TargetValueStat").any? ? "numeric" : "categorical"
+        target = node.css("BayesOutput").attribute("fieldName").value
+
+        probabilities = {
+          prior: prior,
+          conditional: conditional
+        }
+
+        Evaluators::NaiveBayes.new(probabilities: probabilities, features: features)
       end
-
-      target = node.css("BayesOutput").attribute("fieldName").value
-
-      probabilities = {
-        prior: prior,
-        conditional: conditional
-      }
-
-      new(evaluator: Evaluators::NaiveBayes.new(probabilities: probabilities, features: features))
     end
 
-    def to_pmml
+    private
+
+    def generate_pmml
       data_fields = {}
       data_fields[@target] = probabilities[:prior].keys
       probabilities[:conditional].each do |k, v|
         if @features[k] == "categorical"
           data_fields[k] = v.keys
-        else
-          data_fields[k] = nil
         end
       end
 
@@ -184,8 +186,6 @@ module Eps
         end
       end
     end
-
-    private
 
     def group_count(arr)
       r = arr.inject(Hash.new(0)) { |h, e| h[e] += 1; h }

@@ -132,55 +132,25 @@ module Eps
     # pmml
 
     def self.load_pmml(data)
-      # TODO more validation
-      node = data.css("RegressionTable")
-      coefficients = {
-        "_intercept" => node.attribute("intercept").value.to_f
-      }
-      features = {}
-      node.css("NumericPredictor").each do |n|
-        name = n.attribute("name").value
-        coefficients[name] = n.attribute("coefficient").value.to_f
-        features[name] = "numeric"
-      end
-      node.css("CategoricalPredictor").each do |n|
-        name = n.attribute("name").value
-        coefficients[[name, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
-        features[name] = "categorical"
-      end
-      new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients, features: features))
-    end
-
-    def to_pmml
-      predictors = @coefficients.dup
-      predictors.delete("_intercept")
-
-      data_fields = {}
-      predictors.keys.each do |k|
-        if @features[k] == "categorical"
-          (data_fields[k[0]] ||= []) << k[1]
-        else
-          data_fields[k] = nil
+      super do |data|
+        # TODO more validation
+        node = data.css("RegressionTable")
+        coefficients = {
+          "_intercept" => node.attribute("intercept").value.to_f
+        }
+        features = {}
+        node.css("NumericPredictor").each do |n|
+          name = n.attribute("name").value
+          coefficients[name] = n.attribute("coefficient").value.to_f
+          features[name] = "numeric"
         end
-      end
-
-      build_pmml(data_fields) do |xml|
-        xml.RegressionModel(functionName: "regression") do
-          xml.MiningSchema do
-            data_fields.each do |k, _|
-              xml.MiningField(name: k)
-            end
-          end
-          xml.RegressionTable(intercept: @coefficients["_intercept"]) do
-            predictors.each do |k, v|
-              if @features[k] == "categorical"
-                xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
-              else
-                xml.NumericPredictor(name: k, coefficient: v)
-              end
-            end
-          end
+        node.css("CategoricalPredictor").each do |n|
+          name = n.attribute("name").value
+          coefficients[[name, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
+          features[name] = "categorical"
         end
+
+        Evaluators::LinearRegression.new(coefficients: coefficients, features: features)
       end
     end
 
@@ -239,6 +209,37 @@ module Eps
     end
 
     private
+
+    def generate_pmml
+      predictors = @coefficients.dup
+      predictors.delete("_intercept")
+
+      data_fields = {}
+      predictors.keys.each do |k|
+        if @features[k] == "categorical"
+          (data_fields[k[0]] ||= []) << k[1]
+        end
+      end
+
+      build_pmml(data_fields) do |xml|
+        xml.RegressionModel(functionName: "regression") do
+          xml.MiningSchema do
+            data_fields.each do |k, _|
+              xml.MiningField(name: k)
+            end
+          end
+          xml.RegressionTable(intercept: @coefficients["_intercept"]) do
+            predictors.each do |k, v|
+              if @features[k] == "categorical"
+                xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
+              else
+                xml.NumericPredictor(name: k, coefficient: v)
+              end
+            end
+          end
+        end
+      end
+    end
 
     def prep_x(x)
       x = x.dup

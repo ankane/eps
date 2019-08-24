@@ -25,6 +25,20 @@ module Eps
       Eps.metrics(data.label, predict(data))
     end
 
+    def to_pmml
+      (@pmml ||= generate_pmml).to_xml
+    end
+
+    def self.load_pmml(data)
+      if data.is_a?(String)
+        data = Nokogiri::XML(data) { |config| config.strict }
+      end
+      model = new
+      model.instance_variable_set("@pmml", data) # cache data
+      model.instance_variable_set("@evaluator", yield(data))
+      model
+    end
+
     private
 
     def prep_data(data, y, target)
