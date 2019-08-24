@@ -6,67 +6,6 @@ module Eps
       @evaluator = evaluator
     end
 
-    def train(*args)
-      super
-
-      raise "Target must be strings" if @target_type != "categorical"
-
-      data = @data
-
-      # convert boolean to strings
-      data.label = data.label.map(&:to_s)
-
-      indexes = {}
-      data.label.each_with_index do |yi, i|
-        (indexes[yi] ||= []) << i
-      end
-
-      grouped = {}
-      indexes.each do |k, v|
-        grouped[k] = data[v]
-      end
-
-      prior = {}
-      grouped.each do |k, v|
-        prior[k] = v.size
-      end
-
-      conditional = {}
-      @features.each do |k, type|
-        prob = {}
-
-        prior.keys.each do |group|
-          xs = grouped[group]
-
-          # TODO handle this case
-          next unless xs
-
-          values = xs.columns[k]
-
-          prob[group] =
-            if type == "categorical"
-              # TODO apply smoothing
-              # apply smoothing only to
-              # 1. categorical features
-              # 2. conditional probabilities
-              # TODO more efficient count
-              group_count(values)
-            else
-              {mean: mean(values), stdev: stdev(values)}
-            end
-        end
-
-        conditional[k] = prob
-      end
-
-      @probabilities = {
-        prior: prior,
-        conditional: conditional
-      }
-
-      @evaluator = Evaluators::NaiveBayes.new(probabilities: probabilities, features: @features)
-    end
-
     # TODO better summary
     def summary(extended: false)
       str = String.new("")
@@ -79,7 +18,7 @@ module Eps
     end
 
     def accuracy
-      Eps::Metrics.accuracy(@data.label, predict(@data))
+      Eps::Metrics.accuracy(@train_set.label, predict(@train_set))
     end
 
     # pmml
@@ -134,6 +73,66 @@ module Eps
     end
 
     private
+
+
+    def _train
+      raise "Target must be strings" if @target_type != "categorical"
+
+      data = @train_set
+
+      # convert boolean to strings
+      data.label = data.label.map(&:to_s)
+
+      indexes = {}
+      data.label.each_with_index do |yi, i|
+        (indexes[yi] ||= []) << i
+      end
+
+      grouped = {}
+      indexes.each do |k, v|
+        grouped[k] = data[v]
+      end
+
+      prior = {}
+      grouped.each do |k, v|
+        prior[k] = v.size
+      end
+
+      conditional = {}
+      @features.each do |k, type|
+        prob = {}
+
+        prior.keys.each do |group|
+          xs = grouped[group]
+
+          # TODO handle this case
+          next unless xs
+
+          values = xs.columns[k]
+
+          prob[group] =
+            if type == "categorical"
+              # TODO apply smoothing
+              # apply smoothing only to
+              # 1. categorical features
+              # 2. conditional probabilities
+              # TODO more efficient count
+              group_count(values)
+            else
+              {mean: mean(values), stdev: stdev(values)}
+            end
+        end
+
+        conditional[k] = prob
+      end
+
+      @probabilities = {
+        prior: prior,
+        conditional: conditional
+      }
+
+      Evaluators::NaiveBayes.new(probabilities: probabilities, features: @features)
+    end
 
     def generate_pmml
       data_fields = {}

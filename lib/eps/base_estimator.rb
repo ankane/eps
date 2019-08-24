@@ -1,14 +1,17 @@
 module Eps
   class BaseEstimator
     def train(data, y = nil, target: nil, **options)
-      @data, @target = prep_data(data, y, target)
-      @target_type = Utils.column_type(@data.label, @target)
+      data, @target = prep_data(data, y, target)
+      @target_type = Utils.column_type(data.label, @target)
 
       # determine feature types
       @features = {}
-      @data.columns.each do |k, v|
+      data.columns.each do |k, v|
         @features[k] = Utils.column_type(v, k)
       end
+
+      @train_set = data
+      @evaluator = _train
     end
 
     def predict(data)
