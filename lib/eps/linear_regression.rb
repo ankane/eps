@@ -73,7 +73,10 @@ module Eps
           end
           # huge performance boost
           # by multiplying xt * y first
-          v2 = matrix_arr(@xtxi * (xt * y))
+          v2 = @xtxi * (xt * y)
+
+          # convert to array
+          v2 = v2.to_a.map { |xi| xi[0].to_f }
 
           # add back removed
           removed.sort.each do |i|
@@ -202,11 +205,6 @@ module Eps
       new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients))
     end
 
-    # private
-    def self.mean(arr)
-      arr.inject(0, &:+) / arr.size.to_f
-    end
-
     # https://people.richland.edu/james/ictcm/2004/multiple.html
     def summary(extended: false)
       coefficients = @coefficients
@@ -239,6 +237,20 @@ module Eps
     end
 
     private
+
+    def prep_x(x)
+      x = x.dup
+      @features.each do |k, type|
+        if type == "categorical"
+          values = x.columns.delete(k)
+          labels = values.uniq[1..-1]
+          labels.each do |label|
+            x.columns[[k, label]] = values.map { |v| v == label ? 1 : 0 }
+          end
+        end
+      end
+      x
+    end
 
     def display_field(k)
       k.is_a?(Array) ? k.join("") : k
@@ -326,24 +338,6 @@ module Eps
 
     def mean(arr)
       arr.sum / arr.size.to_f
-    end
-
-    def prep_x(x)
-      x = x.dup
-      @features.each do |k, type|
-        if type == "categorical"
-          values = x.columns.delete(k)
-          labels = values.uniq[1..-1]
-          labels.each do |label|
-            x.columns[[k, label]] = values.map { |v| v == label ? 1 : 0 }
-          end
-        end
-      end
-      x
-    end
-
-    def matrix_arr(matrix)
-      matrix.to_a.map { |xi| xi[0].to_f }
     end
   end
 end
