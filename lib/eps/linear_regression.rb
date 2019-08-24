@@ -1,15 +1,7 @@
 module Eps
   class LinearRegression < BaseEstimator
-    def initialize(coefficients: nil, features: nil, gsl: nil)
-      @coefficients = Hash[coefficients.map { |k, v| [k.is_a?(Array) ? [k[0].to_s, k[1]] : k.to_s, v] }] if coefficients
-      @features = features
-
-      # legacy
-      if @coefficients && !@features
-        @features = Hash[@coefficients.keys.map { |k| [k.is_a?(Array) ? k.first : k, "numeric"] }]
-        @features.delete("_intercept")
-      end
-
+    def initialize(evaluator: nil, gsl: nil)
+      @evaluator = evaluator
       @gsl = gsl.nil? ? defined?(GSL) : gsl
     end
 
@@ -87,18 +79,19 @@ module Eps
         end
 
       @coefficients = Hash[@coefficient_names.zip(v3)]
+      @evaluator = Evaluators::LinearRegression.new(coefficients: @coefficients)
     end
 
     # legacy
 
     def coefficients
-      Hash[@coefficients.map { |k, v| [Array(k).join.to_sym, v] }]
+      @evaluator.coefficients
     end
 
     # ruby
 
     def self.load(data)
-      new(Hash[data.map { |k, v| [k.to_sym, v] }])
+      new(evaluator: Evaluators::LinearRegression.new(Hash[data.map { |k, v| [k.to_sym, v] }]))
     end
 
     def dump
@@ -117,7 +110,7 @@ module Eps
         coefficients["_intercept"] = coefficients.delete("(Intercept)")
       end
 
-      new(coefficients: coefficients)
+      new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients))
     end
 
     def to_json(opts = {})
@@ -143,7 +136,7 @@ module Eps
         coefficients[[name, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
         features[name] = "categorical"
       end
-      new(coefficients: coefficients, features: features)
+      new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients, features: features))
     end
 
     def to_pmml
@@ -199,7 +192,7 @@ module Eps
         raise "Coefficients with same name" if coefficients[name]
         coefficients[name] = c
       end
-      new(coefficients: coefficients)
+      new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients))
     end
 
     # metrics
@@ -245,21 +238,6 @@ module Eps
     end
 
     private
-
-    def _predict(x)
-      x, c = prep_x(x, train: false)
-
-      coef = c.map do |v|
-        # use 0 if coefficient does not exist
-        # this can happen for categorical features
-        # since only n-1 coefficients are stored
-        @coefficients[v] || 0
-      end
-
-      x = Matrix.rows(x)
-      c = Matrix.column_vector(coef)
-      matrix_arr(x * c)
-    end
 
     def display_field(k)
       k.is_a?(Array) ? k.join("") : k
@@ -349,7 +327,7 @@ module Eps
       arr.sum / arr.size.to_f
     end
 
-    def prep_x(x, train: true)
+    def prep_x(x)
       matrix = []
       column_names = []
 
@@ -359,31 +337,15 @@ module Eps
       end
       column_names << "_intercept"
 
-      legacy_format = false
-
       @features.each do |k, type|
-        # legacy format
-        if !x.columns[k] && type == "numeric" && !train && !@features.any? { |k, v| v == "categorical" }
-          legacy_format = true
-          expand_legacy_format(x)
-        end
-
-        raise "Missing data in #{k}" if !x.columns[k] || x.columns[k].any?(&:nil?)
-
         if type == "numeric"
           x.columns[k].zip(matrix) do |xi, mi|
             mi << xi
           end
           column_names << k
         else
-          values =
-            if train
-              # n - 1 dummy variables
-              x.columns[k].uniq[1..-1]
-            else
-              # get from coefficients
-              @coefficients.select { |k2, _| k2.is_a?(Array) && k2[0] == k }.map { |k2, _| k2[1] }
-            end
+          # n - 1 dummy variables
+          values = x.columns[k].uniq[1..-1]
 
           # get index to set
           indexes = {}
@@ -403,32 +365,11 @@ module Eps
         end
       end
 
-      if legacy_format
-        # only warn when method completes successfully
-        warn "[eps] DEPRECATION WARNING: Thanks for being an early adopter!\nUnfortunately, this model is stored in a legacy format.\nIt will stop working with Eps 0.3.0.\nPlease retrain the model and store as PMML."
-      end
-
       [matrix, column_names]
     end
 
     def matrix_arr(matrix)
       matrix.to_a.map { |xi| xi[0].to_f }
-    end
-
-    # expand categorical features
-    def expand_legacy_format(x)
-      x.columns.keys.each do |k2|
-        v2 = x.columns[k2]
-        if v2[0].is_a?(String)
-          v2.uniq.each do |v3|
-            x.columns["#{k2}#{v3}"] = [0] * v2.size
-          end
-          v2.each_with_index do |v3, i|
-            x.columns["#{k2}#{v3}"][i] = 1
-          end
-          x.columns.delete(k2)
-        end
-      end
     end
   end
 end

@@ -21,7 +21,7 @@ module Eps
       x = [x] if singular
 
       x = normalize_x(x)
-      pred = _predict(x)
+      pred = @evaluator.predict(x)
 
       singular ? pred[0] : pred
     end
