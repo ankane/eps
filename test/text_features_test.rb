@@ -38,14 +38,14 @@ class TextFeaturesTest < Minitest::Test
 
     model = Eps::Model.new
     model.train(data, target: :y, text_features: {x: {max_features: 1, max_occurrences: 2}})
-    assert_equal [3, 5], model.predict([{x: "Sunday is the best"}, {x: "Monday is the best"}])
+    assert_elements_in_delta [3, 5], model.predict([{x: "Sunday is the best"}, {x: "Monday is the best"}])
 
     pmml = model.to_pmml
     assert_includes pmml, "RegressionModel"
     assert_valid_pmml(pmml)
 
     model = Eps::Model.load_pmml(pmml)
-    assert_equal [3, 5], model.predict([{x: "Sunday is the best!!"}, {x: "Monday is the best!!"}])
+    assert_elements_in_delta [3, 5], model.predict([{x: "Sunday is the best!!"}, {x: "Monday is the best!!"}])
   end
 
   def test_case_sensitive
@@ -58,9 +58,9 @@ class TextFeaturesTest < Minitest::Test
 
     model = Eps::Model.new
     model.train(data, target: :y, text_features: {x: {max_features: 1, max_occurrences: 2, case_sensitive: true}})
-    assert_equal [3, 5], model.predict([{x: "Sunday is the best"}, {x: "sunday is the best"}])
+    assert_elements_in_delta [3, 5], model.predict([{x: "Sunday is the best"}, {x: "sunday is the best"}])
 
     model = Eps::Model.load_pmml(model.to_pmml)
-    assert_equal [3, 5], model.predict([{x: "Sunday is the best!!"}, {x: "sunday is the best!!"}])
+    assert_elements_in_delta [3, 5], model.predict([{x: "Sunday is the best!!"}, {x: "sunday is the best!!"}])
   end
 end
