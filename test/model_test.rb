@@ -16,6 +16,14 @@ class ModelTest < Minitest::Test
     end
   end
 
+  def test_unknown_target
+    data = [1, 2, 3, 4, 5].map { |xi| {x: xi, y: 3 + xi * 5 + rand} }
+    error = assert_raises do
+      Eps::Model.new(data, target: :unknown)
+    end
+    assert_equal "Missing column: unknown", error.message
+  end
+
   def test_boolean_target
     data = [
       {x: "Sunday", y: true},
