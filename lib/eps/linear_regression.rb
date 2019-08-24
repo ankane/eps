@@ -195,12 +195,6 @@ module Eps
       new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients))
     end
 
-    # metrics
-
-    def self.metrics(actual, estimated)
-      Eps.metrics(actual, estimated)
-    end
-
     # private
     def self.mean(arr)
       arr.inject(0, &:+) / arr.size.to_f

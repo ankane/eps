@@ -77,7 +77,7 @@ module Eps
     end
 
     def accuracy
-      self.class.metrics(predict(@x), @y)[:accuracy]
+      Eps::Metrics.accuracy(predict(@x), @y)
     end
 
     # pmml
@@ -181,12 +181,6 @@ module Eps
           end
         end
       end
-    end
-
-    # metrics
-
-    def self.metrics(actual, estimated)
-      Eps.metrics(actual, estimated)
     end
 
     private
