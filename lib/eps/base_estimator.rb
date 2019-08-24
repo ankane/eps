@@ -1,43 +1,47 @@
 module Eps
   class BaseEstimator
     def train(data, y = nil, target: nil, **options)
-      @x = Eps::DataFrame.new(data)
-      @target = (target || "target").to_s
-      @y = (y || @x.columns.delete(target)).to_a
-
-      check_data(@x, @y)
+      @data, @target = prep_data(data, y, target)
+      @target_type = Utils.column_type(@data.label, @target)
 
       # determine feature types
       @features = {}
-      @x.columns.each do |k, v|
+      @data.columns.each do |k, v|
         @features[k] = Utils.column_type(v, k)
       end
     end
 
-    def predict(x)
-      singular = x.is_a?(Hash)
-      x = [x] if singular
+    def predict(data)
+      singular = data.is_a?(Hash)
+      data = [data] if singular
 
-      x = Eps::DataFrame.new(x)
-      pred = @evaluator.predict(x)
+      predictions = @evaluator.predict(Eps::DataFrame.new(data))
 
-      singular ? pred[0] : pred
+      singular ? predictions.first : predictions
     end
 
     def evaluate(data, y = nil, target: nil)
-      target ||= @target
-      raise ArgumentError, "missing target" if !target && !y
-
-      data = Eps::DataFrame.new(data)
-      actual = y || data.columns[target.to_s]
-      check_data(data, actual)
-
-      estimated = predict(data)
-
-      Eps.metrics(actual, estimated)
+      data, target = prep_data(data, y, target || @target)
+      Eps.metrics(data.label, predict(data))
     end
 
     private
+
+    def prep_data(data, y, target)
+      data = Eps::DataFrame.new(data)
+      target = (target || "target").to_s
+      data.label = (y || data.columns.delete(target)).to_a
+      check_data(data)
+      [data, target]
+    end
+
+    def check_data(data)
+      raise "No data" if data.empty?
+      raise "Number of samples differs from target" if data.size != data.label.size
+      raise "Target missing in data" if data.label.any?(&:nil?)
+    end
+
+    # pmml
 
     def build_pmml(data_fields)
       Nokogiri::XML::Builder.new do |xml|
@@ -70,12 +74,6 @@ module Eps
           end
         end
       end
-    end
-
-    def check_data(x, y)
-      raise "No data" if x.empty?
-      raise "Number of samples differs from target" if x.size != y.size
-      raise "Target missing in data" if y.any?(&:nil?)
     end
   end
 end

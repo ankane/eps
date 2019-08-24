@@ -8,7 +8,9 @@ module Eps
     def train(*args)
       super
 
-      data = prep_x(@x)
+      raise "Target must be numeric" if @target_type != "numeric"
+
+      data = prep_x(@data)
 
       if data.size < data.columns.size + 2
         raise "Number of samples must be at least two more than number of features"
@@ -23,12 +25,12 @@ module Eps
       v3 =
         if @gsl
           x = GSL::Matrix.alloc(*x)
-          y = GSL::Vector.alloc(@y)
+          y = GSL::Vector.alloc(data.label)
           c, @covariance, _, _ = GSL::MultiFit::linear(x, y)
           c.to_a
         else
           x = Matrix.rows(x)
-          y = Matrix.column_vector(@y)
+          y = Matrix.column_vector(data.label)
           removed = []
 
           # https://statsmaths.github.io/stat612/lectures/lec13/lecture13.pdf
@@ -306,26 +308,26 @@ module Eps
     end
 
     def y_bar
-      @y_bar ||= mean(@y)
+      @y_bar ||= mean(@data.label)
     end
 
     def y_hat
-      @y_hat ||= predict(@x)
+      @y_hat ||= predict(@data)
     end
 
     # total sum of squares
     def sst
-      @sst ||= @y.map { |y| (y - y_bar)**2 }.sum
+      @sst ||= @data.label.map { |y| (y - y_bar)**2 }.sum
     end
 
     # sum of squared errors of prediction
     # not to be confused with "explained sum of squares"
     def sse
-      @sse ||= @y.zip(y_hat).map { |y, yh| (y - yh)**2 }.sum
+      @sse ||= @data.label.zip(y_hat).map { |y, yh| (y - yh)**2 }.sum
     end
 
     def mst
-      @mst ||= sst / (@y.size - 1)
+      @mst ||= sst / (@data.size - 1)
     end
 
     def mse
@@ -333,7 +335,7 @@ module Eps
     end
 
     def degrees_of_freedom
-      @y.size - @coefficients.size
+      @data.size - @coefficients.size
     end
 
     def mean(arr)

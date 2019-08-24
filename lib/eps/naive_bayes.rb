@@ -9,19 +9,21 @@ module Eps
     def train(*args)
       super
 
-      @y = @y.map { |yi| yi.to_s }
-      x = @x
+      raise "Target must be strings" if @target_type != "categorical"
 
-      x.columns[@target] = @y
+      data = @data
+
+      # convert boolean to strings
+      data.label = data.label.map(&:to_s)
 
       indexes = {}
-      @y.each_with_index do |yi, i|
+      data.label.each_with_index do |yi, i|
         (indexes[yi] ||= []) << i
       end
 
       grouped = {}
       indexes.each do |k, v|
-        grouped[k] = x[v]
+        grouped[k] = data[v]
       end
 
       prior = {}
@@ -77,7 +79,7 @@ module Eps
     end
 
     def accuracy
-      Eps::Metrics.accuracy(predict(@x), @y)
+      Eps::Metrics.accuracy(@data.label, predict(@data))
     end
 
     # pmml
