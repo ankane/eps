@@ -6,8 +6,24 @@ module Eps
       if estimator
         @estimator = estimator
       elsif data # legacy
-        train(data, y, target: target)
+        train(data, y, target: target, verbose: false)
       end
+    end
+
+    def train(data, y = nil, target: nil, **options)
+      data = Eps::DataFrame.new(data)
+      target = (target || "target").to_s
+      y ||= data.columns.delete(target)
+
+      estimator_class =
+        if Utils.column_type(y, target) == "numeric"
+          Eps::LinearRegression
+        else
+          Eps::NaiveBayes
+        end
+
+      @estimator = estimator_class.new(**@options)
+      @estimator.train(data, y, target: target, **options)
     end
 
     # pmml
@@ -58,22 +74,6 @@ module Eps
     end
 
     private
-
-    def train(data, y = nil, target: nil)
-      data = Eps::DataFrame.new(data)
-      target = (target || "target").to_s
-      y ||= data.columns.delete(target)
-
-      estimator_class =
-        if Utils.column_type(y, target) == "numeric"
-          Eps::LinearRegression
-        else
-          Eps::NaiveBayes
-        end
-
-      @estimator = estimator_class.new(**@options)
-      @estimator.train(data, y, target: target, verbose: false)
-    end
 
     def respond_to_missing?(name, include_private = false)
       if @estimator

@@ -1,6 +1,6 @@
 module Eps
   class BaseEstimator
-    def train(data, y = nil, target: nil, split: false, verbose: nil, **options)
+    def train(data, y = nil, target: nil, split: false, validation_set: nil, verbose: nil, **options)
       data, @target = prep_data(data, y, target)
       @target_type = Utils.column_type(data.label, @target)
 
@@ -11,7 +11,7 @@ module Eps
       end
 
       # cross validation
-      if split
+      if split && !validation_set
         split_p = 0.7
         if split == true
           rng = Random.new(0) # seed random number generator
@@ -25,9 +25,13 @@ module Eps
           train_idx, test_idx = (0...data.size).to_a.partition { |i| times[i] < split_time }
         end
         @train_set = data[train_idx]
-        test_set = data[test_idx]
+        validation_set = data[test_idx]
       else
         @train_set = data
+        if validation_set
+          validation_set = Eps::DataFrame.new(validation_set)
+          validation_set.label = validation_set.columns.delete(@target)
+        end
       end
 
       @evaluator = _train
@@ -37,9 +41,9 @@ module Eps
 
       # summary
       if verbose != false
-        if test_set
-          y_true = test_set.label
-          y_pred = predict(test_set)
+        if validation_set
+          y_true = validation_set.label
+          y_pred = predict(validation_set)
 
           case @target_type
           when "numeric"
