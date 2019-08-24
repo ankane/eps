@@ -1,6 +1,7 @@
 module Eps
   class DataFrame
     attr_reader :columns
+    attr_accessor :label
 
     def initialize(data = [])
       @columns = {}
@@ -48,11 +49,18 @@ module Eps
       @columns.any?
     end
 
-    # TODO remove
     def map
       if @columns.any?
         size.times.map do |i|
           yield Hash[@columns.map { |k, v| [k, v[i]] }]
+        end
+      end
+    end
+
+    def map_rows
+      if @columns.any?
+        size.times.map do |i|
+          yield @columns.map { |_, v| v[i] }
         end
       end
     end
@@ -106,12 +114,22 @@ module Eps
 
         df.columns[c] = columns[c].values_at(*rows)
       end
+      df.label = label.values_at(*rows) if label
 
       singular ? df.columns[cols[0]] : df
     end
 
     def ==(other)
       columns.keys == other.columns.keys && columns == other.columns
+    end
+
+    def dup
+      df = Eps::DataFrame.new
+      columns.each do |k, v|
+        df.columns[k] = v
+      end
+      df.label = label
+      df
     end
 
     private

@@ -8,10 +8,16 @@ module Eps
     def train(*args)
       super
 
-      x, @coefficient_names = prep_x(@x)
+      data = prep_x(@x)
 
-      if x.size <= @coefficient_names.size
+      if data.size < data.columns.size + 2
         raise "Number of samples must be at least two more than number of features"
+      end
+
+      x = data.map_rows(&:to_a)
+      data.size.times do |i|
+        # add intercept
+        x[i].unshift(1)
       end
 
       v3 =
@@ -78,6 +84,7 @@ module Eps
           v2
         end
 
+      @coefficient_names = ["_intercept"] + data.columns.keys
       @coefficients = Hash[@coefficient_names.zip(v3)]
       @evaluator = Evaluators::LinearRegression.new(coefficients: @coefficients)
     end
@@ -322,44 +329,17 @@ module Eps
     end
 
     def prep_x(x)
-      matrix = []
-      column_names = []
-
-      # intercept
-      x.size.times do
-        matrix << [1]
-      end
-      column_names << "_intercept"
-
+      x = x.dup
       @features.each do |k, type|
-        if type == "numeric"
-          x.columns[k].zip(matrix) do |xi, mi|
-            mi << xi
+        if type == "categorical"
+          values = x.columns.delete(k)
+          labels = values.uniq[1..-1]
+          labels.each do |label|
+            x.columns[[k, label]] = values.map { |v| v == label ? 1 : 0 }
           end
-          column_names << k
-        else
-          # n - 1 dummy variables
-          values = x.columns[k].uniq[1..-1]
-
-          # get index to set
-          indexes = {}
-          offset = column_names.size
-          values.each do |v|
-            indexes[v] = offset
-            offset += 1
-          end
-
-          zeros = [0] * values.size
-          x.columns[k].zip(matrix) do |xi, mi|
-            mi.concat(zeros)
-            off = indexes[xi]
-            mi[off] = 1 if off
-          end
-          column_names.concat(values.map { |v| [k, v] })
         end
       end
-
-      [matrix, column_names]
+      x
     end
 
     def matrix_arr(matrix)

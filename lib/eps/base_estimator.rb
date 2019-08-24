@@ -1,17 +1,15 @@
 module Eps
   class BaseEstimator
     def train(data, y, target: nil, **options)
-      x = normalize_x(data)
-      y = y.to_a
-      check_data(x, y)
-
-      @x = x
-      @y = y
+      @x = normalize_x(data)
+      @y = y.to_a
       @target = target || "target"
+
+      check_data(@x, @y)
 
       # determine feature types
       @features = {}
-      x.columns.each do |k, v|
+      @x.columns.each do |k, v|
         @features[k] = Utils.column_type(v, k)
       end
     end
