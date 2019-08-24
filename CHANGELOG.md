@@ -1,5 +1,6 @@
 ## 0.2.2 [unreleased]
 
+- Prefer `MyModel.train` over `MyModel.build`
 - Fixed error with classification and Daru
 
 ## 0.2.1
