@@ -6,7 +6,7 @@ module Eps
 
       # legacy
       if @coefficients && !@features
-        @features = Hash[@coefficients.keys.map { |k| [k, "numeric"] }]
+        @features = Hash[@coefficients.keys.map { |k| [k.is_a?(Array) ? k.first : k, "numeric"] }]
         @features.delete("_intercept")
       end
 
