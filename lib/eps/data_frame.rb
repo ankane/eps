@@ -38,7 +38,7 @@ module Eps
     end
 
     def empty?
-      @columns.empty?
+      size == 0
     end
 
     def size

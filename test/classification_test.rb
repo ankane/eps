@@ -2,8 +2,7 @@ require_relative "test_helper"
 
 class ClassificationTest < Minitest::Test
   def test_simple_classification
-    data = CSV.table("test/support/data/houses.csv").map { |row| row.to_h }
-
+    data = houses_data
     model = Eps::Model.new(data.map { |r| r.slice(:bedrooms, :bathrooms, :state, :color) }, target: :color)
     predictions = model.predict(data)
     correct = data.map { |r| r[:predicted_color] }

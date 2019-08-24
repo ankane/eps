@@ -39,4 +39,52 @@ class ModelTest < Minitest::Test
     model = Eps::Model.load_pmml(model.to_pmml)
     assert_equal "false", model.predict(x: "Monday")
   end
+
+  def test_split
+    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price) }
+    model = Eps::Model.new
+    model.train(data, target: :price, split: true)
+  end
+
+  def test_split_symbol
+    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new
+    model.train(data, target: :price, split: :listed_at)
+  end
+
+  def test_split_shuffle_false
+    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price) }
+    model = Eps::Model.new
+    model.train(data, target: :price, split: {shuffle: false})
+  end
+
+  def test_split_column
+    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new
+    model.train(data, target: :price, split: {column: :listed_at})
+  end
+
+  def test_split_column_value
+    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new
+    model.train(data, target: :price, split: {column: :listed_at, value: Date.today - 5})
+  end
+
+  def test_split_no_training_data
+    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new
+    error = assert_raises do
+      model.train(data, target: :price, split: {column: :listed_at, value: Date.today - 20})
+    end
+    assert_equal "No data in training set", error.message
+  end
+
+  def test_split_no_validation_data
+    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new
+    error = assert_raises do
+      model.train(data, target: :price, split: {column: :listed_at, value: Date.today + 20})
+    end
+    assert_equal "No data in validation set", error.message
+  end
 end

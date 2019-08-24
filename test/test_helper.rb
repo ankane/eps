@@ -18,4 +18,8 @@ class Minitest::Test
       assert_in_delta exp, act
     end
   end
+
+  def houses_data
+    CSV.table("test/support/data/houses.csv").map { |row| row.to_h }
+  end
 end

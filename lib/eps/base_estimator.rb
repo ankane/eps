@@ -16,28 +16,40 @@ module Eps
         }.merge(v || {})
       end
 
+      # cross validation
+      if split && !validation_set
+        split = {} if split == true
+        split = {column: split} unless split.is_a?(Hash)
+
+        # TODO rename this option
+        split_p = 1 - (split[:validation_ratio] || 0.3)
+        if split[:column]
+          split_column = split[:column].to_s
+          times = data.columns.delete(split_column)
+          check_missing(times, split_column)
+          split_index = (times.size * split_p).round
+          split_time = split[:value] || times.sort[split_index]
+          train_idx, validation_idx = (0...data.size).to_a.partition { |i| times[i] < split_time }
+        else
+          if split[:shuffle] != false
+            rng = Random.new(0) # seed random number generator
+            train_idx, validation_idx = (0...data.size).to_a.partition { rng.rand < split_p }
+          else
+            split_index = (data.size * split_p).round
+            train_idx, validation_idx = (0...data.size).to_a.partition { |i| i < split_index }
+          end
+        end
+      end
+
       # determine feature types
       @features = {}
       data.columns.each do |k, v|
         @features[k] = @text_features.key?(k) ? "text" : Utils.column_type(v, k)
       end
 
-      # cross validation
       if split && !validation_set
-        split_p = 0.7
-        if split == true
-          rng = Random.new(0) # seed random number generator
-          train_idx, test_idx = (0...data.size).to_a.partition { rng.rand < split_p }
-        else
-          split_column = split.to_s
-          times = data.columns.delete(split_column)
-          check_missing(times, split_column)
-          split_index = (times.size * split_p).round
-          split_time = times.sort[split_index]
-          train_idx, test_idx = (0...data.size).to_a.partition { |i| times[i] < split_time }
-        end
         @train_set = data[train_idx]
-        validation_set = data[test_idx]
+        validation_set = data[validation_idx]
       else
         @train_set = data.dup
         if validation_set
@@ -45,6 +57,9 @@ module Eps
           validation_set.label = validation_set.columns.delete(@target)
         end
       end
+
+      raise "No data in training set" if @train_set.empty?
+      raise "No data in validation set" if validation_set && validation_set.empty?
 
       @evaluator = _train
 
@@ -138,6 +153,11 @@ module Eps
       raise "No data" if data.empty?
       raise "Number of samples differs from target" if data.size != data.label.size
       raise "Target missing in data" if data.label.any?(&:nil?)
+    end
+
+    def check_missing(c, name)
+      raise ArgumentError, "Missing column: #{name}" if !c
+      raise ArgumentError, "Missing values in column #{name}" if c.any?(&:nil?)
     end
 
     # pmml
