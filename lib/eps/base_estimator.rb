@@ -48,7 +48,7 @@ module Eps
           pmml_data_dictionary(xml, data_fields)
           yield xml
         end
-      end.to_xml
+      end
     end
 
     def pmml_header(xml)
