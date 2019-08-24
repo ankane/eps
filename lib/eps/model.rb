@@ -69,8 +69,6 @@ module Eps
       target = (target || "target").to_s
       y ||= data.columns.delete(target)
 
-      check_missing(y, target)
-
       estimator_class =
         if Utils.column_type(y, target) == "numeric"
           Eps::LinearRegression
@@ -80,11 +78,6 @@ module Eps
 
       @estimator = estimator_class.new(**@options)
       @estimator.train(data, y, target: target)
-    end
-
-    def check_missing(c, name)
-      raise ArgumentError, "Missing column: #{name}" if !c
-      raise ArgumentError, "Missing values in column #{name}" if c.any?(&:nil?)
     end
 
     def respond_to_missing?(name, include_private = false)

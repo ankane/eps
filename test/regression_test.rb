@@ -197,7 +197,7 @@ class RegressionTest < Minitest::Test
     error = assert_raises do
       Eps::Model.new(data, target: :y)
     end
-    assert_equal "Missing data in x", error.message
+    assert_equal "Missing values in column x", error.message
   end
 
   def test_predict_missing_extra_data

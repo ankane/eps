@@ -1,11 +1,13 @@
 module Eps
   module Utils
     def self.column_type(c, k)
-      if c.all? { |v| v.nil? }
+      if !c
+        raise ArgumentError, "Missing column: #{k}"
+      elsif c.all? { |v| v.nil? }
         # goes here for empty as well
         nil
       elsif c.any? { |v| v.nil? }
-        raise ArgumentError, "Missing data in #{k}"
+        raise ArgumentError, "Missing values in column #{k}"
       elsif c.all? { |v| v.is_a?(Numeric) }
         "numeric"
       elsif c.all? { |v| v.is_a?(String) || v == true || v == false }
