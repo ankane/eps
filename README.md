@@ -78,6 +78,7 @@ Selecting features for a model is extremely important for performance. Features 
 
 1. numeric
 2. categorical
+3. text (coming soon)
 
 #### Numeric
 
