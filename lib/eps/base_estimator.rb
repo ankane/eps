@@ -1,9 +1,9 @@
 module Eps
   class BaseEstimator
-    def train(data, y, target: nil, **options)
-      @x = normalize_x(data)
-      @y = y.to_a
-      @target = target || "target"
+    def train(data, y = nil, target: nil, **options)
+      @x = Eps::DataFrame.new(data)
+      @target = (target || "target").to_s
+      @y = (y || @x.columns.delete(target)).to_a
 
       check_data(@x, @y)
 
@@ -18,7 +18,7 @@ module Eps
       singular = x.is_a?(Hash)
       x = [x] if singular
 
-      x = normalize_x(x)
+      x = Eps::DataFrame.new(x)
       pred = @evaluator.predict(x)
 
       singular ? pred[0] : pred
@@ -28,7 +28,7 @@ module Eps
       target ||= @target
       raise ArgumentError, "missing target" if !target && !y
 
-      data = normalize_x(data)
+      data = Eps::DataFrame.new(data)
       actual = y || data.columns[target.to_s]
       check_data(data, actual)
 
@@ -76,10 +76,6 @@ module Eps
       raise "No data" if x.empty?
       raise "Number of samples differs from target" if x.size != y.size
       raise "Target missing in data" if y.any?(&:nil?)
-    end
-
-    def normalize_x(x)
-      Eps::DataFrame.new(x)
     end
   end
 end
