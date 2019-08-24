@@ -229,7 +229,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_json
-    data = File.read("test/support/model.json")
+    data = File.read("test/support/linear_regression/model.json")
     model = Eps::Model.load_json(data)
     predictions = model.predict([{x: 6}, {x: 7}])
     assert_in_delta 33, predictions[0]
@@ -237,7 +237,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_json_python
-    data = File.read("test/support/pymodel.json")
+    data = File.read("test/support/linear_regression/pymodel.json")
     model = Eps::Model.load_json(data)
     predictions = model.predict([{x: 6}, {x: 7}])
     assert_in_delta 33, predictions[0]
@@ -252,7 +252,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pmml
-    data = File.read("test/support/model.pmml")
+    data = File.read("test/support/linear_regression/model.pmml")
     model = Eps::Model.load_pmml(data)
     predictions = model.predict([{x: 6}, {x: 7}])
     assert_in_delta 33, predictions[0]
@@ -260,7 +260,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pmml_string_keys
-    data = File.read("test/support/model.pmml")
+    data = File.read("test/support/linear_regression/model.pmml")
     model = Eps::Model.load_pmml(data)
     predictions = model.predict([{"x" => 6}, {"x" => 7}])
     assert_in_delta 33, predictions[0]
@@ -268,7 +268,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pmml_categorical
-    data = File.read("test/support/modelcat.pmml")
+    data = File.read("test/support/linear_regression/modelcat.pmml")
     model = Eps::Model.load_pmml(data)
     predictions = model.predict([{x: 6, weekday: "Sunday"}, {x: 7, weekday: "Monday"}])
     assert_in_delta 22, predictions[0]
@@ -276,7 +276,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pmml_python
-    data = File.read("test/support/pymodel.pmml")
+    data = File.read("test/support/linear_regression/pymodel.pmml")
     model = Eps::Model.load_pmml(data)
     predictions = model.predict([{x0: 6}, {x0: 7}])
     assert_in_delta 33, predictions[0]
@@ -284,7 +284,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pfa
-    data = File.read("test/support/model.pfa")
+    data = File.read("test/support/linear_regression/model.pfa")
     model = Eps::Model.load_pfa(data)
     predictions = model.predict([{x: 6}, {x: 7}])
     assert_in_delta 33, predictions[0]
@@ -292,7 +292,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pfa_categorical
-    data = File.read("test/support/modelcat.pfa")
+    data = File.read("test/support/linear_regression/modelcat.pfa")
     model = Eps::Model.load_pfa(data)
     predictions = model.predict([{x: 6, weekday: "Sunday"}, {x: 7, weekday: "Monday"}])
     assert_in_delta 22, predictions[0]
@@ -300,7 +300,7 @@ class RegressionTest < Minitest::Test
   end
 
   def test_load_pfa_python
-    data = File.read("test/support/pymodel.pfa")
+    data = File.read("test/support/linear_regression/pymodel.pfa")
     model = Eps::Model.load_pfa(data)
     predictions = model.predict([{x0: 6}, {x0: 7}])
     assert_in_delta 33, predictions[0]
@@ -308,14 +308,14 @@ class RegressionTest < Minitest::Test
   end
 
   def test_to_json
-    data = File.read("test/support/modelcat.pmml")
+    data = File.read("test/support/linear_regression/modelcat.pmml")
     model = Eps::Model.load_pmml(data)
     assert_includes model.to_json, "weekdaySunday"
     assert_includes JSON.generate(model), "weekdaySunday"
   end
 
   def test_to_pmml
-    data = File.read("test/support/modelcat.pmml")
+    data = File.read("test/support/linear_regression/modelcat.pmml")
     model = Eps::Model.load_pmml(data)
     pmml = model.to_pmml
     assert_includes pmml, "RegressionModel"

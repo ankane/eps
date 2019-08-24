@@ -2,7 +2,7 @@ require_relative "test_helper"
 
 class ClassificationTest < Minitest::Test
   def test_simple_classification
-    data = CSV.table("test/support/houses.csv").map { |row| row.to_h }
+    data = CSV.table("test/support/data/houses.csv").map { |row| row.to_h }
 
     model = Eps::Model.new(data.map { |r| r.slice(:bedrooms, :bathrooms, :state, :color) }, target: :color)
     predictions = model.predict(data)
@@ -20,7 +20,7 @@ class ClassificationTest < Minitest::Test
   end
 
   def test_daru
-    df = Daru::DataFrame.from_csv("test/support/houses.csv")
+    df = Daru::DataFrame.from_csv("test/support/data/houses.csv")
     df = df["bedrooms", "bathrooms", "state", "color"]
 
     model = Eps::Model.new(df, target: "color")
@@ -42,12 +42,12 @@ class ClassificationTest < Minitest::Test
   end
 
   def test_load_pmml
-    data = File.read("test/support/classifier.pmml")
+    data = File.read("test/support/naive_bayes/classifier.pmml")
     Eps::Model.load_pmml(data)
   end
 
   def test_to_pmml
-    data = File.read("test/support/classifier.pmml")
+    data = File.read("test/support/naive_bayes/classifier.pmml")
     model = Eps::Model.load_pmml(data)
     pmml = model.to_pmml
     assert_includes pmml, "NaiveBayesModel"
