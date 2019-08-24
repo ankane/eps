@@ -51,6 +51,5 @@ class ClassificationTest < Minitest::Test
     model = Eps::Model.load_pmml(data)
     pmml = model.to_pmml
     assert_includes pmml, "NaiveBayesModel"
-    assert_valid_pmml pmml
   end
 end

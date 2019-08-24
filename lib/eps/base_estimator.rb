@@ -60,10 +60,10 @@ module Eps
 
     def pmml_data_dictionary(xml, data_fields)
       xml.DataDictionary do
-        data_fields.each do |k, vs|
-          if @features[k] == "categorical"
+        @features.each do |k, type|
+          if type == "categorical"
             xml.DataField(name: k, optype: "categorical", dataType: "string") do
-              vs.each do |v|
+              data_fields[k].map(&:to_s).sort.each do |v|
                 xml.Value(value: v)
               end
             end

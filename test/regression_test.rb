@@ -319,7 +319,6 @@ class RegressionTest < Minitest::Test
     model = Eps::Model.load_pmml(data)
     pmml = model.to_pmml
     assert_includes pmml, "RegressionModel"
-    assert_valid_pmml pmml
   end
 
   def test_daru

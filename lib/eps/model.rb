@@ -1,7 +1,8 @@
 module Eps
   class Model
-    def initialize(data = nil, y = nil, target: nil, estimator: nil, **options)
+    def initialize(data = nil, y = nil, target: nil, estimator: nil, pmml: nil, **options)
       @options = options
+      @pmml = pmml
 
       if estimator
         @estimator = estimator
@@ -14,7 +15,10 @@ module Eps
 
     def self.load_pmml(data)
       if data.is_a?(String)
+        pmml = data
         data = Nokogiri::XML(data) { |config| config.strict }
+      else
+        pmml = data.to_xml
       end
 
       estimator_class =
@@ -26,15 +30,11 @@ module Eps
           raise "Unknown model"
         end
 
-      new(estimator: estimator_class.load_pmml(data))
+      new(estimator: estimator_class.load_pmml(data), pmml: pmml)
     end
 
     def to_pmml
-      if @estimator
-        @estimator.to_pmml
-      else
-        super
-      end
+      @pmml ||= @estimator.to_pmml
     end
 
     # ruby - legacy
