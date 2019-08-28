@@ -13,7 +13,18 @@ module Eps
         input << Onnx::ValueInfoProto.new(name: k, type: Onnx::TypeProto.new)
       end
 
+      nodes = []
+      nodes << Onnx::NodeProto.new(
+        input: @features.keys,
+        output: [@target],
+        name: "LinearRegressor",
+        op_type: "LinearRegressor",
+        attribute: [{name: "coefficients", floats: [1.0, 2.0, 6.0], type: 1}],
+        domain: "ai.onnx.ml"
+      )
+
       Onnx::GraphProto.new(
+        node: nodes,
         input: input,
         output: [Onnx::ValueInfoProto.new(name: @target, type: Onnx::TypeProto.new)]
       )
