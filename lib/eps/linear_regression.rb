@@ -19,7 +19,10 @@ module Eps
         output: [@target],
         name: "LinearRegressor",
         op_type: "LinearRegressor",
-        attribute: [{name: "coefficients", floats: [1.0, 2.0, 6.0], type: 1}],
+        attribute: [
+          {name: "coefficients", floats: [2.0], type: 6},
+          {name: "intercepts", floats: [10.0], type: 6}
+        ],
         domain: "ai.onnx.ml"
       )
 
@@ -33,11 +36,14 @@ module Eps
     # add to base model
     def to_onnx
       model = Onnx::ModelProto.new(
-        graph: generate_onnx,
+        ir_version: 5,
         producer_name: "Eps",
         producer_version: Eps::VERSION,
-        ir_version: 5,
-        opset_import: [Onnx::OperatorSetIdProto.new(domain: "ai.onnx.ml", version: 1)]
+        domain: "ai.onnx",
+        model_version: 0,
+        doc_string: "",
+        graph: generate_onnx,
+        opset_import: [{domain: "ai.onnx.ml", version: 1}]
       )
       Onnx::ModelProto.encode(model)
     end
