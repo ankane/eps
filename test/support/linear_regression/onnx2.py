@@ -36,3 +36,11 @@ initial_type = [('x', FloatTensorType([-1, 1]))]
 onx = convert_sklearn(pipe, initial_types=initial_type)
 with open("test/support/linear_regression/houses.onnx", "wb") as f:
   f.write(onx.SerializeToString())
+
+# import numpy
+import onnxruntime as rt
+sess = rt.InferenceSession("test/support/linear_regression/houses.onnx")
+print("input")
+[print((o.name, o.type)) for o in sess.get_inputs()]
+print("output")
+[print((o.name, o.type)) for o in sess.get_outputs()]

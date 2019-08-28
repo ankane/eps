@@ -8,9 +8,20 @@ module Eps
     # onnx
 
     def generate_onnx
+      shape = [-1, 1]
+
+      type =
+        Onnx::TypeProto.new(
+          tensor_type: Onnx::TypeProto::Tensor.new(
+            elem_type: 1,
+            shape: Onnx::TensorShapeProto.new(dim: shape.map { |i| Onnx::TensorShapeProto::Dimension.new(dim_value: i) })
+          )
+        )
+
+
       input = []
       @features.each do |k, _|
-        input << Onnx::ValueInfoProto.new(name: k, type: Onnx::TypeProto.new)
+        input << Onnx::ValueInfoProto.new(name: k, type: type)
       end
 
       nodes = []
@@ -28,8 +39,9 @@ module Eps
 
       Onnx::GraphProto.new(
         node: nodes,
+        name: "hi",
         input: input,
-        output: [Onnx::ValueInfoProto.new(name: @target, type: Onnx::TypeProto.new)]
+        output: [Onnx::ValueInfoProto.new(name: @target, type: type)]
       )
     end
 
@@ -51,7 +63,10 @@ module Eps
     def self.load_onnx(data)
       puts "load_onnx"
       require "onnxruntime"
-      new(evaluator: OnnxRuntime::Model.new(data))
+      m = OnnxRuntime::Model.new(data)
+      p m.inputs
+      p m.outputs
+      new(evaluator: m)
     end
 
     # legacy

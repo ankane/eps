@@ -6,3 +6,4 @@ git_source(:github) {|repo_name| "https://github.com/#{repo_name}" }
 gemspec
 
 gem "gsl" if ENV["GSL"]
+gem "onnxruntime", path: "~/open_source/onnxruntime"
