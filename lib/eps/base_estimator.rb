@@ -97,9 +97,7 @@ module Eps
 
       predictions =
         if @evaluator.respond_to?(:inputs)
-          # p data
-          # p Eps::DataFrame.new(data).map_rows(&:to_a)
-          @evaluator.predict(x: Eps::DataFrame.new(data).map_rows(&:to_a))
+          @evaluator.predict(x: Eps::DataFrame.new(data).map_rows(&:to_a)).values.first.map(&:first)
         else
           @evaluator.predict(Eps::DataFrame.new(data))
         end

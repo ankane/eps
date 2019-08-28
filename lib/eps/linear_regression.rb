@@ -25,14 +25,16 @@ module Eps
       end
 
       nodes = []
+      coefficients = @coefficients.dup
+      intercept = coefficients.delete("_intercept")
       nodes << Onnx::NodeProto.new(
         input: @features.keys,
         output: [@target],
         name: "LinearRegressor",
         op_type: "LinearRegressor",
         attribute: [
-          {name: "coefficients", floats: [2.0], type: 6},
-          {name: "intercepts", floats: [10.0], type: 6}
+          {name: "coefficients", floats: coefficients.values, type: 6},
+          {name: "intercepts", floats: [intercept], type: 6}
         ],
         domain: "ai.onnx.ml"
       )
