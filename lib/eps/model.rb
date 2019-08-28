@@ -26,6 +26,12 @@ module Eps
       @estimator.train(data, y, target: target, **options)
     end
 
+    # onnx
+
+    def self.load_onnx(data)
+      new(estimator: Eps::LinearRegression.load_onnx(data))
+    end
+
     # pmml
 
     def self.load_pmml(data)

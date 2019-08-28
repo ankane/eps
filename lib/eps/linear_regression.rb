@@ -5,6 +5,38 @@ module Eps
       @gsl = gsl.nil? ? defined?(GSL) : gsl
     end
 
+    # onnx
+
+    def generate_onnx
+      input = []
+      @features.each do |k, _|
+        input << Onnx::ValueInfoProto.new(name: k, type: Onnx::TypeProto.new)
+      end
+
+      Onnx::GraphProto.new(
+        input: input,
+        output: [Onnx::ValueInfoProto.new(name: @target, type: Onnx::TypeProto.new)]
+      )
+    end
+
+    # add to base model
+    def to_onnx
+      model = Onnx::ModelProto.new(
+        graph: generate_onnx,
+        producer_name: "Eps",
+        producer_version: Eps::VERSION,
+        ir_version: 5,
+        opset_import: [Onnx::OperatorSetIdProto.new(domain: "ai.onnx.ml", version: 1)]
+      )
+      Onnx::ModelProto.encode(model)
+    end
+
+    def self.load_onnx(data)
+      puts "load_onnx"
+      require "onnxruntime"
+      new(evaluator: OnnxRuntime::Model.new(data))
+    end
+
     # legacy
 
     def coefficients

@@ -14,15 +14,23 @@ class RegressionTest < Minitest::Test
     assert_in_delta 3, coefficients[:_intercept]
     assert_in_delta 5, coefficients[:x]
 
-    model = Eps::Model.load_pmml(model.to_pmml)
-    predictions = model.predict([{x: 6}, {x: 7}])
-    coefficients = model.coefficients
+    # model = Eps::Model.load_pmml(model.to_pmml)
+    # predictions = model.predict([{x: 6}, {x: 7}])
+    # coefficients = model.coefficients
 
-    assert_in_delta 33, predictions[0]
-    assert_in_delta 38, predictions[1]
+    # assert_in_delta 33, predictions[0]
+    # assert_in_delta 38, predictions[1]
 
-    assert_in_delta 3, coefficients[:_intercept]
-    assert_in_delta 5, coefficients[:x]
+    # assert_in_delta 3, coefficients[:_intercept]
+    # assert_in_delta 5, coefficients[:x]
+
+    byte_str = File.binread("test/support/linear_regression/houses.onnx")
+    pp Eps::Utils.read_onnx(byte_str)
+    require "onnxruntime"
+    m = OnnxRuntime::Model.new(byte_str)
+    p m.inputs
+    p m.outputs
+    pp Eps::Utils.read_onnx(model.to_onnx)
 
     model = Eps::Model.load_onnx(model.to_onnx)
     predictions = model.predict([{x: 6}, {x: 7}])

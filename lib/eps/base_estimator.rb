@@ -95,6 +95,7 @@ module Eps
       singular = data.is_a?(Hash)
       data = [data] if singular
 
+      p @evaluator
       predictions = @evaluator.predict(Eps::DataFrame.new(data))
 
       singular ? predictions.first : predictions

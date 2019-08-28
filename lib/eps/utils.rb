@@ -16,5 +16,9 @@ module Eps
         raise ArgumentError, "Column values must be all numeric or all string: #{k}"
       end
     end
+
+    def self.read_onnx(byte_str)
+      Onnx::ModelProto.decode(byte_str).to_h
+    end
   end
 end
