@@ -23,6 +23,16 @@ class RegressionTest < Minitest::Test
 
     assert_in_delta 3, coefficients[:_intercept]
     assert_in_delta 5, coefficients[:x]
+
+    model = Eps::Model.load_onnx(model.to_onnx)
+    predictions = model.predict([{x: 6}, {x: 7}])
+    coefficients = model.coefficients
+
+    assert_in_delta 33, predictions[0]
+    assert_in_delta 38, predictions[1]
+
+    assert_in_delta 3, coefficients[:_intercept]
+    assert_in_delta 5, coefficients[:x]
   end
 
   def test_multiple_regression
