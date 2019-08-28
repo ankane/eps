@@ -84,7 +84,7 @@ module Eps
     end
 
     def method_missing(method, *args, &block)
-      if @estimator
+      if @estimator && @estimator.respond_to?(method)
         @estimator.public_send(method, *args, &block)
       else
         super
