@@ -15,10 +15,10 @@ y = df['price']
 numeric_features = [0, 1]
 categorical_features = [2, 3]
 
-numeric_transformer = Pipeline(steps=[
-    ('imputer', SimpleImputer(strategy='median'))
-    # ('scaler', StandardScaler())
-])
+# numeric_transformer = Pipeline(steps=[
+#     ('imputer', SimpleImputer(strategy='median'))
+#     # ('scaler', StandardScaler())
+# ])
 
 categorical_transformer = Pipeline(steps=[
     ('onehot', OneHotEncoder(handle_unknown='ignore'))
@@ -27,7 +27,7 @@ categorical_transformer = Pipeline(steps=[
 
 preprocessor = ColumnTransformer(
     transformers=[
-        ('num', numeric_transformer, numeric_features),
+        ('num', 'passthrough', numeric_features),
         ('cat', categorical_transformer, categorical_features)
     ]
 )
