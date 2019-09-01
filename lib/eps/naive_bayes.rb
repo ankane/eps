@@ -202,6 +202,7 @@ module Eps
     end
 
     def stdev(arr)
+      return nil if arr.size <= 1
       m = mean(arr)
       sum = arr.inject(0) { |accum, i| accum + (i - m)**2 }
       Math.sqrt(sum / (arr.length - 1).to_f)

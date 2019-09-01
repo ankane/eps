@@ -51,4 +51,14 @@ class ClassificationTest < Minitest::Test
     pmml = model.to_pmml
     assert_includes pmml, "NaiveBayesModel"
   end
+
+  def test_example
+    data = [
+      {bedrooms: 1, bathrooms: 1, price: 100000, tag: "Low"},
+      {bedrooms: 2, bathrooms: 1, price: 125000, tag: "Med"},
+      {bedrooms: 2, bathrooms: 2, price: 135000, tag: "Med"},
+      {bedrooms: 3, bathrooms: 2, price: 162000, tag: "High"}
+    ]
+    Eps::Model.new(data, target: :tag)
+  end
 end

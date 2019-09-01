@@ -43,7 +43,7 @@ module Eps
                 px[i] += Math.log(p2)
               end
             else
-              if vc[:stdev] != 0
+              if vc[:stdev] != 0 && !vc[:stdev].nil?
                 x.columns[k].each_with_index do |xi, i|
                   px[i] += Math.log(calculate_probability(xi, vc[:mean], vc[:stdev]))
                 end
