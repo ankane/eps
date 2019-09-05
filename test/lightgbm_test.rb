@@ -117,7 +117,6 @@ class LightGBMTest < Minitest::Test
     ]
 
     model = Eps::LightGBM.new(data, target: :y, early_stopping: false, text_features: {x: {case_sensitive: true}})
-    # puts model.summary
     assert_elements_in_delta [3, 5], model.predict([{x: "Sunday is the best"}, {x: "sunday is the best"}])
 
     model = Eps::Model.load_pmml(model.to_pmml)
@@ -138,8 +137,6 @@ class LightGBMTest < Minitest::Test
     ]
 
     model = Eps::LightGBM.new(data, target: :tag)
-    # puts model.summary
-    # puts model.to_pmml
     assert_equal ["ham", "spam"], model.predict(test_data)
 
     pmml = model.to_pmml
