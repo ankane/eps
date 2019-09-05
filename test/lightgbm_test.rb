@@ -97,7 +97,7 @@ class LightGBMTest < Minitest::Test
       {x: "Monday is the day", y: 5}
     ]
 
-    model = Eps::LightGBM.new(data, target: :y, early_stopping: false, text_features: [:x])
+    model = Eps::LightGBM.new(data, target: :y, early_stopping: false)
     assert_elements_in_delta [3, 5], model.predict([{x: "Sunday is the best"}, {x: "Monday is the best"}])
 
     pmml = model.to_pmml
@@ -137,7 +137,7 @@ class LightGBMTest < Minitest::Test
       {message: "hello document"}
     ]
 
-    model = Eps::LightGBM.new(data, target: :tag, text_features: [:message])
+    model = Eps::LightGBM.new(data, target: :tag)
     # puts model.summary
     # puts model.to_pmml
     assert_equal ["ham", "spam"], model.predict(test_data)
