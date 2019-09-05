@@ -1,6 +1,17 @@
 require_relative "test_helper"
 
 class ModelTest < Minitest::Test
+  def test_example
+    data = [
+      {bedrooms: 1, bathrooms: 1, price: 100000},
+      {bedrooms: 2, bathrooms: 1, price: 125000},
+      {bedrooms: 2, bathrooms: 2, price: 135000},
+      {bedrooms: 3, bathrooms: 2, price: 162000}
+    ]
+    model = Eps::Model.new(data, target: :price)
+    assert_in_delta 125000, model.predict(bedrooms: 2, bathrooms: 1)
+  end
+
   def test_untrained
     model = Eps::Model.new
 
@@ -41,50 +52,74 @@ class ModelTest < Minitest::Test
   end
 
   def test_split
-    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price) }
-    model = Eps::Model.new
-    model.train(data, target: :price, split: true)
+    model = Eps::Model.new(mpg_data, target: :hwy, split: true)
   end
 
   def test_split_symbol
-    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new
-    model.train(data, target: :price, split: :listed_at)
+    data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new(data, target: :hwy, split: :listed_at)
   end
 
   def test_split_shuffle_false
-    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price) }
-    model = Eps::Model.new
-    model.train(data, target: :price, split: {shuffle: false})
+    data = mpg_data
+    model = Eps::Model.new(data, target: :hwy, split: {shuffle: false})
   end
 
   def test_split_column
-    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new
-    model.train(data, target: :price, split: {column: :listed_at})
+    data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new(data, target: :hwy, split: {column: :listed_at})
   end
 
   def test_split_column_value
-    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new
-    model.train(data, target: :price, split: {column: :listed_at, value: Date.today - 5})
+    data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
+    model = Eps::Model.new(data, target: :hwy, split: {column: :listed_at, value: Date.today - 5})
   end
 
   def test_split_no_training_data
-    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new
+    data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
     error = assert_raises do
-      model.train(data, target: :price, split: {column: :listed_at, value: Date.today - 20})
+      Eps::Model.new(data, target: :hwy, split: {column: :listed_at, value: Date.today - 20})
     end
     assert_equal "No data in training set", error.message
   end
 
   def test_split_no_validation_data
-    data = houses_data.map { |r| r.slice(:bedrooms, :bathrooms, :price).merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new
+    data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
     error = assert_raises do
-      model.train(data, target: :price, split: {column: :listed_at, value: Date.today + 20})
+      Eps::Model.new(data, target: :hwy, split: {column: :listed_at, value: Date.today + 20})
     end
     assert_equal "No data in validation set", error.message
+  end
+
+  def test_regression_metrics
+    actual = [1, 2, 3]
+    estimated = [1, 2, 9]
+    metrics = Eps.metrics(actual, estimated)
+
+    assert_in_delta 3.464, metrics[:rmse]
+    assert_in_delta 2, metrics[:mae]
+    assert_in_delta -2, metrics[:me]
+  end
+
+  def test_classification_metrics
+    actual = ["up", "up", "down"]
+    estimated = ["down", "up", "down"]
+    metrics = Eps.metrics(actual, estimated)
+
+    assert_in_delta 0.667, metrics[:accuracy]
+  end
+
+  def test_regression_comparison
+    lr = Eps::LinearRegression.new(mpg_data, target: :hwy)
+    lgb = Eps::LightGBM.new(mpg_data, target: :hwy)
+    # puts lr.summary
+    # puts lgb.summary
+  end
+
+  def test_classification_comparison
+    nb = Eps::NaiveBayes.new(mpg_data, target: :drv)
+    lgb = Eps::LightGBM.new(mpg_data, target: :drv)
+    # puts nb.summary
+    # puts lgb.summary
   end
 end

@@ -19,7 +19,14 @@ class Minitest::Test
     end
   end
 
-  def houses_data
-    CSV.table("test/support/data/houses.csv").map { |row| row.to_h }
+  def mpg_data(binary: false, extra_fields: [])
+    data = CSV.table("test/support/mpg.csv")
+    fields = [:drv, :class, :displ, :year, :cyl, :hwy] + extra_fields
+    data = data.map { |row| row.to_h.slice(*fields) }
+    data.each do |d|
+      d[:drv] = "4" if d[:drv] == "r" if binary
+      d[:drv] = d[:drv].to_s
+    end
+    data
   end
 end

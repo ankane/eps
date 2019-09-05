@@ -18,7 +18,11 @@ Add this line to your application’s Gemfile:
 gem 'eps'
 ```
 
-To speed up training on large datasets, you can also [add GSL](#training-performance).
+On Mac, also install OpenMP:
+
+```sh
+brew install libomp
+```
 
 ## Getting Started
 
@@ -41,40 +45,49 @@ Make a prediction
 model.predict(bedrooms: 2, bathrooms: 1)
 ```
 
-> Pass an array of hashes make multiple predictions at once
+Store the model
 
-The target can be numeric (regression) or categorical (classification). Eps (short for “epsilon”) uses linear regression for regression and naive Bayes for classification.
+```ruby
+File.write("model.pmml", model.to_pmml)
+```
+
+Load the model
+
+```ruby
+pmml = File.read("model.pmml")
+model = Eps::Model.load_pmml(pmml)
+```
+
+A few notes:
+
+- The target can be numeric (regression) or categorical (classification)
+- Pass an array of hashes to `predict` to make multiple predictions at once
+- Models are stored in [PMML](https://en.wikipedia.org/wiki/Predictive_Model_Markup_Language), a standard for model storage
 
 ## Building Models
 
-### Training and Test Sets
+### Goal
 
-When building models, it’s a good idea to hold out some data so you can see how well the model will perform on unseen data. To do this, we split our data into two sets: training and test. We build the model with the training set and later evaluate it on the test set.
+Often, the goal of building a model is to make good predictions on future data. To help achieve this, Eps splits the data into training and validation sets if you have 30+ data points. It uses the training set to build the model and the validation set to evaluate the performance.
 
-```ruby
-houses = House.all
-split_date = Date.parse("2018-06-01")
-train_set, test_set = houses.partition { |h| h.listed_at < split_date }
-```
-
-If your data doesn’t have a time associated with it, you can split it randomly.
+If your data has a time associated with it, it’s highly recommended to use that field for the split.
 
 ```ruby
-rng = Random.new(1) # seed random number generator
-train_set, test_set = houses.partition { rng.rand < 0.7 }
+Eps::Model.new(data, target: :price, split: :listed_at)
 ```
 
-### Outliers and Missing Data
+Otherwise, the split is random. There are a number of [other options](#validation-options) as well.
 
-Next, decide what to do with outliers and missing data. There are a number of methods for handling them, but the easiest is to remove them.
+Performance is reported in the summary.
 
-```ruby
-train_set.reject! { |h| h.bedrooms.nil? || h.price < 10000 }
-```
+- For regression, it reports validation RMSE (root mean squared error) - lower is better
+- For classification, it reports validation accuracy - higher is better
+
+Typically, the best way to improve performance is feature engineering.
 
 ### Feature Engineering
 
-Selecting features for a model is extremely important for performance. Features can be:
+Features are extremely important for model performance. Features can be:
 
 1. numeric
 2. categorical
@@ -90,13 +103,11 @@ For numeric features, use any numeric type.
 
 #### Categorical
 
-For categorical features, use strings.
+For categorical features, use strings or booleans.
 
 ```ruby
-{state: "CA"}
+{state: "CA", basement: true}
 ```
-
-> Categorical features generate coefficients for each distinct value except for one
 
 Convert any ids to strings so they’re treated as categorical features.
 
@@ -116,15 +127,23 @@ For times, create features like day of week and hour of day.
 {weekday: listed_at.strftime("%a"), hour: listed_at.hour.to_s}
 ```
 
-#### Text [master, experimental]
+#### Text
 
-For text features, use:
+For text features, use strings with multiple words.
+
+```ruby
+{description: "a beautiful house on top of a hill"}
+```
+
+This creates features based on word count (term frequency).
+
+You can specify text features explicitly with:
 
 ```ruby
 Eps::Model.new(data, target: :price, text_features: [:description])
 ```
 
-This creates features based on word count (term frequency). You can set advanced options with:
+You can set advanced options with:
 
 ```ruby
 text_features: {
@@ -133,103 +152,11 @@ text_features: {
     max_features: 1000,
     min_length: 1,
     case_sensitive: true,
-    tokenizer: /\s+/
+    tokenizer: /\s+/,
+    stop_words: ["and", "the"]
   }
 }
 ```
-
----
-
-In practice, your code may look like:
-
-```ruby
-def features(house)
-  {
-    bedrooms: house.bedrooms,
-    city_id: house.city_id.to_s,
-    month: house.listed_at.strftime("%b"),
-    price: house.price # target
-  }
-end
-
-train_features = train_set.map { |h| features(h) }
-```
-
-We use a method for features so it can be used across training, evaluation, and prediction.
-
-### Training
-
-Now, let’s train the model.
-
-```ruby
-model = Eps::Model.new(train_features, target: :price)
-puts model.summary
-```
-
-For regression, the summary includes the coefficients and their significance. The lower the p-value, the more significant the feature is. p-values below 0.05 are typically considered significant. It also shows the adjusted r-squared, which is a measure of how well the model fits the data. The higher the number, the better the fit. Here’s a good explanation of why it’s [better than r-squared](https://www.quora.com/What-is-the-difference-between-R-squared-and-Adjusted-R-squared).
-
-### Evaluation
-
-When you’re happy with the model, see how well it performs on the test set. This gives us an idea of how well it’ll perform on unseen data.
-
-```ruby
-test_features = test_set.map { |h| features(h) }
-puts model.evaluate(test_features)
-```
-
-For regression, this returns:
-
-- RMSE - Root mean square error
-- MAE - Mean absolute error
-- ME - Mean error
-
-We want to minimize the RMSE and MAE and keep the ME around 0.
-
-For classification, this returns:
-
-- Accuracy
-
-We want to maximize the accuracy.
-
-### Finalize
-
-Now that we have an idea of how the model will perform, we want to retrain the model with all of our data. Treat outliers and missing data the same as you did with the training set.
-
-```ruby
-# outliers and missing data
-houses.reject! { |h| h.bedrooms.nil? || h.price < 10000 }
-
-# training
-all_features = houses.map { |h| features(h) }
-model = Eps::Model.new(all_features, target: :price)
-```
-
-We now have a model that’s ready to serve.
-
-## Serving Models
-
-Once the model is trained, we need to store it. Eps uses PMML - [Predictive Model Markup Language](https://en.wikipedia.org/wiki/Predictive_Model_Markup_Language) - a standard for storing models. A great option is to write the model to a file with:
-
-```ruby
-File.write("model.pmml", model.to_pmml)
-```
-
-> You may need to add `nokogiri` to your Gemfile
-
-To load a model, use:
-
-```ruby
-pmml = File.read("model.pmml")
-model = Eps::Model.load_pmml(pmml)
-```
-
-Now we can use it to make predictions.
-
-```ruby
-model.predict(bedrooms: 2, bathrooms: 1)
-```
-
-To continuously train models, we recommend [storing them in your database](#database-storage).
 
 ## Full Example
 
@@ -246,32 +173,18 @@ Here’s what a complete model in `app/ml_models/price_model.rb` may look like:
 ```ruby
 class PriceModel < Eps::Base
   def build
-    houses = House.all.to_a
-
-    # divide into training and test set
-    split_date = Date.parse("2018-06-01")
-    train_set, test_set = houses.partition { |h| h.listed_at < split_date }
-
-    # handle outliers and missing values
-    train_set = preprocess(train_set)
+    houses = House.all
 
     # train
-    train_features = train_set.map { |v| features(v) }
-    model = Eps::Model.new(train_features, target: :price)
+    data = houses.map { |v| features(v) }
+    model = Eps::Model.new(data, target: :price, split: :listed_at)
     puts model.summary
 
-    # evaluate
-    test_features = test_set.map { |v| features(v) }
-    puts model.evaluate(test_features)
-
-    # finalize
-    houses = preprocess(houses)
-    all_features = houses.map { |h| features(h) }
-    model = Eps::Model.new(all_features, target: :price)
-
-    # save
+    # save to file
     File.write(model_file, model.to_pmml)
-    @model = nil # reset for future predictions
+
+    # ensure reloads from file
+    @model = nil
   end
 
   def predict(house)
@@ -280,15 +193,12 @@ class PriceModel < Eps::Base
 
   private
 
-  def preprocess(train_set)
-    train_set.reject { |h| h.bedrooms.nil? || h.price < 10000 }
-  end
-
   def features(house)
     {
       bedrooms: house.bedrooms,
       city_id: house.city_id.to_s,
       month: house.listed_at.strftime("%b"),
+      listed_at: house.listed_at,
       price: house.price
     }
   end
@@ -327,46 +237,13 @@ predicted = houses.map(&:predicted_price)
 Eps.metrics(actual, predicted)
 ```
 
-This returns the same evaluation metrics as model building. For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0. For accuracy, alert if it drops below a certain threshold.
+For RMSE and MAE, alert if they rise above a certain threshold. For ME, alert if it moves too far away from 0. For accuracy, alert if it drops below a certain threshold.
 
 ## Other Languages
 
-Eps makes it easy to serve models from other languages. You can build models in R, Python, and others and serve them in Ruby without having to worry about how to deploy or run another language.
+Eps makes it easy to serve models from other languages. You can build models in Python, R, and others and serve them in Ruby without having to worry about how to deploy or run another language.
 
-Eps can serve linear regression and naive Bayes models. Check out [Scoruby](https://github.com/asafschers/scoruby) to serve other models.
-
-### R
-
-To create a model in R, install the [pmml](https://cran.r-project.org/package=pmml) package
-
-```r
-install.packages("pmml")
-```
-
-For regression, run:
-
-```r
-library(pmml)
-
-model <- lm(dist ~ speed,  cars)
-
-# save model
-data <- toString(pmml(model))
-write(data, file="model.pmml")
-```
-
-For classification, run:
-
-```r
-library(pmml)
-library(e1071)
-
-model <- naiveBayes(Species ~ .,  iris)
-
-# save model
-data <- toString(pmml(model, predictedField="Species"))
-write(data, file="model.pmml")
-```
+Eps can serve LightGBM, linear regression, and naive Bayes models. Check out [ONNX Runtime](https://github.com/ankane/onnxruntime) and [Scoruby](https://github.com/asafschers/scoruby) to serve other models.
 
 ### Python
 
@@ -376,36 +253,25 @@ To create a model in Python, install the [sklearn2pmml](https://github.com/jpmml
 pip install sklearn2pmml
 ```
 
-For regression, run:
+And check out the examples:
 
-```python
-from sklearn2pmml import sklearn2pmml, make_pmml_pipeline
-from sklearn.linear_model import LinearRegression
+- [LightGBM Regression](test/support/python/lightgbm_regression.py)
+- [LightGBM Classification](test/support/python/lightgbm_classification.py)
+- [Linear Regression](test/support/python/linear_regression.py)
+- [Naive Bayes](test/support/python/naive_bayes.py)
 
-x = [1, 2, 3, 5, 6]
-y = [5 * xi + 3 for xi in x]
+### R
 
-model = LinearRegression()
-model.fit([[xi] for xi in x], y)
+To create a model in R, install the [pmml](https://cran.r-project.org/package=pmml) package
 
-# save model
-sklearn2pmml(make_pmml_pipeline(model), "model.pmml")
+```r
+install.packages("pmml")
 ```
 
-For classification, run:
+And check out the examples:
 
-```python
-from sklearn2pmml import sklearn2pmml, make_pmml_pipeline
-from sklearn.naive_bayes import GaussianNB
-
-x = [1, 2, 3, 5, 6]
-y = ["ham", "ham", "ham", "spam", "spam"]
-
-model = GaussianNB()
-model.fit([[xi] for xi in x], y)
-
-sklearn2pmml(make_pmml_pipeline(model), "model.pmml")
-```
+- [Linear Regression](test/support/r/linear_regression.R)
+- [Naive Bayes](test/support/r/naive_bayes.R)
 
 ### Verifying
 
@@ -438,6 +304,91 @@ CSV.foreach("predictions.csv", headers: true, converters: :numeric) do |row|
 end
 ```
 
+## Data
+
+A number of data formats are supported. You can pass the target variable separately.
+
+```ruby
+x = [{x: 1}, {x: 2}, {x: 3}]
+y = [1, 2, 3]
+Eps::Model.new(x, y)
+```
+
+Or pass arrays of arrays
+
+```ruby
+x = [[1, 2], [2, 0], [3, 1]]
+y = [1, 2, 3]
+Eps::Model.new(x, y)
+```
+
+### Daru
+
+Eps works well with Daru data frames.
+
+```ruby
+df = Daru::DataFrame.from_csv("houses.csv")
+Eps::Model.new(df, target: "price")
+```
+
+### CSVs
+
+When importing data from CSV files, be sure to convert numeric fields. The `table` method does this automatically.
+
+```ruby
+CSV.table("data.csv").map { |row| row.to_h }
+```
+
+## Algorithms
+
+Pass an algorithm with:
+
+```ruby
+Eps::Model.new(data, algorithm: :linear_regression)
+```
+
+Eps supports:
+
+- LightGBM (default)
+- Linear Regression
+- Naive Bayes
+
+### Linear Regression
+
+To speed up training on large datasets with linear regression, [install GSL](https://www.gnu.org/software/gsl/). With Homebrew, you can use:
+
+```sh
+brew install gsl
+```
+
+Then, add this line to your application’s Gemfile:
+
+```ruby
+gem 'gsl', group: :development
+```
+
+It only needs to be available in environments used to build the model.
+
+## Validation Options
+
+Pass your own validation set with:
+
+```ruby
+Eps::Model.new(data, validation_set: validation_set)
+```
+
+Split on a specific value
+
+```ruby
+Eps::Model.new(data, split: {column: :listed_at, value: Date.parse("2019-01-01")})
+```
+
+Specify the validation set size (the default is `0.25`, which is 25%)
+
+```ruby
+Eps::Model.new(data, split: {validation_size: 0.2})
+```
+
 ## Database Storage
 
 The database is another place you can store models. It’s good if you retrain models automatically.
@@ -464,83 +415,47 @@ data = Model.find_by!(key: "price").data
 model = Eps::Model.load_pmml(data)
 ```
 
-## Training Performance
-
-Speed up training on large datasets with GSL.
-
-First, [install GSL](https://www.gnu.org/software/gsl/). With Homebrew, you can use:
-
-```sh
-brew install gsl
-```
-
-Then, add this line to your application’s Gemfile:
-
-```ruby
-gem 'gsl', group: :development
-```
-
-It only needs to be available in environments used to build the model.
-
-> This only speeds up regression, not classification
-
-## Data
-
-A number of data formats are supported. You can pass the target variable separately.
-
-```ruby
-x = [{x: 1}, {x: 2}, {x: 3}]
-y = [1, 2, 3]
-Eps::Model.new(x, y)
-```
-
-Or pass arrays of arrays
-
-```ruby
-x = [[1, 2], [2, 0], [3, 1]]
-y = [1, 2, 3]
-Eps::Model.new(x, y)
-```
-
-## Daru
-
-Eps works well with Daru data frames.
-
-```ruby
-df = Daru::DataFrame.from_csv("houses.csv")
-Eps::Model.new(df, target: "price")
-```
-
-To split into training and test sets, use:
-
-```ruby
-rng = Random.new(1) # seed random number generator
-train_index = houses.map { rng.rand < 0.7 }
-train_set = houses.where(train_index)
-test_set = houses.where(train_index.map { |v| !v })
-```
-
-## CSVs
-
-When importing data from CSV files, be sure to convert numeric fields. The `table` method does this automatically.
-
-```ruby
-CSV.table("data.csv").map { |row| row.to_h }
-```
-
 ## Jupyter & IRuby
 
 You can use [IRuby](https://github.com/SciRuby/iruby) to run Eps in [Jupyter](https://jupyter.org/) notebooks. Here’s how to get [IRuby working with Rails](https://ankane.org/jupyter-rails).
 
-## Reference
-
-Get an extended summary with standard error, t-values, and r-squared
-
-```ruby
-model.summary(extended: true)
-```
-
 ## Upgrading
+
+## 0.3.0
+
+Eps 0.3.0 brings a number of improvements, including support for LightGBM and cross-validation. There are a number of breaking changes to be aware of:
+
+- LightGBM is now the default for new models. On Mac, run:
+
+  ```sh
+  brew install libomp
+  ```
+
+  Pass the `algorithm` option to use linear regression or naive Bayes.
+
+  ```ruby
+  Eps::Model.new(data, algorithm: :linear_regression) # or :naive_bayes
+  ```
+
+- Cross-validation happens automatically by default. You no longer need to create training and test sets manually. If you were splitting on a time, use:
+
+  ```ruby
+  Eps::Model.new(data, split: {column: :listed_at, value: Date.parse("2019-01-01")})
+  ```
+
+  Or randomly, use:
+
+  ```ruby
+  Eps::Model.new(data, split: {validation_size: 0.3})
+  ```
+
+  To continue splitting manually, use:
+
+  ```ruby
+  Eps::Model.new(data, validation_set: test_set)
+  ```
+
+- It’s no longer possible to load models in JSON or PFA formats. Retrain models and save them as PMML.
 
 ## 0.2.0
 

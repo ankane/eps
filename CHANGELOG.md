@@ -1,8 +1,16 @@
 ## 0.3.0 [unreleased]
 
+- Added support for LightGBM
 - Added text features
-- Prefer `MyModel.train` over `MyModel.build`
+- Fixed naive Bayes PMML
 - Fixed error with classification and Daru
+
+Breaking
+
+- LightGBM is now the default for new models
+- Cross-validation happens automatically by default
+- Removed support for JSON and PFA formats
+- Added smoothing to naive Bayes
 
 ## 0.2.1
 

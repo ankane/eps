@@ -1,0 +1,140 @@
+<PMML version="4.3" xmlns="http://www.dmg.org/PMML-4_3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.dmg.org/PMML-4_3 http://www.dmg.org/pmml/v4-3/pmml-4-3.xsd">
+ <Header copyright="Copyright (c) 2019 andrew" description="NaiveBayes Model">
+  <Extension name="user" value="andrew" extender="SoftwareAG PMML Generator"/>
+  <Application name="SoftwareAG PMML Generator" version="1.4"/>
+  <Timestamp>2019-09-02 12:48:33</Timestamp>
+ </Header>
+ <DataDictionary numberOfFields="5">
+  <DataField name="drv" optype="categorical" dataType="string">
+   <Value value="4"/>
+   <Value value="f"/>
+   <Value value="r"/>
+  </DataField>
+  <DataField name="displ" optype="continuous" dataType="double"/>
+  <DataField name="year" optype="continuous" dataType="double"/>
+  <DataField name="cyl" optype="continuous" dataType="double"/>
+  <DataField name="class" optype="categorical" dataType="string">
+   <Value value="2seater"/>
+   <Value value="compact"/>
+   <Value value="midsize"/>
+   <Value value="minivan"/>
+   <Value value="pickup"/>
+   <Value value="subcompact"/>
+   <Value value="suv"/>
+  </DataField>
+ </DataDictionary>
+ <NaiveBayesModel modelName="naiveBayes_Model" functionName="classification" threshold="0.001">
+  <MiningSchema>
+   <MiningField name="drv" usageType="predicted" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="displ" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="year" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="cyl" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="class" usageType="active" invalidValueTreatment="returnInvalid"/>
+  </MiningSchema>
+  <Output>
+   <OutputField name="Predicted_drv" optype="categorical" dataType="string" feature="predictedValue"/>
+   <OutputField name="Probability_4" optype="continuous" dataType="double" feature="probability" value="4"/>
+   <OutputField name="Probability_f" optype="continuous" dataType="double" feature="probability" value="f"/>
+   <OutputField name="Probability_r" optype="continuous" dataType="double" feature="probability" value="r"/>
+  </Output>
+  <BayesInputs>
+   <BayesInput fieldName="displ">
+    <TargetValueStats>
+     <TargetValueStat value="4">
+      <GaussianDistribution mean="3.99805825242718" variance="1.29685893774986"/>
+     </TargetValueStat>
+     <TargetValueStat value="f">
+      <GaussianDistribution mean="2.55849056603774" variance="0.491403414195867"/>
+     </TargetValueStat>
+     <TargetValueStat value="r">
+      <GaussianDistribution mean="5.176" variance="0.645233333333333"/>
+     </TargetValueStat>
+    </TargetValueStats>
+   </BayesInput>
+   <BayesInput fieldName="year">
+    <TargetValueStats>
+     <TargetValueStat value="4">
+      <GaussianDistribution mean="2003.71844660194" variance="20.4003426613364"/>
+     </TargetValueStat>
+     <TargetValueStat value="f">
+      <GaussianDistribution mean="2003.16037735849" variance="20.3264150943396"/>
+     </TargetValueStat>
+     <TargetValueStat value="r">
+      <GaussianDistribution mean="2004.04" variance="20.79"/>
+     </TargetValueStat>
+    </TargetValueStats>
+   </BayesInput>
+   <BayesInput fieldName="cyl">
+    <TargetValueStats>
+     <TargetValueStat value="4">
+      <GaussianDistribution mean="6.48543689320388" variance="2.54635446411574"/>
+     </TargetValueStat>
+     <TargetValueStat value="f">
+      <GaussianDistribution mean="4.88679245283019" variance="1.03468104222821"/>
+     </TargetValueStat>
+     <TargetValueStat value="r">
+      <GaussianDistribution mean="7.68" variance="0.56"/>
+     </TargetValueStat>
+    </TargetValueStats>
+   </BayesInput>
+   <BayesInput fieldName="class">
+    <PairCounts value="2seater">
+     <TargetValueCounts>
+      <TargetValueCount value="4" count="0.936363636363636"/>
+      <TargetValueCount value="f" count="0.938053097345133"/>
+      <TargetValueCount value="r" count="4.6875"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="compact">
+     <TargetValueCounts>
+      <TargetValueCount value="4" count="12.1727272727273"/>
+      <TargetValueCount value="f" count="33.7699115044248"/>
+      <TargetValueCount value="r" count="0.78125"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="midsize">
+     <TargetValueCounts>
+      <TargetValueCount value="4" count="3.74545454545455"/>
+      <TargetValueCount value="f" count="36.5840707964602"/>
+      <TargetValueCount value="r" count="0.78125"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="minivan">
+     <TargetValueCounts>
+      <TargetValueCount value="4" count="0.936363636363636"/>
+      <TargetValueCount value="f" count="11.2566371681416"/>
+      <TargetValueCount value="r" count="0.78125"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="pickup">
+     <TargetValueCounts>
+      <TargetValueCount value="4" count="31.8363636363636"/>
+      <TargetValueCount value="f" count="0.938053097345133"/>
+      <TargetValueCount value="r" count="0.78125"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="subcompact">
+     <TargetValueCounts>
+      <TargetValueCount value="4" count="4.68181818181818"/>
+      <TargetValueCount value="f" count="21.5752212389381"/>
+      <TargetValueCount value="r" count="7.8125"/>
+     </TargetValueCounts>
+    </PairCounts>
+    <PairCounts value="suv">
+     <TargetValueCounts>
+      <TargetValueCount value="4" count="48.6909090909091"/>
+      <TargetValueCount value="f" count="0.938053097345133"/>
+      <TargetValueCount value="r" count="9.375"/>
+     </TargetValueCounts>
+    </PairCounts>
+   </BayesInput>
+  </BayesInputs>
+  <BayesOutput fieldName="drv">
+   <TargetValueCounts>
+    <TargetValueCount value="4" count="103"/>
+    <TargetValueCount value="f" count="106"/>
+    <TargetValueCount value="r" count="25"/>
+   </TargetValueCounts>
+  </BayesOutput>
+ </NaiveBayesModel>
+</PMML>

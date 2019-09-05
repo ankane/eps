@@ -4,41 +4,11 @@ module Eps
 
     def initialize(**options)
       @options = options
-      @vocabulary = []
+      @vocabulary = options[:vocabulary] || []
     end
 
     def fit(arr)
-      tokenizer = options[:tokenizer]
-
-      fit =
-        arr.map do |xi|
-          # tokenize
-          tokens = xi.to_s
-          tokens = tokens.downcase unless options[:case_sensitive]
-          tokens = tokens.split(tokenizer)
-
-          # TODO stem
-
-          # TODO remove stop words
-
-          # count
-          xc = Hash.new(0)
-          tokens.each do |token|
-            xc[token] += 1
-          end
-          xc
-        end
-
-      counts = Hash.new(0)
-
-      fit.each do |xc|
-        xc.each do |k2, v2|
-          counts[k2] += v2
-        end
-      end
-
-      # remove empty strings
-      counts.delete("")
+      counts, fit = count_and_fit(arr)
 
       min_length = options[:min_length]
       if min_length
@@ -63,6 +33,49 @@ module Eps
       @vocabulary = counts.keys
 
       fit
+    end
+
+    def transform(arr)
+      counts, fit = count_and_fit(arr)
+      fit
+    end
+
+    private
+
+    def count_and_fit(arr)
+      tokenizer = options[:tokenizer]
+      stop_words = Array(options[:stop_words])
+
+      fit =
+        arr.map do |xi|
+          # tokenize
+          tokens = xi.to_s
+          tokens = tokens.downcase unless options[:case_sensitive]
+          tokens = tokens.split(tokenizer)
+
+          # remove stop words
+          tokens -= stop_words
+
+          # count
+          xc = Hash.new(0)
+          tokens.each do |token|
+            xc[token] += 1
+          end
+          xc
+        end
+
+      counts = Hash.new(0)
+
+      fit.each do |xc|
+        xc.each do |k2, v2|
+          counts[k2] += v2
+        end
+      end
+
+      # remove empty strings
+      counts.delete("")
+
+      [counts, fit]
     end
   end
 end

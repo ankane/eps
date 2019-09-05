@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" xmlns:data="http://jpmml.org/jpmml-model/InlineTable" version="4.3">
+	<Header>
+		<Application name="JPMML-SkLearn" version="1.5.13"/>
+		<Timestamp>2019-09-02T04:21:25Z</Timestamp>
+	</Header>
+	<DataDictionary>
+		<DataField name="hwy" optype="continuous" dataType="double"/>
+		<DataField name="displ" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="1.6" rightMargin="7.0"/>
+		</DataField>
+		<DataField name="year" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="1999.0" rightMargin="2008.0"/>
+		</DataField>
+		<DataField name="cyl" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="4.0" rightMargin="8.0"/>
+		</DataField>
+		<DataField name="drv" optype="categorical" dataType="string">
+			<Value value="4"/>
+			<Value value="f"/>
+			<Value value="r"/>
+		</DataField>
+		<DataField name="class" optype="categorical" dataType="string">
+			<Value value="2seater"/>
+			<Value value="compact"/>
+			<Value value="midsize"/>
+			<Value value="minivan"/>
+			<Value value="pickup"/>
+			<Value value="subcompact"/>
+			<Value value="suv"/>
+		</DataField>
+	</DataDictionary>
+	<RegressionModel functionName="regression">
+		<MiningSchema>
+			<MiningField name="hwy" usageType="target"/>
+			<MiningField name="displ" missingValueTreatment="asIs"/>
+			<MiningField name="year" missingValueTreatment="asIs"/>
+			<MiningField name="cyl" missingValueTreatment="asIs"/>
+			<MiningField name="drv" missingValueTreatment="asIs"/>
+			<MiningField name="class" missingValueTreatment="asIs"/>
+		</MiningSchema>
+		<ModelStats>
+			<UnivariateStats field="displ">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="1.6" maximum="7.0" mean="3.47179487179487" standardDeviation="1.28919547918981" median="3.3" interQuartileRange="2.1999999999999997"/>
+			</UnivariateStats>
+			<UnivariateStats field="year">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="1999.0" maximum="2008.0" mean="2003.5" standardDeviation="4.5" median="2003.5" interQuartileRange="9.0"/>
+			</UnivariateStats>
+			<UnivariateStats field="cyl">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="4.0" maximum="8.0" mean="5.888888888888889" standardDeviation="1.6080873481494276" median="6.0" interQuartileRange="4.0"/>
+			</UnivariateStats>
+			<UnivariateStats field="drv">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<DiscrStats>
+					<Array type="string">4 f r</Array>
+					<Array type="int">103 106 25</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="class">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<DiscrStats>
+					<Array type="string">2seater compact midsize minivan pickup subcompact suv</Array>
+					<Array type="int">5 47 41 11 33 35 62</Array>
+				</DiscrStats>
+			</UnivariateStats>
+		</ModelStats>
+		<RegressionTable intercept="-202.05992410655537">
+			<NumericPredictor name="displ" coefficient="-0.5271391300137441"/>
+			<NumericPredictor name="year" coefficient="0.11758151802561523"/>
+			<NumericPredictor name="cyl" coefficient="-1.3321746734453173"/>
+			<CategoricalPredictor name="drv" value="4" coefficient="-1.5304465435358954"/>
+			<CategoricalPredictor name="drv" value="f" coefficient="1.808576352333274"/>
+			<CategoricalPredictor name="drv" value="r" coefficient="-0.2781298087973772"/>
+			<CategoricalPredictor name="class" value="2seater" coefficient="5.362233613256816"/>
+			<CategoricalPredictor name="class" value="compact" coefficient="1.2091521690182634"/>
+			<CategoricalPredictor name="class" value="midsize" coefficient="0.824417815346297"/>
+			<CategoricalPredictor name="class" value="minivan" coefficient="-3.373170384540899"/>
+			<CategoricalPredictor name="class" value="pickup" coefficient="-3.4268585153136084"/>
+			<CategoricalPredictor name="class" value="subcompact" coefficient="1.8842961915492076"/>
+			<CategoricalPredictor name="class" value="suv" coefficient="-2.4800708893160897"/>
+		</RegressionTable>
+	</RegressionModel>
+</PMML>

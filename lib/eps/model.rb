@@ -1,29 +1,11 @@
 module Eps
   class Model
-    def initialize(data = nil, y = nil, target: nil, estimator: nil, **options)
-      @options = options
-
+    def initialize(data = nil, y = nil, estimator: nil, **options)
       if estimator
         @estimator = estimator
-      elsif data # legacy
-        train(data, y, target: target, verbose: false)
+      elsif data
+        train(data, y, **options)
       end
-    end
-
-    def train(data, y = nil, target: nil, **options)
-      data = Eps::DataFrame.new(data)
-      target = (target || "target").to_s
-      y ||= data.columns.delete(target)
-
-      estimator_class =
-        if Utils.column_type(y, target) == "numeric"
-          Eps::LinearRegression
-        else
-          Eps::NaiveBayes
-        end
-
-      @estimator = estimator_class.new(**@options)
-      @estimator.train(data, y, target: target, **options)
     end
 
     # pmml
@@ -34,7 +16,9 @@ module Eps
       end
 
       estimator_class =
-        if data.css("RegressionModel").any?
+        if data.css("Segmentation").any?
+          Eps::LightGBM
+        elsif data.css("RegressionModel").any?
           Eps::LinearRegression
         elsif data.css("NaiveBayesModel").any?
           Eps::NaiveBayes
@@ -45,35 +29,23 @@ module Eps
       new(estimator: estimator_class.load_pmml(data))
     end
 
-    # ruby - legacy
-
-    def self.load(data)
-      new(estimator: Eps::LinearRegression.load(data))
-    end
-
-    # json - legacy
-
-    def self.load_json(data)
-      new(estimator: Eps::LinearRegression.load_json(data))
-    end
-
-    def to_json(opts = {})
-      @estimator ? @estimator.to_json(opts) : super
-    end
-
-    # pfa - legacy
-
-    def self.load_pfa(data)
-      new(estimator: Eps::LinearRegression.load_pfa(data))
-    end
-
-    # metrics
-
-    def self.metrics(actual, estimated)
-      Eps.metrics(actual, estimated)
-    end
-
     private
+
+    def train(data, y = nil, target: nil, algorithm: :lightgbm, **options)
+      estimator_class =
+        case algorithm
+        when :lightgbm
+          Eps::LightGBM
+        when :linear_regression
+          Eps::LinearRegression
+        when :naive_bayes
+          Eps::NaiveBayes
+        else
+          raise ArgumentError, "Unknown algorithm: #{algorithm}"
+        end
+
+      @estimator = estimator_class.new(data, y, target: target, **options)
+    end
 
     def respond_to_missing?(name, include_private = false)
       if @estimator

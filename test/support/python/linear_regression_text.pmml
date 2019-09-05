@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" xmlns:data="http://jpmml.org/jpmml-model/InlineTable" version="4.3">
+	<Header>
+		<Application name="JPMML-SkLearn" version="1.5.13"/>
+		<Timestamp>2019-09-04T20:45:35Z</Timestamp>
+	</Header>
+	<DataDictionary>
+		<DataField name="hwy" optype="continuous" dataType="double"/>
+		<DataField name="displ" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="1.6" rightMargin="7.0"/>
+		</DataField>
+		<DataField name="year" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="1999.0" rightMargin="2008.0"/>
+		</DataField>
+		<DataField name="cyl" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="4.0" rightMargin="8.0"/>
+		</DataField>
+		<DataField name="drv" optype="categorical" dataType="string">
+			<Value value="4"/>
+			<Value value="f"/>
+			<Value value="r"/>
+		</DataField>
+		<DataField name="class" optype="categorical" dataType="string">
+			<Value value="2seater"/>
+			<Value value="compact"/>
+			<Value value="midsize"/>
+			<Value value="minivan"/>
+			<Value value="pickup"/>
+			<Value value="subcompact"/>
+			<Value value="suv"/>
+		</DataField>
+		<DataField name="model" optype="categorical" dataType="string">
+			<Value value="4runner 4wd"/>
+			<Value value="a4"/>
+			<Value value="a4 quattro"/>
+			<Value value="a6 quattro"/>
+			<Value value="altima"/>
+			<Value value="c1500 suburban 2wd"/>
+			<Value value="camry"/>
+			<Value value="camry solara"/>
+			<Value value="caravan 2wd"/>
+			<Value value="civic"/>
+			<Value value="corolla"/>
+			<Value value="corvette"/>
+			<Value value="dakota pickup 4wd"/>
+			<Value value="durango 4wd"/>
+			<Value value="expedition 2wd"/>
+			<Value value="explorer 4wd"/>
+			<Value value="f150 pickup 4wd"/>
+			<Value value="forester awd"/>
+			<Value value="grand cherokee 4wd"/>
+			<Value value="grand prix"/>
+			<Value value="gti"/>
+			<Value value="impreza awd"/>
+			<Value value="jetta"/>
+			<Value value="k1500 tahoe 4wd"/>
+			<Value value="land cruiser wagon 4wd"/>
+			<Value value="malibu"/>
+			<Value value="maxima"/>
+			<Value value="mountaineer 4wd"/>
+			<Value value="mustang"/>
+			<Value value="navigator 2wd"/>
+			<Value value="new beetle"/>
+			<Value value="passat"/>
+			<Value value="pathfinder 4wd"/>
+			<Value value="ram 1500 pickup 4wd"/>
+			<Value value="range rover"/>
+			<Value value="sonata"/>
+			<Value value="tiburon"/>
+			<Value value="toyota tacoma 4wd"/>
+		</DataField>
+	</DataDictionary>
+	<TransformationDictionary>
+		<DefineFunction name="tf@1" optype="continuous" dataType="double">
+			<ParameterField name="document"/>
+			<ParameterField name="term"/>
+			<TextIndex textField="document" wordSeparatorCharacterRE="\s+" tokenize="true">
+				<FieldRef field="term"/>
+			</TextIndex>
+		</DefineFunction>
+		<DerivedField name="lowercase(model)" optype="categorical" dataType="string">
+			<Apply function="lowercase">
+				<FieldRef field="model"/>
+			</Apply>
+		</DerivedField>
+		<DerivedField name="tf@1(2wd)" optype="continuous" dataType="integer">
+			<Apply function="tf@1">
+				<FieldRef field="lowercase(model)"/>
+				<Constant dataType="string">2wd</Constant>
+			</Apply>
+		</DerivedField>
+		<DerivedField name="tf@1(4wd)" optype="continuous" dataType="integer">
+			<Apply function="tf@1">
+				<FieldRef field="lowercase(model)"/>
+				<Constant dataType="string">4wd</Constant>
+			</Apply>
+		</DerivedField>
+		<DerivedField name="tf@1(a4)" optype="continuous" dataType="integer">
+			<Apply function="tf@1">
+				<FieldRef field="lowercase(model)"/>
+				<Constant dataType="string">a4</Constant>
+			</Apply>
+		</DerivedField>
+		<DerivedField name="tf@1(awd)" optype="continuous" dataType="integer">
+			<Apply function="tf@1">
+				<FieldRef field="lowercase(model)"/>
+				<Constant dataType="string">awd</Constant>
+			</Apply>
+		</DerivedField>
+		<DerivedField name="tf@1(pickup)" optype="continuous" dataType="integer">
+			<Apply function="tf@1">
+				<FieldRef field="lowercase(model)"/>
+				<Constant dataType="string">pickup</Constant>
+			</Apply>
+		</DerivedField>
+	</TransformationDictionary>
+	<RegressionModel functionName="regression">
+		<MiningSchema>
+			<MiningField name="hwy" usageType="target"/>
+			<MiningField name="displ" missingValueTreatment="asIs"/>
+			<MiningField name="year" missingValueTreatment="asIs"/>
+			<MiningField name="cyl" missingValueTreatment="asIs"/>
+			<MiningField name="drv" missingValueTreatment="asIs"/>
+			<MiningField name="class" missingValueTreatment="asIs"/>
+			<MiningField name="model" missingValueTreatment="asIs"/>
+		</MiningSchema>
+		<ModelStats>
+			<UnivariateStats field="displ">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="1.6" maximum="7.0" mean="3.47179487179487" standardDeviation="1.28919547918981" median="3.3" interQuartileRange="2.1999999999999997"/>
+			</UnivariateStats>
+			<UnivariateStats field="year">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="1999.0" maximum="2008.0" mean="2003.5" standardDeviation="4.5" median="2003.5" interQuartileRange="9.0"/>
+			</UnivariateStats>
+			<UnivariateStats field="cyl">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="4.0" maximum="8.0" mean="5.888888888888889" standardDeviation="1.6080873481494276" median="6.0" interQuartileRange="4.0"/>
+			</UnivariateStats>
+			<UnivariateStats field="drv">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<DiscrStats>
+					<Array type="string">4 f r</Array>
+					<Array type="int">103 106 25</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="class">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<DiscrStats>
+					<Array type="string">2seater compact midsize minivan pickup subcompact suv</Array>
+					<Array type="int">5 47 41 11 33 35 62</Array>
+				</DiscrStats>
+			</UnivariateStats>
+			<UnivariateStats field="model">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<DiscrStats>
+					<Array type="string">"4runner 4wd" a4 "a4 quattro" "a6 quattro" altima "c1500 suburban 2wd" camry "camry solara" "caravan 2wd" civic corolla corvette "dakota pickup 4wd" "durango 4wd" "expedition 2wd" "explorer 4wd" "f150 pickup 4wd" "forester awd" "grand cherokee 4wd" "grand prix" gti "impreza awd" jetta "k1500 tahoe 4wd" "land cruiser wagon 4wd" malibu maxima "mountaineer 4wd" mustang "navigator 2wd" "new beetle" passat "pathfinder 4wd" "ram 1500 pickup 4wd" "range rover" sonata tiburon "toyota tacoma 4wd"</Array>
+					<Array type="int">6 7 8 3 6 5 7 7 11 9 5 5 9 7 3 6 7 6 8 5 5 8 9 4 2 5 3 4 9 3 6 7 4 10 4 7 7 7</Array>
+				</DiscrStats>
+			</UnivariateStats>
+		</ModelStats>
+		<RegressionTable intercept="-189.09161410386236">
+			<NumericPredictor name="displ" coefficient="-0.21266741604764106"/>
+			<NumericPredictor name="year" coefficient="0.11126088802113543"/>
+			<NumericPredictor name="cyl" coefficient="-1.4892646817534476"/>
+			<NumericPredictor name="tf@1(2wd)" coefficient="-0.7843364541956998"/>
+			<NumericPredictor name="tf@1(4wd)" coefficient="-2.0657029071094675"/>
+			<NumericPredictor name="tf@1(a4)" coefficient="-0.1211225153503412"/>
+			<NumericPredictor name="tf@1(awd)" coefficient="-0.6877065991207952"/>
+			<NumericPredictor name="tf@1(pickup)" coefficient="0.5309232962181745"/>
+			<CategoricalPredictor name="drv" value="4" coefficient="-1.0939174599512547"/>
+			<CategoricalPredictor name="drv" value="f" coefficient="1.8729744663413468"/>
+			<CategoricalPredictor name="drv" value="r" coefficient="-0.7790570063900937"/>
+			<CategoricalPredictor name="class" value="2seater" coefficient="4.88349589756958"/>
+			<CategoricalPredictor name="class" value="compact" coefficient="0.8308145097993481"/>
+			<CategoricalPredictor name="class" value="midsize" coefficient="0.34494460540893246"/>
+			<CategoricalPredictor name="class" value="minivan" coefficient="-3.113112308910581"/>
+			<CategoricalPredictor name="class" value="pickup" coefficient="-2.8050566270345683"/>
+			<CategoricalPredictor name="class" value="subcompact" coefficient="1.647411051952329"/>
+			<CategoricalPredictor name="class" value="suv" coefficient="-1.7884971287850444"/>
+		</RegressionTable>
+	</RegressionModel>
+</PMML>

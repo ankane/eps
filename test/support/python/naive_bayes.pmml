@@ -1,0 +1,229 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_3" xmlns:data="http://jpmml.org/jpmml-model/InlineTable" version="4.3">
+	<Header>
+		<Application name="JPMML-SkLearn" version="1.5.13"/>
+		<Timestamp>2019-09-02T04:33:50Z</Timestamp>
+	</Header>
+	<DataDictionary>
+		<DataField name="drv" optype="categorical" dataType="string">
+			<Value value="4"/>
+			<Value value="f"/>
+			<Value value="r"/>
+		</DataField>
+		<DataField name="displ" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="1.6" rightMargin="7.0"/>
+		</DataField>
+		<DataField name="year" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="1999.0" rightMargin="2008.0"/>
+		</DataField>
+		<DataField name="cyl" optype="continuous" dataType="double">
+			<Interval closure="closedClosed" leftMargin="4.0" rightMargin="8.0"/>
+		</DataField>
+		<DataField name="class" optype="categorical" dataType="string">
+			<Value value="2seater"/>
+			<Value value="compact"/>
+			<Value value="midsize"/>
+			<Value value="minivan"/>
+			<Value value="pickup"/>
+			<Value value="subcompact"/>
+			<Value value="suv"/>
+		</DataField>
+	</DataDictionary>
+	<TransformationDictionary>
+		<DerivedField name="class=2seater" optype="continuous" dataType="double">
+			<NormDiscrete field="class" value="2seater"/>
+		</DerivedField>
+		<DerivedField name="class=compact" optype="continuous" dataType="double">
+			<NormDiscrete field="class" value="compact"/>
+		</DerivedField>
+		<DerivedField name="class=midsize" optype="continuous" dataType="double">
+			<NormDiscrete field="class" value="midsize"/>
+		</DerivedField>
+		<DerivedField name="class=minivan" optype="continuous" dataType="double">
+			<NormDiscrete field="class" value="minivan"/>
+		</DerivedField>
+		<DerivedField name="class=pickup" optype="continuous" dataType="double">
+			<NormDiscrete field="class" value="pickup"/>
+		</DerivedField>
+		<DerivedField name="class=subcompact" optype="continuous" dataType="double">
+			<NormDiscrete field="class" value="subcompact"/>
+		</DerivedField>
+		<DerivedField name="class=suv" optype="continuous" dataType="double">
+			<NormDiscrete field="class" value="suv"/>
+		</DerivedField>
+	</TransformationDictionary>
+	<NaiveBayesModel threshold="0.0" functionName="classification">
+		<MiningSchema>
+			<MiningField name="drv" usageType="target"/>
+			<MiningField name="displ" missingValueTreatment="asIs"/>
+			<MiningField name="year" missingValueTreatment="asIs"/>
+			<MiningField name="cyl" missingValueTreatment="asIs"/>
+			<MiningField name="class" missingValueTreatment="asIs"/>
+		</MiningSchema>
+		<Output>
+			<OutputField name="probability(4)" optype="continuous" dataType="double" feature="probability" value="4"/>
+			<OutputField name="probability(f)" optype="continuous" dataType="double" feature="probability" value="f"/>
+			<OutputField name="probability(r)" optype="continuous" dataType="double" feature="probability" value="r"/>
+		</Output>
+		<ModelStats>
+			<UnivariateStats field="displ">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="1.6" maximum="7.0" mean="3.47179487179487" standardDeviation="1.28919547918981" median="3.3" interQuartileRange="2.1999999999999997"/>
+			</UnivariateStats>
+			<UnivariateStats field="year">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="1999.0" maximum="2008.0" mean="2003.5" standardDeviation="4.5" median="2003.5" interQuartileRange="9.0"/>
+			</UnivariateStats>
+			<UnivariateStats field="cyl">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<NumericInfo minimum="4.0" maximum="8.0" mean="5.888888888888889" standardDeviation="1.6080873481494276" median="6.0" interQuartileRange="4.0"/>
+			</UnivariateStats>
+			<UnivariateStats field="class">
+				<Counts totalFreq="234.0" missingFreq="0.0" invalidFreq="0.0"/>
+				<DiscrStats>
+					<Array type="string">2seater compact midsize minivan pickup subcompact suv</Array>
+					<Array type="int">5 47 41 11 33 35 62</Array>
+				</DiscrStats>
+			</UnivariateStats>
+		</ModelStats>
+		<BayesInputs>
+			<BayesInput fieldName="displ">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="3.9980582524271817" variance="1.284268094526559"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="2.5584905660377366" variance="0.4867675531798681"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="5.176000000000001" variance="0.6194240202500004"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="year">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="2003.7184466019417" variance="20.202281102350085"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="2003.1603773584907" variance="20.13465648162411"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="2004.04" variance="19.958400020249996"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="cyl">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="6.485436893203883" variance="2.521632596364617"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="4.886792452830188" variance="1.0249199205703978"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="7.68" variance="0.5376000202499998"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="class=2seater">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="0.2" variance="0.16000002025000004"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="class=compact">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="0.11650485436893204" variance="0.10293149352740576"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="0.330188679245283" variance="0.2211641355935387"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="class=midsize">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="0.02912621359223301" variance="0.028277897524012614"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="0.3584905660377358" variance="0.22997510034967972"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="class=minivan">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="0.10377358490566038" variance="0.09300464823148819"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="class=pickup">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="0.32038834951456313" variance="0.21773967525989718"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="class=subcompact">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="0.038834951456310676" variance="0.03732681825169667"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="0.20754716981132076" variance="0.1644713623646317"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="0.36" variance="0.23040002025"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+			<BayesInput fieldName="class=suv">
+				<TargetValueStats>
+					<TargetValueStat value="4">
+						<GaussianDistribution mean="0.49514563106796117" variance="0.24997645535227198"/>
+					</TargetValueStat>
+					<TargetValueStat value="f">
+						<GaussianDistribution mean="0.0" variance="2.0250000000000003E-8"/>
+					</TargetValueStat>
+					<TargetValueStat value="r">
+						<GaussianDistribution mean="0.44" variance="0.24640002025000005"/>
+					</TargetValueStat>
+				</TargetValueStats>
+			</BayesInput>
+		</BayesInputs>
+		<BayesOutput fieldName="drv">
+			<TargetValueCounts>
+				<TargetValueCount value="4" count="103.0"/>
+				<TargetValueCount value="f" count="106.0"/>
+				<TargetValueCount value="r" count="25.0"/>
+			</TargetValueCounts>
+		</BayesOutput>
+	</NaiveBayesModel>
+</PMML>

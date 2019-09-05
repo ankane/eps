@@ -1,111 +1,56 @@
 module Eps
   class LinearRegression < BaseEstimator
-    def initialize(evaluator: nil, gsl: nil)
-      @evaluator = evaluator
-      @gsl = gsl.nil? ? defined?(GSL) : gsl
-    end
-
-    # legacy
-
-    def coefficients
-      @evaluator.coefficients
-    end
-
-    # ruby
-
-    def self.load(data)
-      new(evaluator: Evaluators::LinearRegression.new(Hash[data.map { |k, v| [k.to_sym, v] }]))
-    end
-
-    def dump
-      {coefficients: coefficients}
-    end
-
-    # json
-
-    def self.load_json(data)
-      data = JSON.parse(data) if data.is_a?(String)
-      coefficients = data["coefficients"]
-
-      # for R models
-      if coefficients["(Intercept)"]
-        coefficients = coefficients.dup
-        coefficients["_intercept"] = coefficients.delete("(Intercept)")
-      end
-
-      new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients))
-    end
-
-    def to_json(opts = {})
-      JSON.generate(dump, opts)
-    end
-
     # pmml
 
     def self.load_pmml(data)
       super do |data|
         # TODO more validation
         node = data.css("RegressionTable")
+
         coefficients = {
           "_intercept" => node.attribute("intercept").value.to_f
         }
+
         features = {}
+
+        text_features, derived_fields = extract_text_features(data, features)
+
         node.css("NumericPredictor").each do |n|
           name = n.attribute("name").value
-          if name.include?("@")
-            name = name.split("@")
+          if derived_fields[name]
+            name = derived_fields[name]
           else
             features[name] = "numeric"
           end
           coefficients[name] = n.attribute("coefficient").value.to_f
         end
+
         node.css("CategoricalPredictor").each do |n|
           name = n.attribute("name").value
           coefficients[[name, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
           features[name] = "categorical"
-        end
-        data.css("LocalTransformations FieldRef").map { |n| n.attribute("field").value }.uniq.each do |name|
-          features[name] = "text"
-        end
-        text_features = {}
-        data.css("TransformationDictionary DefineFunction").each do |n|
-          name = n.attribute("name").value.sub(/Transform\z/, "")
-          text_index = n.css("TextIndex")
-          text_features[name] = {
-            tokenizer: Regexp.new(text_index.attribute("wordSeparatorCharacterRE").value),
-            case_sensitive: text_index.attribute("isCaseSensitive").value == "true"
-          }
         end
 
         Evaluators::LinearRegression.new(coefficients: coefficients, features: features, text_features: text_features)
       end
     end
 
-    # pfa
-
-    def self.load_pfa(data)
-      data = JSON.parse(data) if data.is_a?(String)
-      init = data["cells"].first[1]["init"]
-      names =
-        if data["input"]["fields"]
-          data["input"]["fields"].map { |f| f["name"] }
-        else
-          init["coeff"].map.with_index { |_, i| "x#{i}" }
-        end
-      coefficients = {
-        "_intercept" => init["const"]
-      }
-      init["coeff"].each_with_index do |c, i|
-        name = names[i]
-        # R can export coefficients with same name
-        raise "Coefficients with same name" if coefficients[name]
-        coefficients[name] = c
-      end
-      new(evaluator: Evaluators::LinearRegression.new(coefficients: coefficients))
+    def coefficients
+      @evaluator.coefficients
     end
 
+    def r2
+      @r2 ||= (sst - sse) / sst
+    end
+
+    def adjusted_r2
+      @adjusted_r2 ||= (mst - mse) / mst
+    end
+
+    private
+
     # https://people.richland.edu/james/ictcm/2004/multiple.html
-    def summary(extended: false)
+    def _summary(extended: false)
       coefficients = @coefficients
       str = String.new("")
       len = [coefficients.keys.map(&:size).max, 15].max
@@ -127,23 +72,15 @@ module Eps
       str
     end
 
-    def r2
-      @r2 ||= (sst - sse) / sst
-    end
-
-    def adjusted_r2
-      @adjusted_r2 ||= (mst - mse) / mst
-    end
-
-    private
-
-    def _train
+    def _train(**options)
       raise "Target must be numeric" if @target_type != "numeric"
+      check_missing_value(@train_set)
+      check_missing_value(@validation_set) if @validation_set
 
       data = prep_x(@train_set)
 
       if data.size < data.columns.size + 2
-        raise "Number of samples must be at least two more than number of features"
+        raise "Number of data points must be at least two more than number of features"
       end
 
       x = data.map_rows(&:to_a)
@@ -152,8 +89,10 @@ module Eps
         x[i].unshift(1)
       end
 
+      gsl = options.key?(:gsl) ? options[:gsl] : defined?(GSL)
+
       v3 =
-        if @gsl
+        if gsl
           x = GSL::Matrix.alloc(*x)
           y = GSL::Vector.alloc(data.label)
           c, @covariance, _, _ = GSL::MultiFit::linear(x, y)
@@ -232,6 +171,8 @@ module Eps
       @features.each do |k, type|
         if type == "categorical"
           data_fields[k] = predictors.keys.select { |k, v| k.is_a?(Array) && k.first == k }.map(&:last)
+        else
+          data_fields[k] = nil
         end
       end
 
@@ -247,7 +188,7 @@ module Eps
             predictors.each do |k, v|
               if k.is_a?(Array)
                 if @features[k.first] == "text"
-                  xml.NumericPredictor(name: k.join("@"), coefficient: v)
+                  xml.NumericPredictor(name: display_field(k), coefficient: v)
                 else
                   xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
                 end
@@ -273,10 +214,6 @@ module Eps
       end
       prep_text_features(x)
       x
-    end
-
-    def display_field(k)
-      k.is_a?(Array) ? k.join("@") : k
     end
 
     def constant?(arr)

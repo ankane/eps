@@ -1,0 +1,55 @@
+<PMML version="4.3" xmlns="http://www.dmg.org/PMML-4_3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.dmg.org/PMML-4_3 http://www.dmg.org/pmml/v4-3/pmml-4-3.xsd">
+ <Header copyright="Copyright (c) 2019 andrew" description="Linear Regression Model">
+  <Extension name="user" value="andrew" extender="SoftwareAG PMML Generator"/>
+  <Application name="SoftwareAG PMML Generator" version="1.4"/>
+  <Timestamp>2019-09-01 21:26:50</Timestamp>
+ </Header>
+ <DataDictionary numberOfFields="6">
+  <DataField name="hwy" optype="continuous" dataType="double"/>
+  <DataField name="displ" optype="continuous" dataType="double"/>
+  <DataField name="year" optype="continuous" dataType="double"/>
+  <DataField name="cyl" optype="continuous" dataType="double"/>
+  <DataField name="drv" optype="categorical" dataType="string">
+   <Value value="4"/>
+   <Value value="f"/>
+   <Value value="r"/>
+  </DataField>
+  <DataField name="class" optype="categorical" dataType="string">
+   <Value value="2seater"/>
+   <Value value="compact"/>
+   <Value value="midsize"/>
+   <Value value="minivan"/>
+   <Value value="pickup"/>
+   <Value value="subcompact"/>
+   <Value value="suv"/>
+  </DataField>
+ </DataDictionary>
+ <RegressionModel modelName="lm_Model" functionName="regression" algorithmName="least squares">
+  <MiningSchema>
+   <MiningField name="hwy" usageType="predicted" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="displ" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="year" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="cyl" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="drv" usageType="active" invalidValueTreatment="returnInvalid"/>
+   <MiningField name="class" usageType="active" invalidValueTreatment="returnInvalid"/>
+  </MiningSchema>
+  <Output>
+   <OutputField name="Predicted_hwy" optype="continuous" dataType="double" feature="predictedValue"/>
+  </Output>
+  <RegressionTable intercept="-198.22813703683">
+   <NumericPredictor name="displ" exponent="1" coefficient="-0.527139130013768"/>
+   <NumericPredictor name="year" exponent="1" coefficient="0.117581518025613"/>
+   <NumericPredictor name="cyl" exponent="1" coefficient="-1.33217467344531"/>
+   <CategoricalPredictor name="drv" value="4" coefficient="0"/>
+   <CategoricalPredictor name="drv" value="f" coefficient="3.33902289586917"/>
+   <CategoricalPredictor name="drv" value="r" coefficient="1.25231673473852"/>
+   <CategoricalPredictor name="class" value="2seater" coefficient="0"/>
+   <CategoricalPredictor name="class" value="compact" coefficient="-4.15308144423856"/>
+   <CategoricalPredictor name="class" value="midsize" coefficient="-4.53781579791057"/>
+   <CategoricalPredictor name="class" value="minivan" coefficient="-8.73540399779774"/>
+   <CategoricalPredictor name="class" value="pickup" coefficient="-8.78909212857045"/>
+   <CategoricalPredictor name="class" value="subcompact" coefficient="-3.47793742170762"/>
+   <CategoricalPredictor name="class" value="suv" coefficient="-7.84230450257293"/>
+  </RegressionTable>
+ </RegressionModel>
+</PMML>

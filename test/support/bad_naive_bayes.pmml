@@ -1,0 +1,111 @@
+<?xml version="1.0"?>
+<PMML xmlns="http://www.dmg.org/PMML-4_4" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" version="4.4">
+  <Header>
+    <Application name="Eps" version="0.2.1"/>
+    <Timestamp>2019-09-02T06:26:12Z</Timestamp>
+  </Header>
+  <DataDictionary>
+    <DataField name="class" optype="categorical" dataType="string">
+      <Value value="4"/>
+      <Value value="f"/>
+      <Value value="r"/>
+    </DataField>
+    <DataField name="displ" optype="continuous" dataType="double"/>
+    <DataField name="year" optype="continuous" dataType="double"/>
+    <DataField name="cyl" optype="continuous" dataType="double"/>
+    <DataField name="hwy" optype="continuous" dataType="double"/>
+  </DataDictionary>
+  <NaiveBayesModel functionName="classification" threshold="0.001">
+    <MiningSchema>
+      <MiningField name="drv"/>
+      <MiningField name="class"/>
+    </MiningSchema>
+    <BayesInputs>
+      <BayesInput fieldName="class">
+        <PairCounts value="f">
+          <TargetValueCounts>
+            <TargetValueCount value="midsize" count="38"/>
+            <TargetValueCount value="subcompact" count="22"/>
+            <TargetValueCount value="compact" count="35"/>
+            <TargetValueCount value="minivan" count="11"/>
+          </TargetValueCounts>
+        </PairCounts>
+        <PairCounts value="4">
+          <TargetValueCounts>
+            <TargetValueCount value="suv" count="51"/>
+            <TargetValueCount value="compact" count="12"/>
+            <TargetValueCount value="pickup" count="33"/>
+            <TargetValueCount value="subcompact" count="4"/>
+            <TargetValueCount value="midsize" count="3"/>
+          </TargetValueCounts>
+        </PairCounts>
+        <PairCounts value="r">
+          <TargetValueCounts>
+            <TargetValueCount value="suv" count="11"/>
+            <TargetValueCount value="subcompact" count="9"/>
+            <TargetValueCount value="2seater" count="5"/>
+          </TargetValueCounts>
+        </PairCounts>
+      </BayesInput>
+      <BayesInput fieldName="displ">
+        <TargetValueStats>
+          <TargetValueStat value="f">
+            <GaussianDistribution mean="2.5584905660377357" variance="0.49140341419586714"/>
+          </TargetValueStat>
+          <TargetValueStat value="4">
+            <GaussianDistribution mean="3.9980582524271844" variance="1.2968589377498572"/>
+          </TargetValueStat>
+          <TargetValueStat value="r">
+            <GaussianDistribution mean="5.176" variance="0.6452333333333337"/>
+          </TargetValueStat>
+        </TargetValueStats>
+      </BayesInput>
+      <BayesInput fieldName="year">
+        <TargetValueStats>
+          <TargetValueStat value="f">
+            <GaussianDistribution mean="2003.1603773584907" variance="20.326415094339577"/>
+          </TargetValueStat>
+          <TargetValueStat value="4">
+            <GaussianDistribution mean="2003.7184466019417" variance="20.400342661336357"/>
+          </TargetValueStat>
+          <TargetValueStat value="r">
+            <GaussianDistribution mean="2004.04" variance="20.790000000000003"/>
+          </TargetValueStat>
+        </TargetValueStats>
+      </BayesInput>
+      <BayesInput fieldName="cyl">
+        <TargetValueStats>
+          <TargetValueStat value="f">
+            <GaussianDistribution mean="4.886792452830188" variance="1.034681042228211"/>
+          </TargetValueStat>
+          <TargetValueStat value="4">
+            <GaussianDistribution mean="6.485436893203883" variance="2.546354464115741"/>
+          </TargetValueStat>
+          <TargetValueStat value="r">
+            <GaussianDistribution mean="7.68" variance="0.5599999999999997"/>
+          </TargetValueStat>
+        </TargetValueStats>
+      </BayesInput>
+      <BayesInput fieldName="hwy">
+        <TargetValueStats>
+          <TargetValueStat value="f">
+            <GaussianDistribution mean="28.160377358490567" variance="17.697843665768175"/>
+          </TargetValueStat>
+          <TargetValueStat value="4">
+            <GaussianDistribution mean="19.174757281553397" variance="16.63582714639253"/>
+          </TargetValueStat>
+          <TargetValueStat value="r">
+            <GaussianDistribution mean="21.0" variance="13.416666666666666"/>
+          </TargetValueStat>
+        </TargetValueStats>
+      </BayesInput>
+    </BayesInputs>
+    <BayesOutput fieldName="target">
+      <TargetValueCounts>
+        <TargetValueCount value="f" count="106"/>
+        <TargetValueCount value="4" count="103"/>
+        <TargetValueCount value="r" count="25"/>
+      </TargetValueCounts>
+    </BayesOutput>
+  </NaiveBayesModel>
+</PMML>

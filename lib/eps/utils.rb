@@ -10,10 +10,12 @@ module Eps
         raise ArgumentError, "Missing values in column #{k}"
       elsif c.all? { |v| v.is_a?(Numeric) }
         "numeric"
-      elsif c.all? { |v| v.is_a?(String) || v == true || v == false }
+      elsif c.all? { |v| v.is_a?(String) }
         "categorical"
+      elsif c.all? { |v| v == true || v == false }
+        "categorical" # boolean
       else
-        raise ArgumentError, "Column values must be all numeric or all string: #{k}"
+        raise ArgumentError, "Column values must be all numeric, all string, or all boolean: #{k}"
       end
     end
   end
