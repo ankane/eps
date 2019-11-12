@@ -1,7 +1,7 @@
 module Eps
   class DataFrame
     attr_reader :columns
-    attr_accessor :label
+    attr_accessor :label, :weight
 
     def initialize(data = [])
       @columns = {}
@@ -115,6 +115,7 @@ module Eps
         df.columns[c] = columns[c].values_at(*rows)
       end
       df.label = label.values_at(*rows) if label
+      df.weight = weight.values_at(*rows) if weight
 
       singular ? df.columns[cols[0]] : df
     end
@@ -129,6 +130,7 @@ module Eps
         df.columns[k] = v
       end
       df.label = label
+      df.weight = weight
       df
     end
 

@@ -1,3 +1,7 @@
+## 0.3.1 [unreleased]
+
+- Added `weight` option for LightGBM
+
 ## 0.3.0
 
 - Added support for LightGBM

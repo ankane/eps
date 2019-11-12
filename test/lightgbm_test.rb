@@ -15,6 +15,16 @@ class LightGBMTest < Minitest::Test
     assert_elements_in_delta expected, predictions
   end
 
+  def test_regression_weight
+    data = mpg_data
+    model = Eps::LightGBM.new(data, target: :hwy, weight: :cyl, split: false)
+    assert model.summary
+
+    expected = [30.68452047, 33.61198231, 17.38480406, 17.07736756, 29.01378163, 29.13743864, 27.65261165, 18.28700064, 24.8307268, 29.13743864]
+    predictions = model.predict(data.first(10))
+    assert_elements_in_delta expected, predictions
+  end
+
   def test_regression_python_pmml
     data = mpg_data(extra_fields: [:model])
     model = Eps::Model.load_pmml(File.read("test/support/python/lightgbm_regression.pmml"))

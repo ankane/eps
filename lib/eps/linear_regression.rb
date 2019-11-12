@@ -76,6 +76,7 @@ module Eps
       raise "Target must be numeric" if @target_type != "numeric"
       check_missing_value(@train_set)
       check_missing_value(@validation_set) if @validation_set
+      raise ArgumentError, "weight not supported" if @train_set.weight
 
       data = prep_x(@train_set)
 

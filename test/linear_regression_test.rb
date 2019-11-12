@@ -15,6 +15,13 @@ class LinearRegressionTest < Minitest::Test
     assert_elements_in_delta expected, predictions
   end
 
+  def test_mpg_weight
+    data = mpg_data
+    assert_raises ArgumentError do
+      Eps::LinearRegression.new(data, target: :hwy, weight: :cyl, split: false)
+    end
+  end
+
   def test_python_pmml
     data = mpg_data
     model = Eps::Model.load_pmml(File.read("test/support/python/linear_regression.pmml"))

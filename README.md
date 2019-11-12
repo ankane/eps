@@ -419,6 +419,15 @@ model = Eps::Model.load_pmml(data)
 
 You can use [IRuby](https://github.com/SciRuby/iruby) to run Eps in [Jupyter](https://jupyter.org/) notebooks. Here’s how to get [IRuby working with Rails](https://ankane.org/jupyter-rails).
 
+## Reference
+
+Specify weights as an array or a key [master]
+
+```ruby
+Eps::Model.new(data, weight: [1, 2, 3])
+Eps::Model.new(data, weight: :weight)
+```
+
 ## Upgrading
 
 ## 0.3.0

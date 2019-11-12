@@ -28,8 +28,8 @@ module Eps
       singular ? predictions.first : predictions
     end
 
-    def evaluate(data, y = nil, target: nil)
-      data, target = prep_data(data, y, target || @target)
+    def evaluate(data, y = nil, target: nil, weight: nil)
+      data, target = prep_data(data, y, target || @target, weight)
       Eps.metrics(data.label, predict(data))
     end
 
@@ -112,8 +112,8 @@ module Eps
 
     private
 
-    def train(data, y = nil, target: nil, split: nil, validation_set: nil, verbose: nil, text_features: nil, early_stopping: nil)
-      data, @target = prep_data(data, y, target)
+    def train(data, y = nil, target: nil, weight: nil, split: nil, validation_set: nil, verbose: nil, text_features: nil, early_stopping: nil)
+      data, @target = prep_data(data, y, target, weight)
       @target_type = Utils.column_type(data.label, @target)
 
       if split.nil?
@@ -210,12 +210,27 @@ module Eps
       nil
     end
 
-    def prep_data(data, y, target)
+    def prep_data(data, y, target, weight)
       data = Eps::DataFrame.new(data)
+
+      # target
       target = (target || "target").to_s
       y ||= data.columns.delete(target)
       check_missing(y, target)
       data.label = y.to_a
+
+      # weight
+      if weight
+        weight =
+          if weight.respond_to?(:to_a)
+            weight.to_a
+          else
+            data.columns.delete(weight.to_s)
+          end
+        check_missing(weight, "weight")
+        data.weight = weight.to_a
+      end
+
       check_data(data)
       [data, target]
     end
@@ -251,6 +266,7 @@ module Eps
     def check_data(data)
       raise "No data" if data.empty?
       raise "Number of data points differs from target" if data.size != data.label.size
+      raise "Number of data points differs from weight" if data.weight && data.size != data.weight.size
     end
 
     def check_missing(c, name)

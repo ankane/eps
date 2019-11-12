@@ -105,6 +105,7 @@ module Eps
       raise "Target must be strings" if @target_type != "categorical"
       check_missing_value(@train_set)
       check_missing_value(@validation_set) if @validation_set
+      raise ArgumentError, "weight not supported" if @train_set.weight
 
       data = @train_set
 

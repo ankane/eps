@@ -16,6 +16,13 @@ class NaiveBayesTest < Minitest::Test
     assert_equal expected, predictions
   end
 
+  def test_mpg_weight
+    data = mpg_data
+    assert_raises ArgumentError do
+      Eps::NaiveBayes.new(data, target: :drv, weight: :cyl, split: false)
+    end
+  end
+
   def test_python_pmml
     data = mpg_data
     model = Eps::Model.load_pmml(File.read("test/support/python/naive_bayes.pmml"))
