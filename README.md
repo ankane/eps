@@ -439,6 +439,8 @@ Weights are supported for metrics as well
 Eps.metrics(actual, predicted, weight: weight)
 ```
 
+Reweighing is one method to [mitigate bias](http://aif360.mybluemix.net/) in training data
+
 ## Upgrading
 
 ## 0.3.0
