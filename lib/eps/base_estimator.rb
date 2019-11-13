@@ -121,6 +121,7 @@ module Eps
       end
 
       # cross validation
+      # TODO adjust based on weight
       if split && !validation_set
         split = {} if split == true
         split = {column: split} unless split.is_a?(Hash)
