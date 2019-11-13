@@ -25,16 +25,16 @@ require "eps/utils"
 require "eps/version"
 
 module Eps
-  def self.metrics(y_true, y_pred)
+  def self.metrics(y_true, y_pred, weight: nil)
     if Utils.column_type(y_true, "actual") == "numeric"
       {
-        rmse: Metrics.rmse(y_true, y_pred),
-        mae: Metrics.mae(y_true, y_pred),
-        me: Metrics.me(y_true, y_pred)
+        rmse: Metrics.rmse(y_true, y_pred, weight: weight),
+        mae: Metrics.mae(y_true, y_pred, weight: weight),
+        me: Metrics.me(y_true, y_pred, weight: weight)
       }
     else
       {
-        accuracy: Metrics.accuracy(y_true, y_pred)
+        accuracy: Metrics.accuracy(y_true, y_pred, weight: weight)
       }
     end
   end

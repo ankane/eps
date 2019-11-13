@@ -101,12 +101,32 @@ class ModelTest < Minitest::Test
     assert_in_delta -2, metrics[:me]
   end
 
+  def test_regression_metrics_weight
+    actual = [1, 1, 1]
+    estimated = [0, 1, 4]
+    weight = [1, 2, 3]
+    metrics = Eps.metrics(actual, estimated, weight: weight)
+
+    assert_in_delta 2.160246899469287, metrics[:rmse]
+    assert_in_delta 1.6667, metrics[:mae]
+    assert_in_delta -1.3333, metrics[:me]
+  end
+
   def test_classification_metrics
     actual = ["up", "up", "down"]
     estimated = ["down", "up", "down"]
     metrics = Eps.metrics(actual, estimated)
 
     assert_in_delta 0.667, metrics[:accuracy]
+  end
+
+  def test_classification_metrics_weight
+    actual = ["down", "up", "down"]
+    estimated = ["down", "up", "up"]
+    weight = [1, 2, 3]
+    metrics = Eps.metrics(actual, estimated, weight: weight)
+
+    assert_in_delta 0.5, metrics[:accuracy]
   end
 
   def test_regression_comparison

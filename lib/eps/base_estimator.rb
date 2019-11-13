@@ -57,11 +57,11 @@ module Eps
         case @target_type
         when "numeric"
           metric_name = "RMSE"
-          v = Metrics.rmse(y_true, y_pred)
+          v = Metrics.rmse(y_true, y_pred, weight: @validation_set.weight)
           metric_value = v.round >= 1000 ? v.round.to_s : "%.3g" % v
         else
           metric_name = "accuracy"
-          metric_value = "%.1f%%" % (100 * Metrics.accuracy(y_true, y_pred)).round(1)
+          metric_value = "%.1f%%" % (100 * Metrics.accuracy(y_true, y_pred, weight: @validation_set.weight)).round(1)
         end
         str << "Validation %s: %s\n\n"  % [metric_name, metric_value]
       end
