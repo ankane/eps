@@ -129,6 +129,11 @@ class ModelTest < Minitest::Test
     assert_in_delta 0.5, metrics[:accuracy]
   end
 
+  def test_log_loss_weight
+    log_loss = Eps::Metrics.log_loss([0, 1, 0], [0, 1, 1], weight: [1, 2, 3])
+    assert_in_delta 17.26978799617044, log_loss
+  end
+
   def test_regression_comparison
     lr = Eps::LinearRegression.new(mpg_data, target: :hwy)
     lgb = Eps::LightGBM.new(mpg_data, target: :hwy)

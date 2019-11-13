@@ -30,11 +30,10 @@ module Eps
       end
 
       # http://wiki.fast.ai/index.php/Log_Loss
-      # TODO incorporate weight
-      def log_loss(y_true, y_pred, eps: 1e-15)
+      def log_loss(y_true, y_pred, eps: 1e-15, weight: nil)
         check_size(y_true, y_pred)
         p = y_pred.map { |yp| yp.clamp(eps, 1 - eps) }
-        mean(y_true.zip(p).map { |yt, pi| yt == 1 ? -Math.log(pi) : -Math.log(1 - pi) })
+        mean(y_true.zip(p).map { |yt, pi| yt == 1 ? -Math.log(pi) : -Math.log(1 - pi) }, weight: weight)
       end
 
       private
