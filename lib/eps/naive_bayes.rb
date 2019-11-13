@@ -3,7 +3,7 @@ module Eps
     attr_reader :probabilities
 
     def accuracy
-      Eps::Metrics.accuracy(@train_set.label, predict(@train_set))
+      Eps::Metrics.accuracy(@train_set.label, predict(@train_set), weight: @train_set.weight)
     end
 
     private
