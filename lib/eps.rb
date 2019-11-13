@@ -9,23 +9,27 @@ require "nokogiri"
 require "eps/base"
 require "eps/base_estimator"
 require "eps/data_frame"
-require "eps/evaluators/linear_regression"
-require "eps/evaluators/lightgbm"
-require "eps/evaluators/naive_bayes"
-require "eps/evaluators/node"
 require "eps/label_encoder"
 require "eps/lightgbm"
 require "eps/linear_regression"
 require "eps/metrics"
 require "eps/model"
 require "eps/naive_bayes"
-require "eps/pmml"
-require "eps/pmml/generator"
-require "eps/pmml/loader"
 require "eps/statistics"
 require "eps/text_encoder"
 require "eps/utils"
 require "eps/version"
+
+# pmml
+require "eps/pmml"
+require "eps/pmml/generator"
+require "eps/pmml/loader"
+
+# evaluators
+require "eps/evaluators/linear_regression"
+require "eps/evaluators/lightgbm"
+require "eps/evaluators/naive_bayes"
+require "eps/evaluators/node"
 
 module Eps
   def self.metrics(y_true, y_pred, weight: nil)
