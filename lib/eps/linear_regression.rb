@@ -94,9 +94,13 @@ module Eps
       v3 =
         if gsl
           x = GSL::Matrix.alloc(*x)
-          w = GSL::Vector.alloc(data.weight)
           y = GSL::Vector.alloc(data.label)
-          c, @covariance, _, _ = GSL::MultiFit::wlinear(x, w, y)
+          if data.weight
+            w = GSL::Vector.alloc(data.weight)
+            c, @covariance, _, _ = GSL::MultiFit::wlinear(x, w, y)
+          else
+            c, @covariance, _, _ = GSL::MultiFit::linear(x, y)
+          end
           c.to_a
         else
           raise ArgumentError, "GSL required for weight" if data.weight
