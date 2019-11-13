@@ -1,40 +1,5 @@
 module Eps
   class LinearRegression < BaseEstimator
-    # pmml
-
-    def self.load_pmml(data)
-      super do |data|
-        # TODO more validation
-        node = data.css("RegressionTable")
-
-        coefficients = {
-          "_intercept" => node.attribute("intercept").value.to_f
-        }
-
-        features = {}
-
-        text_features, derived_fields = extract_text_features(data, features)
-
-        node.css("NumericPredictor").each do |n|
-          name = n.attribute("name").value
-          if derived_fields[name]
-            name = derived_fields[name]
-          else
-            features[name] = "numeric"
-          end
-          coefficients[name] = n.attribute("coefficient").value.to_f
-        end
-
-        node.css("CategoricalPredictor").each do |n|
-          name = n.attribute("name").value
-          coefficients[[name, n.attribute("value").value]] = n.attribute("coefficient").value.to_f
-          features[name] = "categorical"
-        end
-
-        Evaluators::LinearRegression.new(coefficients: coefficients, features: features, text_features: text_features)
-      end
-    end
-
     def coefficients
       @evaluator.coefficients
     end

@@ -4,36 +4,6 @@ module Eps
   class LightGBM < BaseEstimator
     include PmmlGenerators::LightGBM
 
-    def self.load_pmml(data)
-      super do |data|
-        objective = data.css("MiningModel").first.attribute("functionName").value
-        if objective == "classification"
-          labels = data.css("RegressionModel OutputField").map { |n| n.attribute("value").value }
-          objective = labels.size > 2 ? "multiclass" : "binary"
-        end
-
-        features = {}
-        text_features, derived_fields = extract_text_features(data, features)
-        node = data.css("DataDictionary").first
-        node.css("DataField")[1..-1].to_a.each do |node|
-          features[node.attribute("name").value] =
-            if node.attribute("optype").value == "categorical"
-              "categorical"
-            else
-              "numeric"
-            end
-        end
-
-        trees = []
-        data.css("Segmentation TreeModel").each do |tree|
-          node = find_nodes(tree.css("Node").first, derived_fields)
-          trees << node
-        end
-
-        Evaluators::LightGBM.new(trees: trees, objective: objective, labels: labels, features: features, text_features: text_features)
-      end
-    end
-
     private
 
     def _summary(extended: false)
@@ -49,43 +19,6 @@ module Eps
         end
       end
       str
-    end
-
-    def self.find_nodes(xml, derived_fields)
-      score = BigDecimal(xml.attribute("score").value).to_f
-
-      elements = xml.elements
-      xml_predicate = elements.first
-
-      predicate =
-        if xml_predicate.name == "True"
-          nil
-        elsif xml_predicate.name == "SimpleSetPredicate"
-          operator = "in"
-          value = xml_predicate.css("Array").text.scan(/"(.+?)(?<!\\)"|(\S+)/).flatten.compact.map { |v| v.gsub('\"', '"') }
-          field = xml_predicate.attribute("field").value
-          field = derived_fields[field] if derived_fields[field]
-          {
-            field: field,
-            operator: operator,
-            value: value
-          }
-        else
-          operator = xml_predicate.attribute("operator").value
-          value = xml_predicate.attribute("value").value
-          value = BigDecimal(value).to_f if operator == "greaterThan"
-          field = xml_predicate.attribute("field").value
-          field = derived_fields[field] if derived_fields[field]
-          {
-            field: field,
-            operator: operator,
-            value: value
-          }
-        end
-
-      children = elements[1..-1].map { |n| find_nodes(n, derived_fields) }
-
-      Evaluators::Node.new(score: score, predicate: predicate, children: children)
     end
 
     def _train(verbose: nil, early_stopping: nil)

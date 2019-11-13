@@ -37,13 +37,13 @@ module Eps
       (@pmml ||= generate_pmml).to_xml
     end
 
-    def self.load_pmml(data)
-      if data.is_a?(String)
-        data = Nokogiri::XML(data) { |config| config.strict }
-      end
+    def self.load_pmml(pmml)
       model = new
-      model.instance_variable_set("@pmml", data) # cache data
-      model.instance_variable_set("@evaluator", yield(data))
+
+      loader = PMML::Loader.new(pmml)
+      model.instance_variable_set("@pmml", loader.data) # cache data
+      model.instance_variable_set("@evaluator", loader.evaluator)
+
       model
     end
 
@@ -68,46 +68,6 @@ module Eps
 
       str << _summary(extended: extended)
       str
-    end
-
-    # private
-    def self.extract_text_features(data, features)
-      # updates features object
-      vocabulary = {}
-      function_mapping = {}
-      derived_fields = {}
-      data.css("LocalTransformations DerivedField, TransformationDictionary DerivedField").each do |n|
-        name = n.attribute("name")&.value
-        field = n.css("FieldRef").attribute("field").value
-        value = n.css("Constant").text
-
-        field = field[10..-2] if field =~ /\Alowercase\(.+\)\z/
-        next if value.empty?
-
-        (vocabulary[field] ||= []) << value
-
-        function_mapping[field] = n.css("Apply").attribute("function").value
-
-        derived_fields[name] = [field, value]
-      end
-
-      functions = {}
-      data.css("TransformationDictionary DefineFunction").each do |n|
-        name = n.attribute("name").value
-        text_index = n.css("TextIndex")
-        functions[name] = {
-          tokenizer: Regexp.new(text_index.attribute("wordSeparatorCharacterRE").value),
-          case_sensitive: text_index.attribute("isCaseSensitive")&.value == "true"
-        }
-      end
-
-      text_features = {}
-      function_mapping.each do |field, function|
-        text_features[field] = functions[function].merge(vocabulary: vocabulary[field])
-        features[field] = "text"
-      end
-
-      [text_features, derived_fields]
     end
 
     private
