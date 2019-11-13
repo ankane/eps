@@ -30,7 +30,7 @@ module Eps
 
     def evaluate(data, y = nil, target: nil, weight: nil)
       data, target = prep_data(data, y, target || @target, weight)
-      Eps.metrics(data.label, predict(data))
+      Eps.metrics(data.label, predict(data), weight: data.weight)
     end
 
     def to_pmml
