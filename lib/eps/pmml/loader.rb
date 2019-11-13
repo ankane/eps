@@ -236,7 +236,6 @@ module Eps
 
         Evaluators::Node.new(score: score, predicate: predicate, children: children)
       end
-
     end
   end
 end
