@@ -16,7 +16,7 @@ class NaiveBayesTest < Minitest::Test
     assert_equal expected, predictions
   end
 
-  def test_mpg_weight
+  def test_weight
     data = mpg_data
     assert_raises ArgumentError do
       Eps::NaiveBayes.new(data, target: :drv, weight: :cyl, split: false)

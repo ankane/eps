@@ -15,11 +15,15 @@ class LinearRegressionTest < Minitest::Test
     assert_elements_in_delta expected, predictions
   end
 
-  def test_mpg_weight
+  def test_weight
+    skip unless gsl?
+
     data = mpg_data
-    assert_raises ArgumentError do
-      Eps::LinearRegression.new(data, target: :hwy, weight: :cyl, split: false)
-    end
+    model = Eps::LinearRegression.new(data, target: :hwy, weight: :cyl, split: false)
+
+    expected = [29.11587889, 29.72208626, 18.19186325, 14.85352963, 29.95274992, 30.16211498, 28.27000463, 17.99179601, 24.76579075, 30.16211498]
+    predictions = model.predict(data.first(10))
+    assert_elements_in_delta expected, predictions
   end
 
   def test_python_pmml

@@ -76,7 +76,6 @@ module Eps
       raise "Target must be numeric" if @target_type != "numeric"
       check_missing_value(@train_set)
       check_missing_value(@validation_set) if @validation_set
-      raise ArgumentError, "weight not supported" if @train_set.weight
 
       data = prep_x(@train_set)
 
@@ -95,10 +94,13 @@ module Eps
       v3 =
         if gsl
           x = GSL::Matrix.alloc(*x)
+          w = GSL::Vector.alloc(data.weight)
           y = GSL::Vector.alloc(data.label)
-          c, @covariance, _, _ = GSL::MultiFit::linear(x, y)
+          c, @covariance, _, _ = GSL::MultiFit::wlinear(x, w, y)
           c.to_a
         else
+          raise ArgumentError, "GSL required for weight" if data.weight
+
           x = Matrix.rows(x)
           y = Matrix.column_vector(data.label)
           removed = []
