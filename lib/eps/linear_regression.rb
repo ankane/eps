@@ -95,18 +95,17 @@ module Eps
         if gsl
           x = GSL::Matrix.alloc(*x)
           y = GSL::Vector.alloc(data.label)
-          if data.weight
-            w = GSL::Vector.alloc(data.weight)
-            c, @covariance, _, _ = GSL::MultiFit::wlinear(x, w, y)
-          else
-            c, @covariance, _, _ = GSL::MultiFit::linear(x, y)
-          end
+          w = GSL::Vector.alloc(data.weight) if data.weight
+          c, @covariance, _, _ = w ? GSL::MultiFit.wlinear(x, w, y) : GSL::MultiFit.linear(x, y)
           c.to_a
         else
-          raise ArgumentError, "GSL required for weight" if data.weight
-
           x = Matrix.rows(x)
           y = Matrix.column_vector(data.label)
+
+          # weighted OLS
+          # http://www.real-statistics.com/multiple-regression/weighted-linear-regression/weighted-regression-basics/
+          w = Matrix.diagonal(*data.weight) if data.weight
+
           removed = []
 
           # https://statsmaths.github.io/stat612/lectures/lec13/lecture13.pdf
@@ -115,6 +114,7 @@ module Eps
           # the extendmatrix gem has householder and givens (givens has bug)
           # but methods are too slow
           xt = x.t
+          xt *= w if w
           begin
             @xtxi = (xt * x).inverse
           rescue ExceptionForMatrix::ErrNotRegular
@@ -141,6 +141,7 @@ module Eps
             end
             x = Matrix.columns(vectors)
             xt = x.t
+            xt *= w if w
 
             # try again
             begin
@@ -151,6 +152,7 @@ module Eps
           end
           # huge performance boost
           # by multiplying xt * y first
+          # for weighted, w is already included in wt
           v2 = @xtxi * (xt * y)
 
           # convert to array

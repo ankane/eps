@@ -1,6 +1,6 @@
 ## 0.3.1 [unreleased]
 
-- Added `weight` option for LightGBM and linear regression with GSL
+- Added `weight` option for LightGBM and linear regression
 
 ## 0.3.0
 

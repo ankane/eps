@@ -16,8 +16,6 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_weight
-    skip unless gsl?
-
     data = mpg_data
     model = Eps::LinearRegression.new(data, target: :hwy, weight: :cyl, split: false)
 
