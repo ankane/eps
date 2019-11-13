@@ -7,7 +7,7 @@ module Eps
         @model = model
       end
 
-      def pmml
+      def generate
         case @model
         when LightGBM
           lightgbm

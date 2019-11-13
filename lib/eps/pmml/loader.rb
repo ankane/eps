@@ -10,11 +10,7 @@ module Eps
         @data = pmml
       end
 
-      def pmml
-        data.to_xml
-      end
-
-      def evaluator
+      def load
         if data.css("Segmentation").any?
           lightgbm
         elsif data.css("RegressionModel").any?

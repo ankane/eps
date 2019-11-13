@@ -34,16 +34,13 @@ module Eps
     end
 
     def to_pmml
-      @pmml ||= PMML::Generator.new(self).pmml
+      @pmml ||= PMML.generate(self)
     end
 
     def self.load_pmml(pmml)
       model = new
-
-      loader = PMML::Loader.new(pmml)
-      model.instance_variable_set("@pmml", loader.pmml) # cache data
-      model.instance_variable_set("@evaluator", loader.evaluator)
-
+      model.instance_variable_set("@evaluator", PMML.load(pmml))
+      model.instance_variable_set("@pmml", pmml.respond_to?(:to_xml) ? pmml.to_xml : pmml) # cache data
       model
     end
 
