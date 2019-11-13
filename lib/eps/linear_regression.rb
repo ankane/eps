@@ -137,44 +137,6 @@ module Eps
       Evaluators::LinearRegression.new(coefficients: @coefficients, features: @features, text_features: @text_features)
     end
 
-    def generate_pmml
-      predictors = @coefficients.dup
-      predictors.delete("_intercept")
-
-      data_fields = {}
-      @features.each do |k, type|
-        if type == "categorical"
-          data_fields[k] = predictors.keys.select { |k, v| k.is_a?(Array) && k.first == k }.map(&:last)
-        else
-          data_fields[k] = nil
-        end
-      end
-
-      build_pmml(data_fields) do |xml|
-        xml.RegressionModel(functionName: "regression") do
-          xml.MiningSchema do
-            @features.each do |k, _|
-              xml.MiningField(name: k)
-            end
-          end
-          pmml_local_transformations(xml)
-          xml.RegressionTable(intercept: @coefficients["_intercept"]) do
-            predictors.each do |k, v|
-              if k.is_a?(Array)
-                if @features[k.first] == "text"
-                  xml.NumericPredictor(name: display_field(k), coefficient: v)
-                else
-                  xml.CategoricalPredictor(name: k[0], value: k[1], coefficient: v)
-                end
-              else
-                xml.NumericPredictor(name: k, coefficient: v)
-              end
-            end
-          end
-        end
-      end
-    end
-
     def prep_x(x)
       x = x.dup
       @features.each do |k, type|

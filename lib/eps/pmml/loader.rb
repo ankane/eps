@@ -10,6 +10,10 @@ module Eps
         @data = pmml
       end
 
+      def pmml
+        data.to_xml
+      end
+
       def evaluator
         if data.css("Segmentation").any?
           lightgbm

@@ -102,60 +102,6 @@ module Eps
       Evaluators::NaiveBayes.new(probabilities: probabilities, features: @features)
     end
 
-    def generate_pmml
-      data_fields = {}
-      data_fields[@target] = probabilities[:prior].keys
-      probabilities[:conditional].each do |k, v|
-        if @features[k] == "categorical"
-          data_fields[k] = v.keys
-        else
-          data_fields[k] = nil
-        end
-      end
-
-      build_pmml(data_fields) do |xml|
-        xml.NaiveBayesModel(functionName: "classification", threshold: 0.001) do
-          xml.MiningSchema do
-            data_fields.each do |k, _|
-              xml.MiningField(name: k)
-            end
-          end
-          xml.BayesInputs do
-            probabilities[:conditional].each do |k, v|
-              xml.BayesInput(fieldName: k) do
-                if @features[k] == "categorical"
-                  v.sort_by { |k2, _| k2 }.each do |k2, v2|
-                    xml.PairCounts(value: k2) do
-                      xml.TargetValueCounts do
-                        v2.sort_by { |k2, _| k2 }.each do |k3, v3|
-                          xml.TargetValueCount(value: k3, count: v3)
-                        end
-                      end
-                    end
-                  end
-                else
-                  xml.TargetValueStats do
-                    v.sort_by { |k2, _| k2 }.each do |k2, v2|
-                      xml.TargetValueStat(value: k2) do
-                        xml.GaussianDistribution(mean: v2[:mean], variance: v2[:stdev]**2)
-                      end
-                    end
-                  end
-                end
-              end
-            end
-          end
-          xml.BayesOutput(fieldName: "target") do
-            xml.TargetValueCounts do
-              probabilities[:prior].sort_by { |k, _| k }.each do |k, v|
-                xml.TargetValueCount(value: k, count: v)
-              end
-            end
-          end
-        end
-      end
-    end
-
     def group_count(arr, start)
       arr.inject(start) { |h, e| h[e] += 1; h }
     end

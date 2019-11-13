@@ -34,14 +34,14 @@ module Eps
     end
 
     def to_pmml
-      (@pmml ||= generate_pmml).to_xml
+      @pmml ||= PMML::Generator.new(self).pmml
     end
 
     def self.load_pmml(pmml)
       model = new
 
       loader = PMML::Loader.new(pmml)
-      model.instance_variable_set("@pmml", loader.data) # cache data
+      model.instance_variable_set("@pmml", loader.pmml) # cache data
       model.instance_variable_set("@evaluator", loader.evaluator)
 
       model
@@ -250,78 +250,6 @@ module Eps
         end
       else
         k
-      end
-    end
-
-    # pmml
-
-    def build_pmml(data_fields)
-      Nokogiri::XML::Builder.new do |xml|
-        xml.PMML(version: "4.4", xmlns: "http://www.dmg.org/PMML-4_4", "xmlns:xsi" => "http://www.w3.org/2001/XMLSchema-instance") do
-          pmml_header(xml)
-          pmml_data_dictionary(xml, data_fields)
-          pmml_transformation_dictionary(xml)
-          yield xml
-        end
-      end
-    end
-
-    def pmml_header(xml)
-      xml.Header do
-        xml.Application(name: "Eps", version: Eps::VERSION)
-        # xml.Timestamp Time.now.utc.iso8601
-      end
-    end
-
-    def pmml_data_dictionary(xml, data_fields)
-      xml.DataDictionary do
-        data_fields.each do |k, vs|
-          case @features[k]
-          when "categorical", nil
-            xml.DataField(name: k, optype: "categorical", dataType: "string") do
-              vs.map(&:to_s).sort.each do |v|
-                xml.Value(value: v)
-              end
-            end
-          when "text"
-            xml.DataField(name: k, optype: "categorical", dataType: "string")
-          else
-            xml.DataField(name: k, optype: "continuous", dataType: "double")
-          end
-        end
-      end
-    end
-
-    def pmml_transformation_dictionary(xml)
-      if @text_features.any?
-        xml.TransformationDictionary do
-          @text_features.each do |k, text_options|
-            xml.DefineFunction(name: "#{k}Transform", optype: "continuous") do
-              xml.ParameterField(name: "text")
-              xml.ParameterField(name: "term")
-              xml.TextIndex(textField: "text", localTermWeights: "termFrequency", wordSeparatorCharacterRE: text_options[:tokenizer].source, isCaseSensitive: !!text_options[:case_sensitive]) do
-                xml.FieldRef(field: "term")
-              end
-            end
-          end
-        end
-      end
-    end
-
-    def pmml_local_transformations(xml)
-      if @text_features.any?
-        xml.LocalTransformations do
-          @text_features.each do |k, _|
-            @text_encoders[k].vocabulary.each do |v|
-              xml.DerivedField(name: display_field([k, v]), optype: "continuous", dataType: "integer") do
-                xml.Apply(function: "#{k}Transform") do
-                  xml.FieldRef(field: k)
-                  xml.Constant v
-                end
-              end
-            end
-          end
-        end
       end
     end
   end

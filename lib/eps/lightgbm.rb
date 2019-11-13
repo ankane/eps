@@ -1,9 +1,5 @@
-require "eps/pmml_generators/lightgbm"
-
 module Eps
   class LightGBM < BaseEstimator
-    include PmmlGenerators::LightGBM
-
     private
 
     def _summary(extended: false)
@@ -110,10 +106,6 @@ module Eps
       @pmml = nil
 
       Evaluators::LightGBM.new(trees: trees, objective: objective, labels: labels, features: @features, text_features: @text_features)
-    end
-
-    def evaluator_class
-      PmmlLoaders::LightGBM
     end
 
     # for evaluator

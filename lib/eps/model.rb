@@ -17,11 +17,11 @@ module Eps
 
       estimator_class =
         if data.css("Segmentation").any?
-          Eps::LightGBM
+          LightGBM
         elsif data.css("RegressionModel").any?
-          Eps::LinearRegression
+          LinearRegression
         elsif data.css("NaiveBayesModel").any?
-          Eps::NaiveBayes
+          NaiveBayes
         else
           raise "Unknown model"
         end
@@ -35,11 +35,11 @@ module Eps
       estimator_class =
         case algorithm
         when :lightgbm
-          Eps::LightGBM
+          LightGBM
         when :linear_regression
-          Eps::LinearRegression
+          LinearRegression
         when :naive_bayes
-          Eps::NaiveBayes
+          NaiveBayes
         else
           raise ArgumentError, "Unknown algorithm: #{algorithm}"
         end
