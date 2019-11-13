@@ -23,8 +23,6 @@ module Eps
       private
 
       def lightgbm
-        feature_importance = feature_importance
-
         data_fields = {}
         data_fields[target] = labels if labels
         features.each_with_index do |(k, type), i|
