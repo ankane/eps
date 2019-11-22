@@ -369,6 +369,12 @@ gem 'gsl', group: :development
 
 It only needs to be available in environments used to build the model.
 
+By default, an intercept is included. Disable this with: [master]
+
+```ruby
+Eps::Model.new(data, intercept: false)
+```
+
 ## Validation Options
 
 Pass your own validation set with:
