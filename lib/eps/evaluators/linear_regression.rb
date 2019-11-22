@@ -10,7 +10,7 @@ module Eps
       end
 
       def predict(x)
-        intercept = @coefficients["_intercept"]
+        intercept = @coefficients["_intercept"] || 0.0
         scores = [intercept] * x.size
 
         @features.each do |k, type|

@@ -24,6 +24,24 @@ class LinearRegressionTest < Minitest::Test
     assert_elements_in_delta expected, predictions
   end
 
+  # this option behaves the same as Python and R when all columns are numeric
+  # R generates the same number of coefficients when "+ 0" added to formula
+  # it replaces the intercept with a single categorical value that was previously excluded
+  # scikit-learn only supports numeric columns
+  def test_intercept_false
+    data = mpg_data.map { |d| d.slice(:displ, :year, :cyl, :hwy) }
+    model = Eps::LinearRegression.new(data, target: :hwy, split: false, intercept: false)
+    assert model.summary
+
+    expected = [28.19885, 29.01272, 22.16365, 15.48646, 28.98745, 28.98745, 28.02697, 18.44373, 24.10989, 28.98745]
+    predictions = model.predict(data.first(10))
+    assert_elements_in_delta expected, predictions
+
+    model = Eps::Model.load_pmml(model.to_pmml)
+    predictions = model.predict(data.first(10))
+    assert_elements_in_delta expected, predictions
+  end
+
   def test_python_pmml
     data = mpg_data
     model = Eps::Model.load_pmml(File.read("test/support/python/linear_regression.pmml"))

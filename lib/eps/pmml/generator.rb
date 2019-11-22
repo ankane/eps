@@ -152,7 +152,7 @@ module Eps
 
       def linear_regression
         predictors = model.instance_variable_get("@coefficients").dup
-        intercept = predictors.delete("_intercept")
+        intercept = predictors.delete("_intercept") || 0.0
 
         data_fields = {}
         features.each do |k, type|

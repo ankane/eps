@@ -49,9 +49,12 @@ module Eps
       end
 
       x = data.map_rows(&:to_a)
-      data.size.times do |i|
-        # add intercept
-        x[i].unshift(1)
+
+      intercept = @options.key?(:intercept) ? @options[:intercept] : true
+      if intercept
+        data.size.times do |i|
+          x[i].unshift(1)
+        end
       end
 
       gsl = options.key?(:gsl) ? options[:gsl] : defined?(GSL)
@@ -132,7 +135,8 @@ module Eps
           v2
         end
 
-      @coefficient_names = ["_intercept"] + data.columns.keys
+      @coefficient_names = data.columns.keys
+      @coefficient_names.unshift("_intercept") if intercept
       @coefficients = Hash[@coefficient_names.zip(v3)]
       Evaluators::LinearRegression.new(coefficients: @coefficients, features: @features, text_features: @text_features)
     end
