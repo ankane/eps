@@ -1,5 +1,4 @@
 # dependencies
-require "bigdecimal"
 require "json"
 require "lightgbm"
 require "matrix"
