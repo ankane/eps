@@ -114,12 +114,12 @@ module Eps
             if bad_format
               n2.css("TargetValueCount").each do |n3|
                 prob[n3.attribute("value").value] ||= {}
-                prob[n3.attribute("value").value][n2.attribute("value").value] = BigDecimal(n3.attribute("count").value)
+                prob[n3.attribute("value").value][n2.attribute("value").value] = n3.attribute("count").value.to_f
               end
             else
               boom = {}
               n2.css("TargetValueCount").each do |n3|
-                boom[n3.attribute("value").value] = BigDecimal(n3.attribute("count").value)
+                boom[n3.attribute("value").value] = n3.attribute("count").value.to_f
               end
               prob[n2.attribute("value").value] = boom
             end
@@ -201,7 +201,7 @@ module Eps
       end
 
       def find_nodes(xml, derived_fields)
-        score = BigDecimal(xml.attribute("score").value).to_f
+        score = xml.attribute("score").value.to_f
 
         elements = xml.elements
         xml_predicate = elements.first
@@ -222,7 +222,7 @@ module Eps
           else
             operator = xml_predicate.attribute("operator").value
             value = xml_predicate.attribute("value").value
-            value = BigDecimal(value).to_f if operator == "greaterThan"
+            value = value.to_f if operator == "greaterThan"
             field = xml_predicate.attribute("field").value
             field = derived_fields[field] if derived_fields[field]
             {
