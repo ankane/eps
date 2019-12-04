@@ -77,7 +77,7 @@ module Eps
           removed = []
 
           # https://statsmaths.github.io/stat612/lectures/lec13/lecture13.pdf
-          # unforutnately, this method is unstable
+          # unfortunately, this method is unstable
           # haven't found an efficient way to do QR-factorization in Ruby
           # the extendmatrix gem has householder and givens (givens has bug)
           # but methods are too slow
@@ -86,6 +86,9 @@ module Eps
           begin
             @xtxi = (xt * x).inverse
           rescue ExceptionForMatrix::ErrNotRegular
+            # matrix cannot be inverted
+            # https://en.wikipedia.org/wiki/Multicollinearity
+
             constant = {}
             (1...x.column_count).each do |i|
               constant[i] = constant?(x.column(i))
