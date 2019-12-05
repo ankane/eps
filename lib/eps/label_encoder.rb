@@ -25,7 +25,7 @@ module Eps
           nil
         else
           v = @labels[yi.to_s]
-          raise "Unknown label: #{yi}" unless v
+          raise "Previously unseen label: #{yi}" unless v
           v
         end
       end
