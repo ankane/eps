@@ -103,7 +103,9 @@ class LightGBMTest < Minitest::Test
     data = mpg_data
     train_set = data[0...150]
     validation_set = data[150..-1]
-    validation_set.last[:class] = "unseen"
+    validation_set.each_with_index do |r, i|
+      r[:class] = "unseen" if i % 3
+    end
     model = Eps::LightGBM.new(train_set, target: :hwy, weight: :cyl, validation_set: validation_set)
     assert model.summary
   end
