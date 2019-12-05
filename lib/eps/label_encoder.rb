@@ -24,9 +24,12 @@ module Eps
         if yi.nil?
           nil
         else
-          # use additional label for unseen values
-          # this is only used for the LightGBM eval_set as
-          # the evaluator handles categorical features differently
+          # use an additional label for unseen values
+          # this is only used during training for the LightGBM eval_set
+          # LightGBM ignores them (only uses seen categories for predictions)
+          # https://github.com/microsoft/LightGBM/issues/1936
+          # the evaluator also ignores them (to be consistent with LightGBM)
+          # but doesn't use this code
           @labels[yi.to_s] || @labels.size
         end
       end
