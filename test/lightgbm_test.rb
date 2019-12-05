@@ -99,6 +99,15 @@ class LightGBMTest < Minitest::Test
     assert_equal "Bad type for column year: Expected numeric but got categorical", error.message
   end
 
+  def test_unseen
+    data = mpg_data
+    train_set = data[0...150]
+    validation_set = data[150..-1]
+    validation_set.last[:class] = "unseen"
+    model = Eps::LightGBM.new(train_set, target: :hwy, weight: :cyl, validation_set: validation_set)
+    assert model.summary
+  end
+
   def test_text_features_regression
     data = [
       {x: "Sunday is the best", y: 3},

@@ -24,9 +24,10 @@ module Eps
         if yi.nil?
           nil
         else
-          v = @labels[yi.to_s]
-          raise "Previously unseen label: #{yi}" unless v
-          v
+          # use additional label for unseen values
+          # this is only used for the LightGBM eval_set as
+          # the evaluator handles categorical features differently
+          @labels[yi.to_s] || @labels.size
         end
       end
     end
