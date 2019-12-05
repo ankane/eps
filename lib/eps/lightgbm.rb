@@ -23,8 +23,8 @@ module Eps
       summary_label = train_set.label
 
       # create check set
-      check_idx = 100.times.map { |r| rand(train_set.size) }
-      check_set = @train_set[check_idx]
+      check_idx = 100.times.map { |r| rand(train_set.size) }.uniq
+      evaluator_set = validation_set ? validation_set[check_idx] : train_set[check_idx]
 
       # objective
       objective =
@@ -110,7 +110,8 @@ module Eps
       @pmml = nil
 
       evaluator = Evaluators::LightGBM.new(trees: trees, objective: objective, labels: labels, features: @features, text_features: @text_features)
-      check_evaluator(objective, labels, booster, train_set[check_idx], evaluator, check_set)
+      booster_set = validation_set ? validation_set[check_idx] : train_set[check_idx]
+      check_evaluator(objective, labels, booster, booster_set, evaluator, evaluator_set)
       evaluator
     end
 
