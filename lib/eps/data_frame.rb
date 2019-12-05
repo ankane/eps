@@ -78,6 +78,10 @@ module Eps
           rows = Range.new(rows.begin, size - 1)
         elsif rows.end < 0
           rows = Range.new(rows.begin, size + rows.end, rows.exclude_end?)
+        else
+          finish = rows.end
+          finish -= 1 if rows.exclude_end?
+          rows = Range.new(rows.begin, size - 1) if finish >= size - 1
         end
       end
 

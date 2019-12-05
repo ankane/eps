@@ -16,6 +16,7 @@ class DataFrameTest < Minitest::Test
     assert_equal Eps::DataFrame.new(c1: ["a", "b", "c"]), df[["c1"]]
     assert_equal df[0..1], df[0...-1]
     assert_equal Eps::DataFrame.new(c1: ["a", "c"], c2: [1, 3]), df[[0, 2]]
+    assert_equal df, df[0...10]
 
     error = assert_raises do
       df[0..nil, "c3"]
