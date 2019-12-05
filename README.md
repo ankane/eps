@@ -395,6 +395,12 @@ Specify the validation set size (the default is `0.25`, which is 25%)
 Eps::Model.new(data, split: {validation_size: 0.2})
 ```
 
+Disable the validation set completely with:
+
+```ruby
+Eps::Model.new(data, split: false)
+```
+
 ## Database Storage
 
 The database is another place you can store models. It’s good if you retrain models automatically.
