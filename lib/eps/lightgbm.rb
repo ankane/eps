@@ -128,9 +128,16 @@ module Eps
       actual = evaluator.predict(evaluator_set)
 
       regression = objective == "regression"
-      expected.zip(actual) do |exp, act|
+      bad_observations = []
+      expected.zip(actual).each_with_index do |(exp, act), i|
         success = regression ? (act - exp).abs < 0.001 : act == exp
-        raise "Bug detected in evaluator - please report an issue" unless success
+        unless success
+          bad_observations << {expected: exp, actual: act, data_point: evaluator_set[i].map(&:itself).first}
+        end
+      end
+
+      if bad_observations.any?
+        raise "Bug detected in evaluator. Please report an issue. Bad data points: #{bad_observations.inspect}"
       end
     end
 
