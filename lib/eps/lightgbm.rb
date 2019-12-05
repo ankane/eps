@@ -22,6 +22,10 @@ module Eps
       validation_set = @validation_set.dup
       summary_label = train_set.label
 
+      # create check set
+      check_idx = 100.times.map { |r| rand(train_set.size) }
+      check_set = @train_set[check_idx]
+
       # objective
       objective =
         if @target_type == "numeric"
@@ -105,7 +109,28 @@ module Eps
       # reset pmml
       @pmml = nil
 
-      Evaluators::LightGBM.new(trees: trees, objective: objective, labels: labels, features: @features, text_features: @text_features)
+      evaluator = Evaluators::LightGBM.new(trees: trees, objective: objective, labels: labels, features: @features, text_features: @text_features)
+      check_evaluator(objective, labels, booster, train_set[check_idx], evaluator, check_set)
+      evaluator
+    end
+
+    # compare a subset of predictions to check for possible bugs in evaluator
+    def check_evaluator(objective, labels, booster, booster_set, evaluator, evaluator_set)
+      expected = @booster.predict(booster_set.map_rows(&:to_a))
+      if objective == "multiclass"
+        expected.map! do |v|
+          labels[v.map.with_index.max_by { |v2, _| v2 }.last]
+        end
+      elsif objective == "binary"
+        expected.map! { |v| labels[v >= 0.5 ? 1 : 0] }
+      end
+      actual = evaluator.predict(evaluator_set)
+
+      regression = objective == "regression"
+      expected.zip(actual) do |exp, act|
+        success = regression ? (act - exp).abs < 0.001 : act == exp
+        raise "Bug detected in evaluator - please report an issue" unless success
+      end
     end
 
     # for evaluator
