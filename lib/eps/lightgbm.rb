@@ -23,8 +23,9 @@ module Eps
       summary_label = train_set.label
 
       # create check set
-      check_idx = 100.times.map { |r| rand(train_set.size) }.uniq
-      evaluator_set = validation_set ? validation_set[check_idx] : train_set[check_idx]
+      evaluator_set = validation_set || train_set
+      check_idx = 100.times.map { |r| rand(evaluator_set.size) }.uniq
+      evaluator_set = evaluator_set[check_idx]
 
       # objective
       objective =
