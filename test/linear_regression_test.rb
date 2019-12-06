@@ -394,6 +394,21 @@ class LinearRegressionTest < Minitest::Test
     end
   end
 
+  def test_unstable_solution
+    x = 10.times.map { |i| [i ** 10, i ** 10 + 0.0001] }
+    y = x.map { |xi| 1 }
+    y[-1] = 2
+
+    if gsl?
+      model = Eps::LinearRegression.new(x, y)
+      assert model.summary
+    else
+      assert_raises(Eps::UnstableSolution) do
+        Eps::LinearRegression.new(x, y)
+      end
+    end
+  end
+
   private
 
   def gsl?

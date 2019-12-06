@@ -3,6 +3,7 @@
 - Added `weight` option for LightGBM and linear regression
 - Added `intercept` option for linear regression
 - Fixed `Unknown label` error for LightGBM
+- Fixed error message for unstable solutions with linear regression
 
 ## 0.3.0 (2019-09-05)
 

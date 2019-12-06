@@ -31,6 +31,9 @@ require "eps/evaluators/naive_bayes"
 require "eps/evaluators/node"
 
 module Eps
+  class Error < StandardError; end
+  class UnstableSolution < Error; end
+
   def self.metrics(y_true, y_pred, weight: nil)
     if Utils.column_type(y_true, "actual") == "numeric"
       {

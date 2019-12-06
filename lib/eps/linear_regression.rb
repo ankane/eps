@@ -138,6 +138,10 @@ module Eps
           v2
         end
 
+      if @xtxi && @xtxi.each(:diagonal).any? { |v| v < 0 }
+        raise UnstableSolution, "GSL is needed to find a stable solution for this dataset"
+      end
+
       @coefficient_names = data.columns.keys
       @coefficient_names.unshift("_intercept") if intercept
       @coefficients = Hash[@coefficient_names.zip(v3)]
