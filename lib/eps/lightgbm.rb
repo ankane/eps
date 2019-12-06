@@ -117,6 +117,7 @@ module Eps
     end
 
     # compare a subset of predictions to check for possible bugs in evaluator
+    # NOTE LightGBM must use double data type for prediction input for these to be consistent
     def check_evaluator(objective, labels, booster, booster_set, evaluator, evaluator_set)
       expected = @booster.predict(booster_set.map_rows(&:to_a))
       if objective == "multiclass"
