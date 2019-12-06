@@ -369,7 +369,7 @@ gem 'gsl', group: :development
 
 It only needs to be available in environments used to build the model.
 
-By default, an intercept is included. Disable this with: [master]
+By default, an intercept is included. Disable this with:
 
 ```ruby
 Eps::Model.new(data, intercept: false)
@@ -431,7 +431,7 @@ model = Eps::Model.load_pmml(data)
 
 You can use [IRuby](https://github.com/SciRuby/iruby) to run Eps in [Jupyter](https://jupyter.org/) notebooks. Here’s how to get [IRuby working with Rails](https://ankane.org/jupyter-rails).
 
-## Weights [master]
+## Weights
 
 Specify a weight for each data point
 

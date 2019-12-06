@@ -1,4 +1,4 @@
-## 0.3.1 (unreleased)
+## 0.3.1 (2019-12-06)
 
 - Added `weight` option for LightGBM and linear regression
 - Added `intercept` option for linear regression
