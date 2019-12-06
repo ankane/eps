@@ -381,7 +381,7 @@ class LinearRegressionTest < Minitest::Test
     model = Eps::LinearRegression.new(data, target: :y, validation_set: validation_set)
   end
 
-  def test_gsl_needed
+  def test_multiple_solutions
     x = 10.times.map { |i| [i, i + 1] }
     y = x.map { |xi| xi[0] }
     if gsl?
