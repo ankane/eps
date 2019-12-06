@@ -154,8 +154,9 @@ module Eps
       else
         @train_set = data.dup
         if validation_set
-          validation_set = Eps::DataFrame.new(validation_set)
-          validation_set.label = validation_set.columns.delete(@target)
+          raise "Target required for validation set" unless target
+          raise "Weight required for validation set" if data.weight && !weight
+          validation_set, _ = prep_data(validation_set, nil, @target, weight)
         end
       end
 

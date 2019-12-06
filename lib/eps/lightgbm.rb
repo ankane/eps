@@ -24,7 +24,7 @@ module Eps
 
       # create check set
       evaluator_set = validation_set || train_set
-      check_idx = 100.times.map { |r| rand(evaluator_set.size) }.uniq
+      check_idx = 100.times.map { rand(evaluator_set.size) }.uniq
       evaluator_set = evaluator_set[check_idx]
 
       # objective
