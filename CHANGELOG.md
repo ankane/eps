@@ -1,4 +1,4 @@
-## 0.3.2 (unreleased)
+## 0.3.2 (2019-12-08)
 
 - Added support for GSLR
 
