@@ -1,11 +1,11 @@
-dist: xenial
+dist: bionic
 language: ruby
-rvm: 2.6.3
+rvm: 2.6
 script: bundle exec rake test
 addons:
   apt:
     packages:
-    - libgsl0-dev
+    - libgsl-dev
 env:
   -
   - GSL=t
