@@ -50,17 +50,35 @@ module Eps
 
       x = data.map_rows(&:to_a)
 
+      gsl =
+        if options.key?(:gsl)
+          options[:gsl]
+        elsif defined?(GSL)
+          true
+        elsif defined?(GSLR)
+          :gslr
+        else
+          false
+        end
+
       intercept = @options.key?(:intercept) ? @options[:intercept] : true
-      if intercept
+      if intercept && gsl != :gslr
         data.size.times do |i|
           x[i].unshift(1)
         end
       end
 
-      gsl = options.key?(:gsl) ? options[:gsl] : defined?(GSL)
-
       v3 =
-        if gsl
+        if gsl == :gslr
+          model = GSLR::OLS.new(intercept: intercept)
+          model.fit(x, data.label, weight: data.weight)
+
+          @covariance = model.covariance
+
+          coefficients = model.coefficients.dup
+          coefficients.unshift(model.intercept) if intercept
+          coefficients
+        elsif gsl
           x = GSL::Matrix.alloc(*x)
           y = GSL::Vector.alloc(data.label)
           w = GSL::Vector.alloc(data.weight) if data.weight
@@ -196,7 +214,11 @@ module Eps
 
     def diagonal
       @diagonal ||= begin
-        if covariance.respond_to?(:each)
+        if covariance.is_a?(Array)
+          covariance.size.times.map do |i|
+            covariance[i][i]
+          end
+        elsif covariance.respond_to?(:each)
           d = covariance.each(:diagonal).to_a
           @removed.each do |i|
             d.insert(i, 0)

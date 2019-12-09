@@ -1,3 +1,7 @@
+## 0.3.2 (unreleased)
+
+- Added support for GSLR
+
 ## 0.3.1 (2019-12-06)
 
 - Added `weight` option for LightGBM and linear regression

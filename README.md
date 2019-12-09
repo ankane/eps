@@ -355,6 +355,8 @@ Eps supports:
 
 ### Linear Regression
 
+#### Performance
+
 To speed up training on large datasets with linear regression, [install GSL](https://www.gnu.org/software/gsl/). With Homebrew, you can use:
 
 ```sh
@@ -364,10 +366,12 @@ brew install gsl
 Then, add this line to your application’s Gemfile:
 
 ```ruby
-gem 'gsl', group: :development
+gem 'gslr', group: :development
 ```
 
 It only needs to be available in environments used to build the model.
+
+#### Options
 
 By default, an intercept is included. Disable this with:
 

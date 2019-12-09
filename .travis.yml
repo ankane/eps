@@ -9,6 +9,7 @@ addons:
 env:
   -
   - GSL=t
+  - GSL=gslr
 notifications:
   email:
     on_success: never
