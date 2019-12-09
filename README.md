@@ -357,7 +357,7 @@ Eps supports:
 
 #### Performance
 
-To speed up training on large datasets with linear regression, [install GSL](https://www.gnu.org/software/gsl/). With Homebrew, you can use:
+To speed up training on large datasets with linear regression, [install GSL](https://github.com/ankane/gslr#gsl-installation). With Homebrew, you can use:
 
 ```sh
 brew install gsl
