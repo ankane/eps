@@ -4,6 +4,7 @@ module Eps
       @options = options.dup
       # TODO better pattern - don't pass most options to train
       options.delete(:intercept)
+      @trained = false
       train(data, y, **options) if data
     end
 
@@ -48,6 +49,8 @@ module Eps
     end
 
     def summary(extended: false)
+      raise "Summary not available for loaded models" unless @trained
+
       str = String.new("")
 
       if @validation_set
@@ -168,6 +171,8 @@ module Eps
 
       # reset pmml
       @pmml = nil
+
+      @trained = true
 
       nil
     end
