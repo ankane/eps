@@ -22,7 +22,7 @@ module Eps
               scores[i] += @coefficients[[k, xv]].to_f
             end
           when "text"
-            encoder = TextEncoder.new(@text_features[k])
+            encoder = TextEncoder.new(**@text_features[k])
             counts = encoder.transform(x.columns[k])
             coef = {}
             @coefficients.each do |k2, v|

@@ -1,3 +1,7 @@
+## 0.3.3 (unreleased)
+
+- Fixed deprecation warnings in Ruby 2.7
+
 ## 0.3.2 (2019-12-08)
 
 - Added support for GSLR

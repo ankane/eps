@@ -205,7 +205,7 @@ module Eps
 
         # TODO determine max features automatically
         # start based on number of rows
-        encoder = Eps::TextEncoder.new(v)
+        encoder = Eps::TextEncoder.new(**v)
         counts = encoder.fit(train_set.columns.delete(k))
         encoder.vocabulary.each do |word|
           train_set.columns[[k, word]] = [0] * counts.size

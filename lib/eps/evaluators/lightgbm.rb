@@ -16,7 +16,7 @@ module Eps
 
         # sparse matrix
         @text_features.each do |k, v|
-          encoder = TextEncoder.new(v)
+          encoder = TextEncoder.new(**v)
 
           values = data.columns.delete(k)
           counts = encoder.transform(values)
