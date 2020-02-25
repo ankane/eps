@@ -1,6 +1,7 @@
 ## 0.3.3 (unreleased)
 
 - Fixed bug in evaluator with boolean columns
+- Fixed error with boolean columns and Naive bayes
 - Fixed deprecation warnings in Ruby 2.7
 
 ## 0.3.2 (2019-12-08)

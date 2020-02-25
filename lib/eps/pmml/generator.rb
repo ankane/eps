@@ -210,10 +210,10 @@ module Eps
               probabilities[:conditional].each do |k, v|
                 xml.BayesInput(fieldName: k) do
                   if features[k] == "categorical"
-                    v.sort_by { |k2, _| k2 }.each do |k2, v2|
+                    v.sort_by { |k2, _| k2.to_s }.each do |k2, v2|
                       xml.PairCounts(value: k2) do
                         xml.TargetValueCounts do
-                          v2.sort_by { |k2, _| k2 }.each do |k3, v3|
+                          v2.sort_by { |k2, _| k2.to_s }.each do |k3, v3|
                             xml.TargetValueCount(value: k3, count: v3)
                           end
                         end
@@ -221,7 +221,7 @@ module Eps
                     end
                   else
                     xml.TargetValueStats do
-                      v.sort_by { |k2, _| k2 }.each do |k2, v2|
+                      v.sort_by { |k2, _| k2.to_s }.each do |k2, v2|
                         xml.TargetValueStat(value: k2) do
                           xml.GaussianDistribution(mean: v2[:mean], variance: v2[:stdev]**2)
                         end
@@ -233,7 +233,7 @@ module Eps
             end
             xml.BayesOutput(fieldName: "target") do
               xml.TargetValueCounts do
-                probabilities[:prior].sort_by { |k, _| k }.each do |k, v|
+                probabilities[:prior].sort_by { |k, _| k.to_s }.each do |k, v|
                   xml.TargetValueCount(value: k, count: v)
                 end
               end

@@ -105,4 +105,22 @@ class NaiveBayesTest < Minitest::Test
     model = Eps::Model.load_pmml(pmml)
     assert_equal ["ham", "spam"], model.predict(test_data)
   end
+
+  def test_boolean
+    data = [
+      {x: false, y: "ham"},
+      {x: false, y: "ham"},
+      {x: true, y: "spam"},
+      {x: true, y: "spam"}
+    ]
+
+    model = Eps::NaiveBayes.new(data, target: :y)
+    assert_equal ["ham", "spam"], model.predict([{x: false}, {x: true}])
+
+    pmml = model.to_pmml
+    assert_valid_pmml(pmml)
+
+    model = Eps::Model.load_pmml(pmml)
+    assert_equal ["ham", "spam"], model.predict([{x: false}, {x: true}])
+  end
 end

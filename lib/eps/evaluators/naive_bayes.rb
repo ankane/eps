@@ -38,7 +38,8 @@ module Eps
             case type
             when "categorical"
               x.columns[k].each_with_index do |xi, i|
-                vc = probabilities[:conditional][k][xi]
+                # TODO clean this up
+                vc = probabilities[:conditional][k][xi] || probabilities[:conditional][k][xi.to_s]
 
                 # unknown value if not vc
                 if vc
