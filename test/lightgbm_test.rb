@@ -110,6 +110,25 @@ class LightGBMTest < Minitest::Test
     assert model.summary
   end
 
+  def test_boolean
+    data = [
+      {x: false, y: 3},
+      {x: false, y: 3},
+      {x: true, y: 5},
+      {x: true, y: 5}
+    ]
+
+    model = Eps::LightGBM.new(data, target: :y, early_stopping: false)
+    assert_elements_in_delta [3, 5], model.predict([{x: false}, {x: true}])
+
+    pmml = model.to_pmml
+    assert_includes pmml, "Segmentation"
+    assert_valid_pmml(pmml)
+
+    model = Eps::Model.load_pmml(pmml)
+    assert_elements_in_delta [3, 5], model.predict([{x: false}, {x: true}])
+  end
+
   def test_text_features_regression
     data = [
       {x: "Sunday is the best", y: 3},

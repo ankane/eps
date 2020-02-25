@@ -81,7 +81,7 @@ module Eps
           else
             case node.operator
             when "equal"
-              v.to_s == node.value.to_s
+              v.to_s == node.value
             when "in"
               node.value.include?(v)
             when "greaterThan"
