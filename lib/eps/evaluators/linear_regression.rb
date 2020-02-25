@@ -19,7 +19,8 @@ module Eps
           case type
           when "categorical"
             x.columns[k].each_with_index do |xv, i|
-              scores[i] += @coefficients[[k, xv]].to_f
+              # TODO clean up
+              scores[i] += (@coefficients[[k, xv]] || @coefficients[[k, xv.to_s]]).to_f
             end
           when "text"
             encoder = TextEncoder.new(**@text_features[k])

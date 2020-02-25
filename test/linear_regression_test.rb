@@ -227,17 +227,20 @@ class LinearRegressionTest < Minitest::Test
 
   def test_boolean
     data = [
-      {x: true, y: 3},
-      {x: true, y: 3},
-      {x: false, y: 5},
-      {x: false, y: 5}
+      {x: false, y: 3},
+      {x: false, y: 3},
+      {x: true, y: 5},
+      {x: true, y: 5}
     ]
 
     model = Eps::LinearRegression.new(data, target: :y, split: false)
-    coefficients = model.coefficients
+    assert_elements_in_delta [3, 5], model.predict([{x: false}, {x: true}])
 
-    assert_in_delta 3, coefficients[:_intercept]
-    assert_in_delta 2, coefficients[:xfalse]
+    pmml = model.to_pmml
+    assert_valid_pmml(pmml)
+
+    model = Eps::Model.load_pmml(pmml)
+    assert_elements_in_delta [3, 5], model.predict([{x: false}, {x: true}])
   end
 
   def test_both
