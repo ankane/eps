@@ -1,6 +1,6 @@
-## 0.3.3 (unreleased)
+## 0.3.3 (2020-02-24)
 
-- Fixed errors with boolean columns
+- Fixed errors and incorrect predictions with boolean columns
 - Fixed deprecation warnings in Ruby 2.7
 
 ## 0.3.2 (2019-12-08)
