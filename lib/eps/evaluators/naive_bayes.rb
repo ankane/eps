@@ -10,7 +10,10 @@ module Eps
         @legacy = legacy
       end
 
-      def predict(x)
+      def predict(x, probabilities: false)
+        # could support, but naive Bayes probabilities aren't reliable
+        raise "Probabilities not supported" if probabilities
+
         probs = calculate_class_probabilities(x)
         probs.map do |xp|
           # convert probabilities

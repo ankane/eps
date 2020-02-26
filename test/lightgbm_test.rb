@@ -47,6 +47,20 @@ class LightGBMTest < Minitest::Test
     assert_equal expected, predictions
   end
 
+  def test_binary_probabilities
+    data = mpg_data(binary: true)
+    model = Eps::LightGBM.new(data, target: :drv, split: false)
+
+    predictions = model.predict(data.first, probabilities: true)
+    assert_in_delta 0, predictions["4"]
+    assert_in_delta 1, predictions["f"]
+
+    model = Eps::Model.load_pmml(model.to_pmml)
+    predictions = model.predict(data.first, probabilities: true)
+    assert_in_delta 0, predictions["4"]
+    assert_in_delta 1, predictions["f"]
+  end
+
   def test_binary_python_pmml
     data = mpg_data(binary: true)
     model = Eps::Model.load_pmml(File.read("test/support/python/lightgbm_binary.pmml"))

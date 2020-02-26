@@ -9,7 +9,9 @@ module Eps
         @text_features = text_features || {}
       end
 
-      def predict(x)
+      def predict(x, probabilities: false)
+        raise "Probabilities not supported" if probabilities
+
         intercept = @coefficients["_intercept"] || 0.0
         scores = [intercept] * x.size
 

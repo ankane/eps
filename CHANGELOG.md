@@ -1,3 +1,7 @@
+## 0.3.4 (unreleased)
+
+- Added support for probabilities with LightGBM classification
+
 ## 0.3.3 (2020-02-24)
 
 - Fixed errors and incorrect predictions with boolean columns

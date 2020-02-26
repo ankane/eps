@@ -11,7 +11,9 @@ module Eps
         @text_features = text_features
       end
 
-      def predict(data)
+      def predict(data, probabilities: false)
+        raise "Probabilities not supported" if probabilities && @objective == "regression"
+
         rows = data.map(&:to_h)
 
         # sparse matrix
@@ -38,7 +40,12 @@ module Eps
         when "regression"
           sum_trees(rows, @trees)
         when "binary"
-          sum_trees(rows, @trees).map { |s| @labels[sigmoid(s) > 0.5 ? 1 : 0] }
+          prob = sum_trees(rows, @trees).map { |s| sigmoid(s) }
+          if probabilities
+            prob.map { |v| @labels.zip([1 - v, v]).to_h }
+          else
+            prob.map { |v| @labels[v > 0.5 ? 1 : 0] }
+          end
         else
           tree_scores = []
           num_trees = @trees.size / @labels.size

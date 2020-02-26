@@ -124,12 +124,15 @@ module Eps
         expected.map! do |v|
           labels[v.map.with_index.max_by { |v2, _| v2 }.last]
         end
+        # TODO check probabilities
+        actual = evaluator.predict(evaluator_set)
       elsif objective == "binary"
-        expected.map! { |v| labels[v >= 0.5 ? 1 : 0] }
+        actual = evaluator.predict(evaluator_set, probabilities: true).map { |v| v.values.last }
+      else
+        actual = evaluator.predict(evaluator_set)
       end
-      actual = evaluator.predict(evaluator_set)
 
-      regression = objective == "regression"
+      regression = objective == "regression" || objective == "binary"
       bad_observations = []
       expected.zip(actual).each_with_index do |(exp, act), i|
         success = regression ? (act - exp).abs < 0.001 : act == exp

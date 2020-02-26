@@ -8,7 +8,7 @@ module Eps
       train(data, y, **options) if data
     end
 
-    def predict(data)
+    def predict(data, probabilities: false)
       singular = data.is_a?(Hash)
       data = [data] if singular
 
@@ -27,7 +27,7 @@ module Eps
         # TODO check for unknown values for categorical features
       end
 
-      predictions = @evaluator.predict(data)
+      predictions = @evaluator.predict(data, probabilities: probabilities)
 
       singular ? predictions.first : predictions
     end
