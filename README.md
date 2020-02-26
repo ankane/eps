@@ -379,6 +379,14 @@ By default, an intercept is included. Disable this with:
 Eps::Model.new(data, intercept: false)
 ```
 
+## Probability [master]
+
+To get probabilities for predictions with LightGBM classification, use:
+
+```ruby
+model.predict_probability(data)
+```
+
 ## Validation Options
 
 Pass your own validation set with:

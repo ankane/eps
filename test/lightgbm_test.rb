@@ -51,12 +51,12 @@ class LightGBMTest < Minitest::Test
     data = mpg_data(binary: true)
     model = Eps::LightGBM.new(data, target: :drv, split: false)
 
-    predictions = model.predict(data.first, probabilities: true)
+    predictions = model.predict_probability(data.first)
     assert_in_delta 0, predictions["4"]
     assert_in_delta 1, predictions["f"]
 
     model = Eps::Model.load_pmml(model.to_pmml)
-    predictions = model.predict(data.first, probabilities: true)
+    predictions = model.predict_probability(data.first)
     assert_in_delta 0, predictions["4"]
     assert_in_delta 1, predictions["f"]
   end
@@ -89,13 +89,13 @@ class LightGBMTest < Minitest::Test
     data.each { |r| r.delete(:hwy) }
     model = Eps::LightGBM.new(data, target: :drv, split: false)
 
-    predictions = model.predict(data.first, probabilities: true)
+    predictions = model.predict_probability(data.first)
     assert_in_delta 1.07585907e-02, predictions["4"]
     assert_in_delta 9.89241409e-01, predictions["f"]
     assert_in_delta 7.08908049e-11, predictions["r"]
 
     model = Eps::Model.load_pmml(model.to_pmml)
-    predictions = model.predict(data.first, probabilities: true)
+    predictions = model.predict_probability(data.first)
     assert_in_delta 1.07585907e-02, predictions["4"]
     assert_in_delta 9.89241409e-01, predictions["f"]
     assert_in_delta 7.08908049e-11, predictions["r"]

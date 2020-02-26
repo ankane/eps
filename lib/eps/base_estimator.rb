@@ -8,28 +8,12 @@ module Eps
       train(data, y, **options) if data
     end
 
-    def predict(data, probabilities: false)
-      singular = data.is_a?(Hash)
-      data = [data] if singular
+    def predict(data)
+      _predict(data, false)
+    end
 
-      data = Eps::DataFrame.new(data)
-
-      @evaluator.features.each do |k, type|
-        values = data.columns[k]
-        raise ArgumentError, "Missing column: #{k}" if !values
-        column_type = Utils.column_type(values.compact, k) if values
-
-        if !column_type.nil?
-          if (type == "numeric" && column_type != "numeric") || (type != "numeric" && column_type != "categorical")
-            raise ArgumentError, "Bad type for column #{k}: Expected #{type} but got #{column_type}"
-          end
-        end
-        # TODO check for unknown values for categorical features
-      end
-
-      predictions = @evaluator.predict(data, probabilities: probabilities)
-
-      singular ? predictions.first : predictions
+    def predict_probability(data)
+      _predict(data, true)
     end
 
     def evaluate(data, y = nil, target: nil, weight: nil)
@@ -74,6 +58,30 @@ module Eps
     end
 
     private
+
+    def _predict(data, probabilities)
+      singular = data.is_a?(Hash)
+      data = [data] if singular
+
+      data = Eps::DataFrame.new(data)
+
+      @evaluator.features.each do |k, type|
+        values = data.columns[k]
+        raise ArgumentError, "Missing column: #{k}" if !values
+        column_type = Utils.column_type(values.compact, k) if values
+
+        if !column_type.nil?
+          if (type == "numeric" && column_type != "numeric") || (type != "numeric" && column_type != "categorical")
+            raise ArgumentError, "Bad type for column #{k}: Expected #{type} but got #{column_type}"
+          end
+        end
+        # TODO check for unknown values for categorical features
+      end
+
+      predictions = @evaluator.predict(data, probabilities: probabilities)
+
+      singular ? predictions.first : predictions
+    end
 
     def train(data, y = nil, target: nil, weight: nil, split: nil, validation_set: nil, verbose: nil, text_features: nil, early_stopping: nil)
       data, @target = prep_data(data, y, target, weight)
