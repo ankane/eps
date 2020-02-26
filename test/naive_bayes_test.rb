@@ -123,4 +123,22 @@ class NaiveBayesTest < Minitest::Test
     model = Eps::Model.load_pmml(pmml)
     assert_equal ["ham", "spam"], model.predict([{x: false}, {x: true}])
   end
+
+  def test_probabilities
+    data = mpg_data
+    data = data.map { |r| r.slice(:displ, :year, :cyl, :class, :drv) }
+    model = Eps::NaiveBayes.new(data, target: :drv, split: false)
+    assert model.summary
+
+    predictions = model.predict_probability(data.first)
+    assert_in_delta 0.007528105, predictions["4"]
+    assert_in_delta 9.924719e-01, predictions["f"]
+    assert_in_delta 6.506897e-10, predictions["r"]
+
+    model = Eps::Model.load_pmml(model.to_pmml)
+    predictions = model.predict_probability(data.first)
+    assert_in_delta 0.007528105, predictions["4"]
+    assert_in_delta 9.924719e-01, predictions["f"]
+    assert_in_delta 6.506897e-10, predictions["r"]
+  end
 end

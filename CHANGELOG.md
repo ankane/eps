@@ -1,6 +1,6 @@
 ## 0.3.4 (unreleased)
 
-- Added `predict_probability` for LightGBM classification
+- Added `predict_probability` for classification
 
 ## 0.3.3 (2020-02-24)
 

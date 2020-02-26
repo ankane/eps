@@ -381,7 +381,7 @@ Eps::Model.new(data, intercept: false)
 
 ## Probability [master]
 
-To get probabilities for predictions with LightGBM classification, use:
+To get the probability of each category for predictions with classification, use:
 
 ```ruby
 model.predict_probability(data)

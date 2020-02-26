@@ -11,16 +11,14 @@ module Eps
       end
 
       def predict(x, probabilities: false)
-        # could support, but naive Bayes probabilities aren't reliable
-        raise "Probabilities not supported" if probabilities
-
         probs = calculate_class_probabilities(x)
         probs.map do |xp|
-          # convert probabilities
-          # not needed when just returning label
-          # sum = xp.values.map { |v| Math.exp(v) }.sum.to_f
-          # p xp.map { |k, v| [k, Math.exp(v) / sum] }.to_h
-          xp.sort_by { |k, v| [-v, k] }[0][0]
+          if probabilities
+            sum = xp.values.map { |v| Math.exp(v) }.sum.to_f
+            xp.map { |k, v| [k, Math.exp(v) / sum] }.to_h
+          else
+            xp.sort_by { |k, v| [-v, k] }[0][0]
+          end
         end
       end
 
