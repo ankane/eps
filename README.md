@@ -387,7 +387,7 @@ To get the probability of each category for predictions with classification, use
 model.predict_probability(data)
 ```
 
-> Naive Bayes is known to produce poor probability estimates, so stick with LightGBM if you need this
+Naive Bayes is known to produce poor probability estimates, so stick with LightGBM if you need this.
 
 ## Validation Options
 
