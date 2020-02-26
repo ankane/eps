@@ -54,8 +54,14 @@ module Eps
           end
           data.size.times.map do |i|
             v = tree_scores.map { |s| s[i] }
-            idx = v.map.with_index.max_by { |v2, _| v2 }.last
-            @labels[idx]
+            if probabilities
+              exp = v.map { |vi| Math.exp(vi) }
+              sum = exp.sum
+              @labels.zip(exp.map { |e| e / sum }).to_h
+            else
+              idx = v.map.with_index.max_by { |v2, _| v2 }.last
+              @labels[idx]
+            end
           end
         end
       end
@@ -116,7 +122,7 @@ module Eps
       end
 
       def sigmoid(x)
-        1.0 / (1 + Math::E**(-x))
+        1.0 / (1 + Math.exp(-x))
       end
     end
   end

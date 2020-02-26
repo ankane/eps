@@ -121,11 +121,10 @@ module Eps
     def check_evaluator(objective, labels, booster, booster_set, evaluator, evaluator_set)
       expected = @booster.predict(booster_set.map_rows(&:to_a))
       if objective == "multiclass"
-        expected.map! do |v|
-          labels[v.map.with_index.max_by { |v2, _| v2 }.last]
-        end
-        # TODO check probabilities
-        actual = evaluator.predict(evaluator_set)
+        actual = evaluator.predict(evaluator_set, probabilities: true)
+        # just compare first for now
+        expected.map! { |v| v.first }
+        actual.map! { |v| v.values.first }
       elsif objective == "binary"
         actual = evaluator.predict(evaluator_set, probabilities: true).map { |v| v.values.last }
       else
@@ -135,7 +134,7 @@ module Eps
       regression = objective == "regression" || objective == "binary"
       bad_observations = []
       expected.zip(actual).each_with_index do |(exp, act), i|
-        success = regression ? (act - exp).abs < 0.001 : act == exp
+        success = (act - exp).abs < 0.001
         unless success
           bad_observations << {expected: exp, actual: act, data_point: evaluator_set[i].map(&:itself).first}
         end

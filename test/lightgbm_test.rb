@@ -84,6 +84,23 @@ class LightGBMTest < Minitest::Test
     assert_equal expected, predictions
   end
 
+  def test_multiclass_probabilities
+    data = mpg_data
+    data.each { |r| r.delete(:hwy) }
+    model = Eps::LightGBM.new(data, target: :drv, split: false)
+
+    predictions = model.predict(data.first, probabilities: true)
+    assert_in_delta 1.07585907e-02, predictions["4"]
+    assert_in_delta 9.89241409e-01, predictions["f"]
+    assert_in_delta 7.08908049e-11, predictions["r"]
+
+    model = Eps::Model.load_pmml(model.to_pmml)
+    predictions = model.predict(data.first, probabilities: true)
+    assert_in_delta 1.07585907e-02, predictions["4"]
+    assert_in_delta 9.89241409e-01, predictions["f"]
+    assert_in_delta 7.08908049e-11, predictions["r"]
+  end
+
   def test_multiclass_python_pmml
     data = mpg_data
     model = Eps::Model.load_pmml(File.read("test/support/python/lightgbm_multiclass.pmml"))
