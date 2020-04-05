@@ -4,7 +4,6 @@ Machine learning for Ruby
 
 - Build predictive models quickly and easily
 - Serve models built in Ruby, Python, R, and more
-- No prior knowledge of machine learning required :tada:
 
 Check out [this post](https://ankane.org/rails-meet-data-science) for more info on machine learning with Rails
 
@@ -424,7 +423,7 @@ The database is another place you can store models. It’s good if you retrain m
 Create an ActiveRecord model to store the predictive model.
 
 ```sh
-rails g model Model key:string:uniq data:text
+rails generate model Model key:string:uniq data:text
 ```
 
 Store the model with:
@@ -534,11 +533,11 @@ Everyone is encouraged to help improve this project. Here are a few ways you can
 - Write, clarify, or fix documentation
 - Suggest or add new features
 
-To get started with development and testing:
+To get started with development:
 
 ```sh
 git clone https://github.com/ankane/eps.git
 cd eps
 bundle install
-rake test
+bundle exec rake test
 ```
