@@ -378,7 +378,7 @@ By default, an intercept is included. Disable this with:
 Eps::Model.new(data, intercept: false)
 ```
 
-## Probability [master]
+## Probability
 
 To get the probability of each category for predictions with classification, use:
 

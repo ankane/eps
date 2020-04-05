@@ -1,4 +1,4 @@
-## 0.3.4 (unreleased)
+## 0.3.4 (2020-04-05)
 
 - Added `predict_probability` for classification
 
