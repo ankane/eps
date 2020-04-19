@@ -218,6 +218,16 @@ class LightGBMTest < Minitest::Test
     assert_equal ["ham", "spam"], model.predict(test_data)
   end
 
+  def test_learning_rate
+    data = mpg_data
+    model = Eps::LightGBM.new(data, target: :hwy, split: false, learning_rate: 1)
+    assert model.summary
+
+    expected = [30.80980036, 34.39919293, 17.99841545, 17.298401, 28.4685196, 29.31558087, 27.79557906, 18.44068633, 24.64178236, 29.31558087]
+    predictions = model.predict(data.first(10))
+    assert_elements_in_delta expected, predictions
+  end
+
   private
 
   def model

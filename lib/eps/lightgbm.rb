@@ -17,7 +17,7 @@ module Eps
       str
     end
 
-    def _train(verbose: nil, early_stopping: nil)
+    def _train(verbose: nil, early_stopping: nil, learning_rate: 0.1)
       train_set = @train_set
       validation_set = @validation_set.dup
       summary_label = train_set.label
@@ -66,6 +66,7 @@ module Eps
         params[:min_data_in_bin] = 1
         params[:min_data_in_leaf] = 1
       end
+      params[:learning_rate] = learning_rate
 
       # create datasets
       categorical_idx = @features.values.map.with_index.select { |type, _| type == "categorical" }.map(&:last)

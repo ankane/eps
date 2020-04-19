@@ -1,3 +1,7 @@
+## 0.3.5 (unreleased)
+
+- Added `learning_rate` option for LightGBM
+
 ## 0.3.4 (2020-04-05)
 
 - Added `predict_probability` for classification

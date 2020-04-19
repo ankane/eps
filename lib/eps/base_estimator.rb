@@ -83,7 +83,7 @@ module Eps
       singular ? predictions.first : predictions
     end
 
-    def train(data, y = nil, target: nil, weight: nil, split: nil, validation_set: nil, verbose: nil, text_features: nil, early_stopping: nil)
+    def train(data, y = nil, target: nil, weight: nil, split: nil, validation_set: nil, text_features: nil, **options)
       data, @target = prep_data(data, y, target, weight)
       @target_type = Utils.column_type(data.label, @target)
 
@@ -175,7 +175,7 @@ module Eps
       raise "No data in validation set" if validation_set && validation_set.empty?
 
       @validation_set = validation_set
-      @evaluator = _train(verbose: verbose, early_stopping: early_stopping)
+      @evaluator = _train(**options)
 
       # reset pmml
       @pmml = nil
