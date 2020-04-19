@@ -37,6 +37,7 @@ module Eps
       str
     end
 
+    # TODO use keyword arguments for gsl and intercept in 0.4.0
     def _train(**options)
       raise "Target must be numeric" if @target_type != "numeric"
       check_missing_value(@train_set)
@@ -61,7 +62,7 @@ module Eps
           false
         end
 
-      intercept = @options.key?(:intercept) ? @options[:intercept] : true
+      intercept = options.key?(:intercept) ? options[:intercept] : true
       if intercept && gsl != :gslr
         data.size.times do |i|
           x[i].unshift(1)

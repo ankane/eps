@@ -17,7 +17,7 @@ module Eps
       str
     end
 
-    def _train(smoothing: 1, **options)
+    def _train(smoothing: 1)
       raise "Target must be strings" if @target_type != "categorical"
       check_missing_value(@train_set)
       check_missing_value(@validation_set) if @validation_set

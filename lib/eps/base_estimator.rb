@@ -2,9 +2,8 @@ module Eps
   class BaseEstimator
     def initialize(data = nil, y = nil, **options)
       @options = options.dup
-      # TODO better pattern - don't pass most options to train
-      options.delete(:intercept)
       @trained = false
+      # TODO better pattern - don't pass most options to train
       train(data, y, **options) if data
     end
 
