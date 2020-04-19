@@ -60,13 +60,15 @@ module Eps
       prep_text_features(validation_set) if validation_set
 
       # create params
-      params = {objective: objective}
+      params = {
+        objective: objective,
+        learning_rate: learning_rate
+      }
       params[:num_classes] = labels.size if objective == "multiclass"
       if train_set.size < 30
         params[:min_data_in_bin] = 1
         params[:min_data_in_leaf] = 1
       end
-      params[:learning_rate] = learning_rate
 
       # create datasets
       categorical_idx = @features.values.map.with_index.select { |type, _| type == "categorical" }.map(&:last)
