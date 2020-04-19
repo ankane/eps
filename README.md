@@ -352,6 +352,14 @@ Eps supports:
 - Linear Regression
 - Naive Bayes
 
+### LightGBM
+
+Pass the learning rate with: [master]
+
+```ruby
+Eps::Model.new(data, learning_rate: 0.01)
+```
+
 ### Linear Regression
 
 #### Performance
