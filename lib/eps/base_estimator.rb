@@ -66,10 +66,10 @@ module Eps
 
       @evaluator.features.each do |k, type|
         values = data.columns[k]
-        raise ArgumentError, "Missing column: #{k}" if !values
+        raise ArgumentError, "Missing column: #{k}" unless values
         column_type = Utils.column_type(values.compact, k) if values
 
-        if !column_type.nil?
+        unless column_type.nil?
           if (type == "numeric" && column_type != "numeric") || (type != "numeric" && column_type != "categorical")
             raise ArgumentError, "Bad type for column #{k}: Expected #{type} but got #{column_type}"
           end
@@ -244,7 +244,7 @@ module Eps
     end
 
     def check_missing(c, name)
-      raise ArgumentError, "Missing column: #{name}" if !c
+      raise ArgumentError, "Missing column: #{name}" unless c
       raise ArgumentError, "Missing values in column #{name}" if c.any?(&:nil?)
     end
 
