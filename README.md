@@ -375,7 +375,11 @@ Eps::Model.new(data, learning_rate: 0.01)
 
 ### Linear Regression
 
-#### Performance
+By default, an intercept is included. Disable this with:
+
+```ruby
+Eps::Model.new(data, intercept: false)
+```
 
 To speed up training on large datasets with linear regression, [install GSL](https://github.com/ankane/gslr#gsl-installation). With Homebrew, you can use:
 
@@ -390,14 +394,6 @@ gem 'gslr', group: :development
 ```
 
 It only needs to be available in environments used to build the model.
-
-#### Options
-
-By default, an intercept is included. Disable this with:
-
-```ruby
-Eps::Model.new(data, intercept: false)
-```
 
 ## Probability
 
