@@ -1,6 +1,7 @@
 dist: bionic
 language: ruby
-rvm: 2.6
+rvm: 2.7
+cache: bundler
 script: bundle exec rake test
 addons:
   apt:
