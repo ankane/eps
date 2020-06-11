@@ -321,7 +321,7 @@ y = [1, 2, 3]
 Eps::Model.new(x, y)
 ```
 
-Or Numo arrays [unreleased]
+Or Numo arrays
 
 ```ruby
 x = Numo::NArray.cast([[1, 2], [2, 0], [3, 1]])
@@ -329,7 +329,7 @@ y = Numo::NArray.cast([1, 2, 3])
 Eps::Model.new(x, y)
 ```
 
-Or a Rover data frame [unreleased]
+Or a Rover data frame
 
 ```ruby
 df = Rover.read_csv("houses.csv")
@@ -367,7 +367,7 @@ Eps supports:
 
 ### LightGBM
 
-Pass the learning rate with: [master]
+Pass the learning rate with:
 
 ```ruby
 Eps::Model.new(data, learning_rate: 0.01)

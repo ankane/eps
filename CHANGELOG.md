@@ -1,4 +1,4 @@
-## 0.3.5 (unreleased)
+## 0.3.5 (2020-06-10)
 
 - Added `learning_rate` option for LightGBM
 - Added support for Numo and Rover
