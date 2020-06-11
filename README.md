@@ -343,9 +343,7 @@ df = Daru::DataFrame.from_csv("houses.csv")
 Eps::Model.new(df, target: "price")
 ```
 
-### CSVs
-
-When importing data from CSV files, be sure to convert numeric fields. The `table` method does this automatically.
+When reading CSV files directly, be sure to convert numeric fields. The `table` method does this automatically.
 
 ```ruby
 CSV.table("data.csv").map { |row| row.to_h }
