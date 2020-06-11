@@ -3,6 +3,8 @@ Bundler.require(:default)
 require "minitest/autorun"
 require "minitest/pride"
 require "daru"
+require "numo/narray"
+require "rover"
 
 class Minitest::Test
   def assert_valid_pmml(pmml)

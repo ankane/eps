@@ -245,7 +245,7 @@ module Eps
 
     def check_missing(c, name)
       raise ArgumentError, "Missing column: #{name}" if !c
-      raise ArgumentError, "Missing values in column #{name}" if c.any?(&:nil?)
+      raise ArgumentError, "Missing values in column #{name}" if c.to_a.any?(&:nil?)
     end
 
     def check_missing_value(df)

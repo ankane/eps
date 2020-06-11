@@ -10,7 +10,7 @@ module Eps
         data.columns.each do |k, v|
           @columns[k] = v
         end
-      elsif daru?(data)
+      elsif rover?(data) || daru?(data)
         data.to_h.each do |k, v|
           @columns[k.to_s] = v.to_a
         end
@@ -19,6 +19,8 @@ module Eps
           @columns[k.to_s] = v.to_a
         end
       else
+        data = data.to_a if numo?(data)
+
         if data.any?
           row = data[0]
 
@@ -140,8 +142,16 @@ module Eps
 
     private
 
+    def numo?(x)
+      defined?(Numo::NArray) && x.is_a?(Numo::NArray)
+    end
+
+    def rover?(x)
+      defined?(Rover::DataFrame) && x.is_a?(Rover::DataFrame)
+    end
+
     def daru?(x)
-      defined?(Daru) && x.is_a?(Daru::DataFrame)
+      defined?(Daru::DataFrame) && x.is_a?(Daru::DataFrame)
     end
   end
 end

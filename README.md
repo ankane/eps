@@ -313,7 +313,7 @@ y = [1, 2, 3]
 Eps::Model.new(x, y)
 ```
 
-Or pass arrays of arrays
+Data can be an array of arrays
 
 ```ruby
 x = [[1, 2], [2, 0], [3, 1]]
@@ -321,9 +321,22 @@ y = [1, 2, 3]
 Eps::Model.new(x, y)
 ```
 
-### Daru
+Or Numo arrays [unreleased]
 
-Eps works well with Daru data frames.
+```ruby
+x = Numo::NArray.cast([[1, 2], [2, 0], [3, 1]])
+y = Numo::NArray.cast([1, 2, 3])
+Eps::Model.new(x, y)
+```
+
+Or a Rover data frame [unreleased]
+
+```ruby
+df = Rover.read_csv("houses.csv")
+Eps::Model.new(df, target: "price")
+```
+
+Or a Daru data frame
 
 ```ruby
 df = Daru::DataFrame.from_csv("houses.csv")

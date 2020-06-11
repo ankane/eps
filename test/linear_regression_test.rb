@@ -301,6 +301,66 @@ class LinearRegressionTest < Minitest::Test
     assert_equal "Number of data points must be at least two more than number of features", error.message
   end
 
+  def test_numo
+    x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
+    y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
+
+    model = Eps::LinearRegression.new(x, y, split: false)
+    predictions = model.predict(Numo::NArray.cast([[6], [7]]))
+    coefficients = model.coefficients
+
+    assert_in_delta 33, predictions[0]
+    assert_in_delta 38, predictions[1]
+
+    assert_in_delta 3, coefficients[:_intercept]
+    assert_in_delta 5, coefficients[:x0]
+  end
+
+  def test_evaluate_numo
+    x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
+    y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
+
+    model = Eps::LinearRegression.new(x, y, split: false)
+    test_x = Numo::NArray.cast([[6], [7]])
+    test_y = Numo::NArray.cast([33, 36])
+    metrics = model.evaluate(test_x, test_y)
+
+    assert_in_delta 1.4142, metrics[:rmse]
+    assert_in_delta 1, metrics[:mae]
+    assert_in_delta -1, metrics[:me]
+  end
+
+  def test_rover
+    x = [1, 2, 3, 4, 5]
+    y = x.map { |v| 3 + v * 5 }
+    df = Rover::DataFrame.new({x: x, y: y})
+
+    model = Eps::LinearRegression.new(df, target: :y, split: false)
+    predictions = model.predict(Rover::DataFrame.new({x: [6, 7]}))
+    coefficients = model.coefficients
+
+    assert_in_delta 33, predictions[0]
+    assert_in_delta 38, predictions[1]
+
+    assert_in_delta 3, coefficients[:_intercept]
+    assert_in_delta 5, coefficients[:x]
+  end
+
+  def test_evaluate_rover
+    x = [1, 2, 3, 4, 5]
+    y = x.map { |v| 3 + v * 5 }
+    df = Rover::DataFrame.new({x: x, y: y})
+
+    model = Eps::LinearRegression.new(df, target: :y, split: false)
+
+    test_df = Rover::DataFrame.new({x: [6, 7], y: [33, 36]})
+    metrics = model.evaluate(test_df)
+
+    assert_in_delta 1.4142, metrics[:rmse]
+    assert_in_delta 1, metrics[:mae]
+    assert_in_delta -1, metrics[:me]
+  end
+
   def test_daru
     x = [1, 2, 3, 4, 5]
     y = x.map { |v| 3 + v * 5 }
