@@ -57,7 +57,7 @@ module Eps
 
       # text feature encoding
       prep_text_features(train_set)
-      prep_text_features(validation_set) if validation_set
+      prep_text_features(validation_set, fit: false) if validation_set
 
       # create params
       params = {

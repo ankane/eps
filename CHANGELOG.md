@@ -1,3 +1,7 @@
+## 0.3.6 (unreleased)
+
+- Fixed error with text features for LightGBM
+
 ## 0.3.5 (2020-06-10)
 
 - Added `learning_rate` option for LightGBM
