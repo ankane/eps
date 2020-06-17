@@ -213,6 +213,9 @@ module Eps
     def prep_text_features(train_set, fit: true)
       @text_features.each do |k, v|
         if fit
+          # reset vocabulary
+          v.delete(:vocabulary)
+
           # TODO determine max features automatically
           # start based on number of rows
           encoder = Eps::TextEncoder.new(**v)
@@ -233,7 +236,12 @@ module Eps
           end
         end
 
-        @text_encoders[k] = encoder if fit
+        if fit
+          @text_encoders[k] = encoder
+
+          # update vocabulary
+          v[:vocabulary] = encoder.vocabulary
+        end
       end
 
       raise "No features left" if train_set.columns.empty?
