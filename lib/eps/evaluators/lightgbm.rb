@@ -19,13 +19,7 @@ module Eps
         # sparse matrix
         @text_features.each do |k, v|
           encoder = TextEncoder.new(**v)
-
-          values = data.columns.delete(k)
-          counts = encoder.transform(values)
-
-          encoder.vocabulary.each do |word|
-            data.columns[[k, word]] = [0] * values.size
-          end
+          counts = encoder.transform(data.columns[k])
 
           counts.each_with_index do |xc, i|
             row = rows[i]
@@ -52,7 +46,7 @@ module Eps
           @trees.each_slice(num_trees).each do |trees|
             tree_scores << sum_trees(rows, trees)
           end
-          data.size.times.map do |i|
+          rows.size.times.map do |i|
             v = tree_scores.map { |s| s[i] }
             if probabilities
               exp = v.map { |vi| Math.exp(vi) }
