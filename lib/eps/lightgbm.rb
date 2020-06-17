@@ -144,7 +144,10 @@ module Eps
       end
 
       if bad_observations.any?
-        raise "Bug detected in evaluator. Please report an issue. Bad data points: #{bad_observations.inspect}"
+        bad_observations.each do |obs|
+          p obs
+        end
+        raise "Bug detected in evaluator. Please report an issue."
       end
     end
 
