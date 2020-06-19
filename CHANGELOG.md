@@ -1,4 +1,4 @@
-## 0.3.6 (unreleased)
+## 0.3.6 (2020-06-19)
 
 - Fixed error with text features for LightGBM
 
