@@ -134,7 +134,7 @@ For text features, use strings with multiple words.
 {description: "a beautiful house on top of a hill"}
 ```
 
-This creates features based on word count (term frequency).
+This creates features based on [word count](https://en.wikipedia.org/wiki/Bag-of-words_model).
 
 You can specify text features explicitly with:
 
@@ -147,12 +147,12 @@ You can set advanced options with:
 ```ruby
 text_features: {
   description: {
-    min_occurences: 5,
-    max_features: 1000,
-    min_length: 1,
-    case_sensitive: true,
-    tokenizer: /\s+/,
-    stop_words: ["and", "the"]
+    min_occurences: 5,          # min times a word must appear to be included in the model
+    max_features: 1000,         # max number of words to include in the model
+    min_length: 1,              # min length of words to be included
+    case_sensitive: true,       # how to treat words with different case
+    tokenizer: /\s+/,           # how to tokenize the text, defaults to whitespace
+    stop_words: ["and", "the"]  # words to exclude from the model
   }
 }
 ```
