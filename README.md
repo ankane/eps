@@ -218,7 +218,7 @@ Build the model with:
 PriceModel.build
 ```
 
-This saves the model to `price_model.pmml`. Be sure to check this into source control.
+This saves the model to `price_model.pmml`. Check this into source control or use a tool like [Trove](https://github.com/ankane/trove) to store it.
 
 Predict with:
 
