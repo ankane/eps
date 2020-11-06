@@ -20,7 +20,7 @@ class LightGBMTest < Minitest::Test
     model = Eps::LightGBM.new(data, target: :hwy, weight: :cyl, split: false)
     assert model.summary
 
-    expected = [30.68452047, 33.61198231, 17.38480406, 17.07736756, 29.01378163, 29.13743864, 27.65261165, 18.28700064, 24.8307268, 29.13743864]
+    expected = [30.816408220564853, 33.67316784681556, 17.374629901348282, 17.1710193131715, 29.403161956316275, 29.17722520031403, 27.29606023681178, 18.389428934078527, 24.583836209258205, 29.17722520031403]
     predictions = model.predict(data.first(10))
     assert_elements_in_delta expected, predictions
   end
@@ -90,15 +90,15 @@ class LightGBMTest < Minitest::Test
     model = Eps::LightGBM.new(data, target: :drv, split: false)
 
     predictions = model.predict_probability(data.first)
-    assert_in_delta 1.07585907e-02, predictions["4"]
-    assert_in_delta 9.89241409e-01, predictions["f"]
-    assert_in_delta 7.08908049e-11, predictions["r"]
+    assert_in_delta 1.19861155e-03, predictions["4"]
+    assert_in_delta 9.98772665e-01, predictions["f"]
+    assert_in_delta 2.87230554e-05, predictions["r"]
 
     model = Eps::Model.load_pmml(model.to_pmml)
     predictions = model.predict_probability(data.first)
-    assert_in_delta 1.07585907e-02, predictions["4"]
-    assert_in_delta 9.89241409e-01, predictions["f"]
-    assert_in_delta 7.08908049e-11, predictions["r"]
+    assert_in_delta 1.19861155e-03, predictions["4"]
+    assert_in_delta 9.98772665e-01, predictions["f"]
+    assert_in_delta 2.87230554e-05, predictions["r"]
   end
 
   def test_multiclass_python_pmml
