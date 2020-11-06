@@ -10,7 +10,7 @@ module Eps
         str << "Model needs more data for better predictions\n"
       else
         str << "Most important features\n"
-        @importance_keys.zip(importance).sort_by { |k, v| [-v, k] }.first(10).each do |k, v|
+        @importance_keys.zip(importance).sort_by { |k, v| [-v, display_field(k)] }.first(10).each do |k, v|
           str << "#{display_field(k)}: #{(100 * v / total).round}\n"
         end
       end
