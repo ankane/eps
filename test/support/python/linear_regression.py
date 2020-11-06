@@ -28,4 +28,4 @@ pipeline.fit(data, data["hwy"])
 
 sklearn2pmml(pipeline, "test/support/python/linear_regression_text.pmml")
 
-print(pipeline.predict(data[:10]))
+print(list(pipeline.predict(data[:10])))

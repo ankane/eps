@@ -33,4 +33,5 @@ pipeline.fit(data, data["drv"], model__categorical_feature=[3])
 suffix = "binary" if binary else "multiclass"
 sklearn2pmml(pipeline, "test/support/python/lightgbm_" + suffix + ".pmml")
 
-print(pipeline.predict(data[:10]))
+print(list(pipeline.predict(data[:10])))
+print(list(pipeline.predict_proba(data[0:1])[0]))

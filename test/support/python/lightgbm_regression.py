@@ -24,6 +24,7 @@ pipeline = PMMLPipeline([
   ("mapper", mapper),
   ("model", LGBMRegressor(n_estimators=1000))
 ])
+# use model__sample_weight for weight
 pipeline.fit(data, data["hwy"], model__categorical_feature=[3, 4])
 
 sklearn2pmml(pipeline, "test/support/python/lightgbm_regression.pmml")
