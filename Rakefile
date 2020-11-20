@@ -13,7 +13,7 @@ task default: :test
 task :benchmark do
   require "benchmark"
   require "eps"
-  require "gsl" if ENV["GSL"]
+  # require "gsl" if ENV["GSL"]
 
   data = []
   10000.times do
