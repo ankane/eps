@@ -12,7 +12,7 @@ jobs:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
     - uses: actions/checkout@v2
-    - if: ${{ matrix.gsl }}
+    - if: ${{ contains(matrix.gemfile, 'gsl') }}
       run: sudo apt-get install libgsl-dev
     - uses: ruby/setup-ruby@v1
       with:
