@@ -12,11 +12,11 @@ jobs:
       GSL: ${{ matrix.gsl }}
     steps:
     - uses: actions/checkout@v2
+    - if: ${{ matrix.gsl }}
+      run: sudo apt-get install libgsl-dev
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7
         # bundler-cache: true
     - run: bundle install
-    - if: ${{ matrix.gsl }}
-      run: sudo apt-get install libgsl-dev
     - run: bundle exec rake test
