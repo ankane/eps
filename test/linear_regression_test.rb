@@ -476,6 +476,6 @@ class LinearRegressionTest < Minitest::Test
   private
 
   def gsl?
-    !ENV["GSL"].to_s.empty?
+    defined?(GSL) || defined?(GSLR)
   end
 end

@@ -1,0 +1,5 @@
+source "https://rubygems.org"
+
+gemspec path: ".."
+
+gem "gslr", ">= 0.1.2"

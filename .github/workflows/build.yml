@@ -6,10 +6,10 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        gsl: ['', t, gslr]
+        gemfile: [Gemfile, gemfiles/gsl.gemfile, gemfiles/gslr.gemfile]
     runs-on: ubuntu-latest
     env:
-      GSL: ${{ matrix.gsl }}
+      BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
     - uses: actions/checkout@v2
     - if: ${{ matrix.gsl }}
@@ -17,6 +17,5 @@ jobs:
     - uses: ruby/setup-ruby@v1
       with:
         ruby-version: 2.7
-        # bundler-cache: true
-    - run: bundle install
+        bundler-cache: true
     - run: bundle exec rake test
