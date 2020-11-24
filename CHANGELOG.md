@@ -1,4 +1,4 @@
-## 0.3.7 (unreleased)
+## 0.3.7 (2020-11-23)
 
 - Fixed error with LightGBM summary
 
