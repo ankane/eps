@@ -2,4 +2,9 @@ source "https://rubygems.org"
 
 gemspec path: ".."
 
+gem "daru"
+gem "minitest", ">= 5"
+gem "numo-narray"
+gem "rake"
+gem "rover-df"
 gem "gsl"
