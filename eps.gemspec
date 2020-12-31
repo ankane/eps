@@ -17,11 +17,4 @@ Gem::Specification.new do |spec|
 
   spec.add_dependency "lightgbm", ">= 0.1.7"
   spec.add_dependency "nokogiri"
-
-  spec.add_development_dependency "bundler"
-  spec.add_development_dependency "daru"
-  spec.add_development_dependency "minitest"
-  spec.add_development_dependency "numo-narray"
-  spec.add_development_dependency "rake"
-  spec.add_development_dependency "rover-df"
 end
