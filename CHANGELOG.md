@@ -1,3 +1,7 @@
+## 0.3.8 (unreleased)
+
+- Fixed error with categorical and text features
+
 ## 0.3.7 (2020-11-23)
 
 - Fixed error with LightGBM summary

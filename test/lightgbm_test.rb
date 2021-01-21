@@ -218,6 +218,14 @@ class LightGBMTest < Minitest::Test
     assert_equal ["ham", "spam"], model.predict(test_data)
   end
 
+  def test_text_features_classification_categorical
+    data = [
+      {message: "This is the first document.", category: "A", tag: "ham"},
+      {message: "Hello, this is the second document.", category: "B", tag: "spam"},
+    ]
+    Eps::LightGBM.new(data, target: :tag)
+  end
+
   def test_learning_rate
     data = mpg_data
     model = Eps::LightGBM.new(data, target: :hwy, split: false, learning_rate: 1)

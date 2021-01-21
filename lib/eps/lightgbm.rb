@@ -71,7 +71,7 @@ module Eps
       end
 
       # create datasets
-      categorical_idx = @features.values.map.with_index.select { |type, _| type == "categorical" }.map(&:last)
+      categorical_idx = train_set.columns.keys.map.with_index.select { |k, _| @features[k] == "categorical" }.map(&:last)
       train_ds = ::LightGBM::Dataset.new(train_set.map_rows(&:to_a), label: train_set.label, weight: train_set.weight, categorical_feature: categorical_idx, params: params)
       validation_ds = ::LightGBM::Dataset.new(validation_set.map_rows(&:to_a), label: validation_set.label, weight: validation_set.weight, categorical_feature: categorical_idx, params: params, reference: train_ds) if validation_set
 
