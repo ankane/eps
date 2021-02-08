@@ -1,4 +1,4 @@
-## 0.3.8 (unreleased)
+## 0.3.8 (2021-02-08)
 
 - Fixed error with categorical and text features
 
