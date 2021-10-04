@@ -92,9 +92,9 @@ module Eps
             when "in"
               node.value.include?(v)
             when "greaterThan"
-              v > node.value
+              v > node.value.to_f
             when "lessOrEqual"
-              v <= node.value
+              v <= node.value.to_f
             else
               raise "Unknown operator: #{node.operator}"
             end
