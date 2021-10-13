@@ -1,3 +1,7 @@
+## 0.3.9 (unreleased)
+
+- Fixed error with `lessOrEqual` operator
+
 ## 0.3.8 (2021-02-08)
 
 - Fixed error with categorical and text features

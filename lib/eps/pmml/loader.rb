@@ -222,7 +222,7 @@ module Eps
           else
             operator = xml_predicate.attribute("operator").value
             value = xml_predicate.attribute("value").value
-            value = value.to_f if operator == "greaterThan"
+            value = value.to_f if operator == "greaterThan" || operator == "lessOrEqual"
             field = xml_predicate.attribute("field").value
             field = derived_fields[field] if derived_fields[field]
             {
