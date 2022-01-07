@@ -2,17 +2,16 @@ name: build
 on: [push, pull_request]
 jobs:
   build:
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
     strategy:
       fail-fast: false
       matrix:
         include:
         - gemfile: Gemfile
-          ruby: 3.0
+          ruby: 3.1
+        - gemfile: gemfiles/gslr.gemfile
+          ruby: "3.0"
         - gemfile: gemfiles/gsl.gemfile
           ruby: 2.7
-        - gemfile: gemfiles/gslr.gemfile
-          ruby: 3.0
     runs-on: ubuntu-latest
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
