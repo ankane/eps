@@ -85,6 +85,8 @@ module Eps
           finish -= 1 if rows.exclude_end?
           rows = Range.new(rows.begin, size - 1) if finish >= size - 1
         end
+      elsif rows.is_a?(Integer)
+        rows = [rows]
       end
 
       if cols
@@ -118,10 +120,11 @@ module Eps
       cols.each do |c|
         raise "Undefined column: #{c}" unless columns.include?(c)
 
-        df.columns[c] = columns[c].values_at(*rows)
+        col = columns[c]
+        df.columns[c] = rows.map { |i| col[i] }
       end
-      df.label = label.values_at(*rows) if label
-      df.weight = weight.values_at(*rows) if weight
+      df.label = rows.map { |i| label[i] } if label
+      df.weight = rows.map { |i| weight[i] } if weight
 
       singular ? df.columns[cols[0]] : df
     end

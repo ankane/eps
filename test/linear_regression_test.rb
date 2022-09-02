@@ -473,6 +473,11 @@ class LinearRegressionTest < Minitest::Test
     end
   end
 
+  def test_many_rows
+    data = 200000.times.map { |i| {x: i + rand, y: i * 2 } }
+    Eps::LinearRegression.new(data, target: :y)
+  end
+
   private
 
   def gsl?
