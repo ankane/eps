@@ -51,16 +51,7 @@ module Eps
 
       x = data.map_rows(&:to_a)
 
-      gsl =
-        if options.key?(:gsl)
-          options[:gsl]
-        elsif defined?(GSL)
-          true
-        elsif defined?(GSLR)
-          :gslr
-        else
-          false
-        end
+      gsl = options.key?(:gsl) ? options[:gsl] : defined?(GSLR)
 
       intercept = options.key?(:intercept) ? options[:intercept] : true
       if intercept && gsl != :gslr
@@ -70,7 +61,7 @@ module Eps
       end
 
       v3 =
-        if gsl == :gslr
+        if gsl
           model = GSLR::OLS.new(intercept: intercept)
           model.fit(x, data.label, weight: data.weight)
 
@@ -79,12 +70,6 @@ module Eps
           coefficients = model.coefficients.dup
           coefficients.unshift(model.intercept) if intercept
           coefficients
-        elsif gsl
-          x = GSL::Matrix.alloc(*x)
-          y = GSL::Vector.alloc(data.label)
-          w = GSL::Vector.alloc(data.weight) if data.weight
-          c, @covariance, _, _ = w ? GSL::MultiFit.wlinear(x, w, y) : GSL::MultiFit.linear(x, y)
-          c.to_a
         else
           x = Matrix.rows(x)
           y = Matrix.column_vector(data.label)
@@ -195,13 +180,7 @@ module Eps
     def p_value
       @p_value ||= begin
         Hash[@coefficients.map do |k, _|
-          tp =
-            if @gsl
-              GSL::Cdf.tdist_P(t_value[k].abs, degrees_of_freedom)
-            else
-              Eps::Statistics.tdist_p(t_value[k].abs, degrees_of_freedom)
-            end
-
+          tp = Eps::Statistics.tdist_p(t_value[k].abs, degrees_of_freedom)
           [k, 2 * (1 - tp)]
         end]
       end

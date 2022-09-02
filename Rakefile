@@ -13,7 +13,7 @@ task default: :test
 task :benchmark do
   require "benchmark"
   require "eps"
-  # require "gsl"
+  # require "gslr"
 
   data = []
   10000.times do

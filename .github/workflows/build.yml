@@ -10,7 +10,7 @@ jobs:
           ruby: 3.1
         - gemfile: gemfiles/gslr.gemfile
           ruby: "3.0"
-        - gemfile: gemfiles/gsl.gemfile
+        - gemfile: Gemfile
           ruby: 2.7
     runs-on: ubuntu-latest
     env:

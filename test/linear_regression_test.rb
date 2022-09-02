@@ -481,6 +481,6 @@ class LinearRegressionTest < Minitest::Test
   private
 
   def gsl?
-    defined?(GSL) || defined?(GSLR)
+    defined?(GSLR)
   end
 end
