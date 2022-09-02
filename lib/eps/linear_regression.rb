@@ -54,7 +54,7 @@ module Eps
       gsl = options.key?(:gsl) ? options[:gsl] : defined?(GSLR)
 
       intercept = options.key?(:intercept) ? options[:intercept] : true
-      if intercept && gsl != :gslr
+      if intercept && !gsl
         data.size.times do |i|
           x[i].unshift(1)
         end
