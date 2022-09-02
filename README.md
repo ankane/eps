@@ -14,7 +14,7 @@ Check out [this post](https://ankane.org/rails-meet-data-science) for more info 
 Add this line to your application’s Gemfile:
 
 ```ruby
-gem 'eps'
+gem "eps"
 ```
 
 On Mac, also install OpenMP:
@@ -388,7 +388,7 @@ brew install gsl
 Then, add this line to your application’s Gemfile:
 
 ```ruby
-gem 'gslr', group: :development
+gem "gslr", group: :development
 ```
 
 It only needs to be available in environments used to build the model.
