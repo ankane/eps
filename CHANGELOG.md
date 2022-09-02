@@ -1,6 +1,7 @@
 ## 0.4.0 (unreleased)
 
 - Fixed `stack level too deep` error with many rows
+- Dropped support for Ruby < 2.7
 
 ## 0.3.9 (2021-10-14)
 
