@@ -1,4 +1,4 @@
-## 0.4.0 (unreleased)
+## 0.4.0 (2022-09-02)
 
 - Fixed `stack level too deep` error with many rows
 - Dropped support for `gsl` gem (use `gslr` instead)
