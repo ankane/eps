@@ -1,3 +1,7 @@
+## 0.4.1 (unreleased)
+
+- Fixed `cannot load such file -- matrix` error with Ruby 3.1
+
 ## 0.4.0 (2022-09-02)
 
 - Fixed `stack level too deep` error with many rows
