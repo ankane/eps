@@ -1,4 +1,4 @@
-## 0.4.1 (unreleased)
+## 0.4.1 (2022-09-28)
 
 - Fixed `cannot load such file -- matrix` error with Ruby 3.1
 
