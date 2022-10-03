@@ -27,7 +27,7 @@ module Eps
 
       max_features = options[:max_features]
       if max_features
-        counts = Hash[counts.sort_by { |_, v| -v }[0...max_features]]
+        counts = counts.sort_by { |_, v| -v }[0...max_features].to_h
       end
 
       @vocabulary = counts.keys

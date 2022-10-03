@@ -146,7 +146,7 @@ module Eps
 
       @coefficient_names = data.columns.keys
       @coefficient_names.unshift("_intercept") if intercept
-      @coefficients = Hash[@coefficient_names.zip(v3)]
+      @coefficients = @coefficient_names.zip(v3).to_h
       Evaluators::LinearRegression.new(coefficients: @coefficients, features: @features, text_features: @text_features)
     end
 
@@ -172,21 +172,21 @@ module Eps
     # add epsilon for perfect fits
     # consistent with GSL
     def t_value
-      @t_value ||= Hash[@coefficients.map { |k, v| [k, v / (std_err[k] + Float::EPSILON)] }]
+      @t_value ||= @coefficients.to_h { |k, v| [k, v / (std_err[k] + Float::EPSILON)] }
     end
 
     def p_value
       @p_value ||= begin
-        Hash[@coefficients.map do |k, _|
+        @coefficients.to_h do |k, _|
           tp = Eps::Statistics.tdist_p(t_value[k].abs, degrees_of_freedom)
           [k, 2 * (1 - tp)]
-        end]
+        end
       end
     end
 
     def std_err
       @std_err ||= begin
-        Hash[@coefficient_names.zip(diagonal.map { |v| Math.sqrt(v) })]
+        @coefficient_names.zip(diagonal.map { |v| Math.sqrt(v) }).to_h
       end
     end
 

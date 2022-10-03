@@ -4,7 +4,7 @@ module Eps
       attr_reader :features
 
       def initialize(coefficients:, features:, text_features:)
-        @coefficients = Hash[coefficients.map { |k, v| [k.is_a?(Array) ? [k[0].to_s, k[1]] : k.to_s, v] }]
+        @coefficients = coefficients.to_h { |k, v| [k.is_a?(Array) ? [k[0].to_s, k[1]] : k.to_s, v] }
         @features = features
         @text_features = text_features || {}
       end
@@ -50,7 +50,7 @@ module Eps
       end
 
       def coefficients
-        Hash[@coefficients.map { |k, v| [Array(k).join.to_sym, v] }]
+        @coefficients.to_h { |k, v| [Array(k).join.to_sym, v] }
       end
     end
   end

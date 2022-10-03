@@ -54,7 +54,7 @@ module Eps
     def map
       if @columns.any?
         size.times.map do |i|
-          yield Hash[@columns.map { |k, v| [k, v[i]] }]
+          yield @columns.to_h { |k, v| [k, v[i]] }
         end
       end
     end
