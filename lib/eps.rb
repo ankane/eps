@@ -1,34 +1,36 @@
 # dependencies
-require "json"
 require "lightgbm"
 require "matrix"
 require "nokogiri"
 
+# stdlib
+require "json"
+
 # modules
-require "eps/base"
-require "eps/base_estimator"
-require "eps/data_frame"
-require "eps/label_encoder"
-require "eps/lightgbm"
-require "eps/linear_regression"
-require "eps/metrics"
-require "eps/model"
-require "eps/naive_bayes"
-require "eps/statistics"
-require "eps/text_encoder"
-require "eps/utils"
-require "eps/version"
+require_relative "eps/base"
+require_relative "eps/base_estimator"
+require_relative "eps/data_frame"
+require_relative "eps/label_encoder"
+require_relative "eps/lightgbm"
+require_relative "eps/linear_regression"
+require_relative "eps/metrics"
+require_relative "eps/model"
+require_relative "eps/naive_bayes"
+require_relative "eps/statistics"
+require_relative "eps/text_encoder"
+require_relative "eps/utils"
+require_relative "eps/version"
 
 # pmml
-require "eps/pmml"
-require "eps/pmml/generator"
-require "eps/pmml/loader"
+require_relative "eps/pmml"
+require_relative "eps/pmml/generator"
+require_relative "eps/pmml/loader"
 
 # evaluators
-require "eps/evaluators/linear_regression"
-require "eps/evaluators/lightgbm"
-require "eps/evaluators/naive_bayes"
-require "eps/evaluators/node"
+require_relative "eps/evaluators/linear_regression"
+require_relative "eps/evaluators/lightgbm"
+require_relative "eps/evaluators/naive_bayes"
+require_relative "eps/evaluators/node"
 
 module Eps
   class Error < StandardError; end
