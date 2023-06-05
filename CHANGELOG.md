@@ -1,3 +1,7 @@
+## 0.5.0 (unreleased)
+
+- Dropped support for Ruby < 3
+
 ## 0.4.1 (2022-09-28)
 
 - Fixed `cannot load such file -- matrix` error with Ruby 3.1
