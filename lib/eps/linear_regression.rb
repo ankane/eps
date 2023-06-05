@@ -178,8 +178,7 @@ module Eps
     def p_value
       @p_value ||= begin
         @coefficients.to_h do |k, _|
-          tp = Eps::Statistics.tdist_p(t_value[k].abs, degrees_of_freedom)
-          [k, 2 * (1 - tp)]
+          [k, 2 * Eps::Statistics.students_t_cdf(-t_value[k].abs, degrees_of_freedom)]
         end
       end
     end

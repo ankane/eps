@@ -1,79 +1,73 @@
-### Extracted from https://github.com/estebanz01/ruby-statistics
-### The Ruby author is Esteban Zapata Rojas
-###
-### Originally extracted from https://codeplea.com/incomplete-beta-function-c
-### These functions shared under zlib license and the author is Lewis Van Winkle
-
 module Eps
   module Statistics
-    def self.tdist_p(value, degrees_of_freedom)
-      upper = (value + Math.sqrt(value * value + degrees_of_freedom))
-      lower = (2.0 * Math.sqrt(value * value + degrees_of_freedom))
-
-      x = upper/lower
-
-      alpha = degrees_of_freedom/2.0
-      beta = degrees_of_freedom/2.0
-
-      incomplete_beta_function(x, alpha, beta)
+    def self.normal_cdf(x, mean, std_dev)
+      0.5 * (1.0 + Math.erf((x - mean) / (std_dev * Math.sqrt(2))))
     end
 
-    def self.incomplete_beta_function(x, alp, bet)
-      return if x < 0.0
-      return 1.0 if x > 1.0
+    # Hill, G. W. (1970).
+    # Algorithm 395: Student's t-distribution.
+    # Communications of the ACM, 13(10), 617-619.
+    def self.students_t_cdf(x, n)
+      start, sign = x < 0 ? [0, 1] : [1, -1]
 
-      tiny = 1.0E-50
+      z = 1.0
+      t = x * x
+      y = t / n.to_f
+      b = 1.0 + y
 
-      if x > ((alp + 1.0)/(alp + bet + 2.0))
-        return 1.0 - incomplete_beta_function(1.0 - x, bet, alp)
-      end
-
-      # To avoid overflow problems, the implementation applies the logarithm properties
-      # to calculate in a faster and safer way the values.
-      lbet_ab = (Math.lgamma(alp)[0] + Math.lgamma(bet)[0] - Math.lgamma(alp + bet)[0]).freeze
-      front = (Math.exp(Math.log(x) * alp + Math.log(1.0 - x) * bet - lbet_ab) / alp.to_f).freeze
-
-      # This is the non-log version of the left part of the formula (before the continuous fraction)
-      # down_left = alp * self.beta_function(alp, bet)
-      # upper_left = (x ** alp) * ((1.0 - x) ** bet)
-      # front = upper_left/down_left
-
-      f, c, d = 1.0, 1.0, 0.0
-
-      returned_value = nil
-
-      # Let's do more iterations than the proposed implementation (200 iters)
-      (0..500).each do |number|
-        m = number/2
-
-        numerator = if number == 0
-                      1.0
-                    elsif number % 2 == 0
-                      (m * (bet - m) * x)/((alp + 2.0 * m - 1.0)* (alp + 2.0 * m))
-                    else
-                      top = -((alp + m) * (alp + bet + m) * x)
-                      down = ((alp + 2.0 * m) * (alp + 2.0 * m + 1.0))
-
-                      top/down
-                    end
-
-        d = 1.0 + numerator * d
-        d = tiny if d.abs < tiny
-        d = 1.0 / d
-
-        c = 1.0 + numerator / c
-        c = tiny if c.abs < tiny
-
-        cd = (c*d).freeze
-        f = f * cd
-
-        if (1.0 - cd).abs < 1.0E-10
-          returned_value = front * (f - 1.0)
-          break
+      if n > n.floor || (n >= 20.0 && t < n) || n > 200.0
+        # asymptotic series for large or noninteger n
+        if y > 10e-6
+          y = Math.log(b)
         end
+        a = n - 0.5
+        b = 48.0 * a * a
+        y *= a
+        y = (((((-0.4 * y - 3.3) * y - 24.0) * y - 85.5) / (0.8 * y * y + 100.0 + b) + y + 3.0) / b + 1.0) * Math.sqrt(y)
+        return start + sign * normal_cdf(-y, 0.0, 1.0)
       end
 
-      returned_value
+      if n < 20 && t < 4.0
+        # nested summation of cosine series
+        y = Math.sqrt(y)
+        a = y
+        if n == 1
+          a = 0.0
+        end
+
+        # loop
+        if n > 1
+          n -= 2
+          while n > 1
+            a = (n - 1) / (b * n) * a + y
+            n -= 2
+          end
+        end
+        a = n == 0 ? a / Math.sqrt(b) : (Math.atan(y) + a / b) * (2.0 / Math::PI)
+        return start + sign * (z - a) / 2.0
+      end
+
+      # tail series expanation for large t-values
+      a = Math.sqrt(b)
+      y = a * n
+      j = 0
+      while a != z
+        j += 2
+        z = a
+        y = y * (j - 1) / (b * j)
+        a += y / (n + j)
+      end
+      z = 0.0
+      y = 0.0
+      a = -a
+
+      # loop (without n + 2 and n - 2)
+      while n > 1
+        a = (n - 1) / (b * n) * a + y
+        n -= 2
+      end
+      a = n == 0 ? a / Math.sqrt(b) : (Math.atan(y) + a / b) * (2.0 / Math::PI)
+      start + sign * (z - a) / 2.0
     end
   end
 end
