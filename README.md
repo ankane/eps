@@ -435,7 +435,7 @@ The database is another place you can store models. It’s good if you retrain m
 
 > We recommend adding monitoring and guardrails as well if you retrain automatically
 
-Create an ActiveRecord model to store the predictive model.
+Create an Active Record model to store the predictive model.
 
 ```sh
 rails generate model Model key:string:uniq data:text
