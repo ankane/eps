@@ -7,6 +7,8 @@ jobs:
       matrix:
         include:
           - gemfile: Gemfile
+            ruby: 3.3
+          - gemfile: Gemfile
             ruby: 3.2
           - gemfile: Gemfile
             ruby: 3.1
@@ -16,7 +18,7 @@ jobs:
     env:
       BUNDLE_GEMFILE: ${{ matrix.gemfile }}
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - if: ${{ contains(matrix.gemfile, 'gsl') }}
         run: sudo apt-get install libgsl-dev
       - uses: ruby/setup-ruby@v1
