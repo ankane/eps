@@ -7,7 +7,7 @@ Machine learning for Ruby
 
 Check out [this post](https://ankane.org/rails-meet-data-science) for more info on machine learning with Rails
 
-[![Build Status](https://github.com/ankane/eps/workflows/build/badge.svg?branch=master)](https://github.com/ankane/eps/actions)
+[![Build Status](https://github.com/ankane/eps/actions/workflows/build.yml/badge.svg)](https://github.com/ankane/eps/actions)
 
 ## Installation
 
