@@ -481,60 +481,6 @@ Eps.metrics(actual, predicted, weight: weight)
 
 Reweighing is one method to [mitigate bias](http://aif360.mybluemix.net/) in training data
 
-## Upgrading
-
-## 0.3.0
-
-Eps 0.3.0 brings a number of improvements, including support for LightGBM and cross-validation. There are a number of breaking changes to be aware of:
-
-- LightGBM is now the default for new models. On Mac, run:
-
-  ```sh
-  brew install libomp
-  ```
-
-  Pass the `algorithm` option to use linear regression or naive Bayes.
-
-  ```ruby
-  Eps::Model.new(data, algorithm: :linear_regression) # or :naive_bayes
-  ```
-
-- Cross-validation happens automatically by default. You no longer need to create training and test sets manually. If you were splitting on a time, use:
-
-  ```ruby
-  Eps::Model.new(data, split: {column: :listed_at, value: Date.parse("2019-01-01")})
-  ```
-
-  Or randomly, use:
-
-  ```ruby
-  Eps::Model.new(data, split: {validation_size: 0.3})
-  ```
-
-  To continue splitting manually, use:
-
-  ```ruby
-  Eps::Model.new(data, validation_set: test_set)
-  ```
-
-- It’s no longer possible to load models in JSON or PFA formats. Retrain models and save them as PMML.
-
-## 0.2.0
-
-Eps 0.2.0 brings a number of improvements, including support for classification.
-
-We recommend:
-
-1. Changing `Eps::Regressor` to `Eps::Model`
-2. Converting models from JSON to PMML
-
-  ```ruby
-  model = Eps::Model.load_json("model.json")
-  File.write("model.pmml", model.to_pmml)
-  ```
-
-3. Renaming `app/stats_models` to `app/ml_models`
-
 ## History
 
 View the [changelog](https://github.com/ankane/eps/blob/master/CHANGELOG.md)
