@@ -221,7 +221,7 @@ class LightGBMTest < Minitest::Test
   def test_text_features_classification_categorical
     data = [
       {message: "This is the first document.", category: "A", tag: "ham"},
-      {message: "Hello, this is the second document.", category: "B", tag: "spam"},
+      {message: "Hello, this is the second document.", category: "B", tag: "spam"}
     ]
     Eps::LightGBM.new(data, target: :tag)
   end

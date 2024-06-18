@@ -73,7 +73,7 @@ class NaiveBayesTest < Minitest::Test
       {x: "Sunday", y: "red"},
       {x: "Sunday", y: "red"},
       {x: "Monday", y: "blue"},
-      {x: "Monday", y: "blue"},
+      {x: "Monday", y: "blue"}
     ]
 
     model = Eps::NaiveBayes.new(data, target: :y, split: false)

@@ -248,7 +248,7 @@ class LinearRegressionTest < Minitest::Test
       {x: 1, weekday: "Sunday", y: 12},
       {x: 2, weekday: "Sunday", y: 14},
       {x: 3, weekday: "Monday", y: 22},
-      {x: 4, weekday: "Monday", y: 24},
+      {x: 4, weekday: "Monday", y: 24}
     ]
 
     model = Eps::LinearRegression.new(data, target: :y, split: false)
