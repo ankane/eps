@@ -13,7 +13,7 @@ module Eps
         raise "Probabilities not supported" if probabilities
 
         intercept = @coefficients["_intercept"] || 0.0
-        scores = [intercept] * x.size
+        scores = Array.new(x.size, intercept)
 
         @features.each do |k, type|
           raise "Missing data in #{k}" if !x.columns[k] || x.columns[k].any?(&:nil?)

@@ -33,7 +33,7 @@ module Eps
         total = probabilities[:prior].values.sum.to_f
         probabilities[:prior].each do |c, cv|
           prior = Math.log(cv / total)
-          px = [prior] * x.size
+          px = Array.new(x.size, prior)
 
           @features.each do |k, type|
             case type

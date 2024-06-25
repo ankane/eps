@@ -226,7 +226,7 @@ module Eps
         end
 
         encoder.vocabulary.each do |word|
-          train_set.columns[[k, word]] = [0] * counts.size
+          train_set.columns[[k, word]] = Array.new(counts.size, 0)
         end
 
         counts.each_with_index do |ci, i|
