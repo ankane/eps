@@ -304,8 +304,6 @@ class LinearRegressionTest < Minitest::Test
   def test_numo
     skip if RUBY_PLATFORM == "java"
 
-    require "numo/narray"
-
     x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
     y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
 
@@ -322,8 +320,6 @@ class LinearRegressionTest < Minitest::Test
 
   def test_evaluate_numo
     skip if RUBY_PLATFORM == "java"
-
-    require "numo/narray"
 
     x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
     y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
