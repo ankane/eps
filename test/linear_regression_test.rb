@@ -302,6 +302,10 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_numo
+    skip if RUBY_PLATFORM == "java"
+
+    require "numo/narray"
+
     x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
     y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
 
@@ -317,6 +321,10 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_evaluate_numo
+    skip if RUBY_PLATFORM == "java"
+
+    require "numo/narray"
+
     x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
     y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
 
@@ -331,6 +339,10 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_rover
+    skip if RUBY_PLATFORM == "java"
+
+    require "rover-df"
+
     x = [1, 2, 3, 4, 5]
     y = x.map { |v| 3 + v * 5 }
     df = Rover::DataFrame.new({x: x, y: y})
@@ -347,6 +359,10 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_evaluate_rover
+    skip if RUBY_PLATFORM == "java"
+
+    require "rover-df"
+
     x = [1, 2, 3, 4, 5]
     y = x.map { |v| 3 + v * 5 }
     df = Rover::DataFrame.new({x: x, y: y})
@@ -362,6 +378,8 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_daru
+    require "daru"
+
     x = [1, 2, 3, 4, 5]
     y = x.map { |v| 3 + v * 5 }
     df = Daru::DataFrame.new(x: x, y: y)
@@ -378,6 +396,8 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_evaluate_daru
+    require "daru"
+
     x = [1, 2, 3, 4, 5]
     y = x.map { |v| 3 + v * 5 }
     df = Daru::DataFrame.new(x: x, y: y)

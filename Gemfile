@@ -4,7 +4,7 @@ gemspec
 
 gem "daru"
 gem "minitest", ">= 5"
-gem "numo-narray"
+gem "numo-narray", platform: :ruby
 gem "rake"
-gem "rover-df"
+gem "rover-df", platform: :ruby
 gem "csv"
