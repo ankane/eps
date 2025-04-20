@@ -27,4 +27,8 @@ class Minitest::Test
     end
     data
   end
+
+  def numo?
+    !["jruby", "truffleruby"].include?(RUBY_ENGINE)
+  end
 end

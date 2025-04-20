@@ -302,7 +302,7 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_numo
-    skip if RUBY_PLATFORM == "java"
+    skip unless numo?
 
     x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
     y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
@@ -319,7 +319,7 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_evaluate_numo
-    skip if RUBY_PLATFORM == "java"
+    skip unless numo?
 
     x = Numo::NArray.cast([[1], [2], [3], [4], [5]])
     y = Numo::NArray.cast(x[true, 0].map { |xi| 3 + xi * 5 })
@@ -335,9 +335,7 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_rover
-    skip if RUBY_PLATFORM == "java"
-
-    require "rover-df"
+    skip unless numo?
 
     x = [1, 2, 3, 4, 5]
     y = x.map { |v| 3 + v * 5 }
@@ -355,9 +353,7 @@ class LinearRegressionTest < Minitest::Test
   end
 
   def test_evaluate_rover
-    skip if RUBY_PLATFORM == "java"
-
-    require "rover-df"
+    skip unless numo?
 
     x = [1, 2, 3, 4, 5]
     y = x.map { |v| 3 + v * 5 }
