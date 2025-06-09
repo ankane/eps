@@ -47,7 +47,7 @@ module Eps
         return start + sign * (z - a) / 2.0
       end
 
-      # tail series expanation for large t-values
+      # tail series expansion for large t-values
       a = Math.sqrt(b)
       y = a * n
       j = 0
