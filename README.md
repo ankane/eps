@@ -147,7 +147,7 @@ You can set advanced options with:
 ```ruby
 text_features: {
   description: {
-    min_occurences: 5,          # min times a word must appear to be included in the model
+    min_occurrences: 5,         # min times a word must appear to be included in the model
     max_features: 1000,         # max number of words to include in the model
     min_length: 1,              # min length of words to be included
     case_sensitive: true,       # how to treat words with different case
