@@ -36,7 +36,7 @@ module Eps
     end
 
     def transform(arr)
-      counts, fit = count_and_fit(arr)
+      _, fit = count_and_fit(arr)
       fit
     end
 

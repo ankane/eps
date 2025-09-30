@@ -8,7 +8,7 @@ class MetricsTest < Minitest::Test
 
     assert_in_delta 3.464, metrics[:rmse]
     assert_in_delta 2, metrics[:mae]
-    assert_in_delta -2, metrics[:me]
+    assert_in_delta (-2), metrics[:me]
   end
 
   def test_regression_metrics_weight
@@ -19,7 +19,7 @@ class MetricsTest < Minitest::Test
 
     assert_in_delta 2.160246899469287, metrics[:rmse]
     assert_in_delta 1.6667, metrics[:mae]
-    assert_in_delta -1.3333, metrics[:me]
+    assert_in_delta (-1.3333), metrics[:me]
   end
 
   def test_classification_metrics

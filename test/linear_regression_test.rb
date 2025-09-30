@@ -204,7 +204,7 @@ class LinearRegressionTest < Minitest::Test
 
     assert_in_delta 1.4142, metrics[:rmse]
     assert_in_delta 1, metrics[:mae]
-    assert_in_delta -1, metrics[:me]
+    assert_in_delta (-1), metrics[:me]
   end
 
   def test_categorical
@@ -331,7 +331,7 @@ class LinearRegressionTest < Minitest::Test
 
     assert_in_delta 1.4142, metrics[:rmse]
     assert_in_delta 1, metrics[:mae]
-    assert_in_delta -1, metrics[:me]
+    assert_in_delta (-1), metrics[:me]
   end
 
   def test_rover
@@ -366,7 +366,7 @@ class LinearRegressionTest < Minitest::Test
 
     assert_in_delta 1.4142, metrics[:rmse]
     assert_in_delta 1, metrics[:mae]
-    assert_in_delta -1, metrics[:me]
+    assert_in_delta (-1), metrics[:me]
   end
 
   def test_daru
@@ -401,7 +401,7 @@ class LinearRegressionTest < Minitest::Test
 
     assert_in_delta 1.4142, metrics[:rmse]
     assert_in_delta 1, metrics[:mae]
-    assert_in_delta -1, metrics[:me]
+    assert_in_delta (-1), metrics[:me]
   end
 
   def test_summary
@@ -453,7 +453,7 @@ class LinearRegressionTest < Minitest::Test
   def test_validation_set
     data = [1, 2, 3, 4, 5].map { |xi| {x: xi, y: 3 + xi * 5} }
     validation_set = [{x: 6, y: 33}, {x: 7, y: 41}]
-    model = Eps::LinearRegression.new(data, target: :y, validation_set: validation_set)
+    Eps::LinearRegression.new(data, target: :y, validation_set: validation_set)
   end
 
   # TODO better name

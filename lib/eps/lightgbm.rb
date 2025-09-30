@@ -20,7 +20,6 @@ module Eps
     def _train(verbose: nil, early_stopping: nil, learning_rate: 0.1)
       train_set = @train_set
       validation_set = @validation_set.dup
-      summary_label = train_set.label
 
       # create check set
       evaluator_set = validation_set || train_set
@@ -134,7 +133,6 @@ module Eps
         actual = evaluator.predict(evaluator_set)
       end
 
-      regression = objective == "regression" || objective == "binary"
       bad_observations = []
       expected.zip(actual).each_with_index do |(exp, act), i|
         success = (act - exp).abs < 0.001

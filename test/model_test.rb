@@ -52,27 +52,27 @@ class ModelTest < Minitest::Test
   end
 
   def test_split
-    model = Eps::Model.new(mpg_data, target: :hwy, split: true)
+    Eps::Model.new(mpg_data, target: :hwy, split: true)
   end
 
   def test_split_symbol
     data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new(data, target: :hwy, split: :listed_at)
+    Eps::Model.new(data, target: :hwy, split: :listed_at)
   end
 
   def test_split_shuffle_false
     data = mpg_data
-    model = Eps::Model.new(data, target: :hwy, split: {shuffle: false})
+    Eps::Model.new(data, target: :hwy, split: {shuffle: false})
   end
 
   def test_split_column
     data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new(data, target: :hwy, split: {column: :listed_at})
+    Eps::Model.new(data, target: :hwy, split: {column: :listed_at})
   end
 
   def test_split_column_value
     data = mpg_data.map { |r| r.merge(listed_at: Date.today - rand(10)) }
-    model = Eps::Model.new(data, target: :hwy, split: {column: :listed_at, value: Date.today - 5})
+    Eps::Model.new(data, target: :hwy, split: {column: :listed_at, value: Date.today - 5})
   end
 
   def test_split_no_training_data
@@ -92,15 +92,15 @@ class ModelTest < Minitest::Test
   end
 
   def test_regression_comparison
-    lr = Eps::LinearRegression.new(mpg_data, target: :hwy)
-    lgb = Eps::LightGBM.new(mpg_data, target: :hwy)
+    _lr = Eps::LinearRegression.new(mpg_data, target: :hwy)
+    _lgb = Eps::LightGBM.new(mpg_data, target: :hwy)
     # puts lr.summary
     # puts lgb.summary
   end
 
   def test_classification_comparison
-    nb = Eps::NaiveBayes.new(mpg_data, target: :drv)
-    lgb = Eps::LightGBM.new(mpg_data, target: :drv)
+    _nb = Eps::NaiveBayes.new(mpg_data, target: :drv)
+    _lgb = Eps::LightGBM.new(mpg_data, target: :drv)
     # puts nb.summary
     # puts lgb.summary
   end

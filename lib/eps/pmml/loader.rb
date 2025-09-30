@@ -139,8 +139,6 @@ module Eps
           features[name] = n.css("TargetValueStat").any? ? "numeric" : "categorical"
         end
 
-        target = node.css("BayesOutput").attribute("fieldName").value
-
         probabilities = {
           prior: prior,
           conditional: conditional
