@@ -7,6 +7,8 @@ jobs:
       matrix:
         include:
           - gemfile: Gemfile
+            ruby: "4.0"
+          - gemfile: Gemfile
             ruby: 3.4
           - gemfile: Gemfile
             ruby: 3.3
