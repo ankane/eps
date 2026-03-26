@@ -5,6 +5,6 @@ gemspec
 gem "rake"
 gem "minitest"
 gem "daru"
-gem "numo-narray", platform: :mri
+gem "numo-narray-alt", platform: :mri
 gem "rover-df", platform: :mri
 gem "csv"
