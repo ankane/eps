@@ -10,7 +10,7 @@ module Eps
         data.columns.each do |k, v|
           @columns[k] = v
         end
-      elsif rover?(data) || daru?(data)
+      elsif rover?(data)
         data.to_h.each do |k, v|
           @columns[k.to_s] = v.to_a
         end
@@ -151,10 +151,6 @@ module Eps
 
     def rover?(x)
       defined?(Rover::DataFrame) && x.is_a?(Rover::DataFrame)
-    end
-
-    def daru?(x)
-      defined?(Daru::DataFrame) && x.is_a?(Daru::DataFrame)
     end
   end
 end

@@ -55,18 +55,6 @@ class NaiveBayesTest < Minitest::Test
     assert_equal expected, predictions
   end
 
-  def test_daru
-    df = Daru::DataFrame.from_csv("test/support/mpg.csv")
-    df = df["displ", "year", "cyl", "class", "drv"]
-    df["drv"] = df["drv"].map(&:to_s)
-
-    model = Eps::NaiveBayes.new(df, target: :drv, split: false)
-
-    expected = %w(f f 4 r f f f 4 f f)
-    predictions = model.predict(df.first(10))
-    assert_equal expected, predictions
-  end
-
   def test_unknown_categorical_value
     data = [
       {x: "Sunday", y: "red"},

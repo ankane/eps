@@ -336,13 +336,6 @@ df = Rover.read_csv("houses.csv")
 Eps::Model.new(df, target: "price")
 ```
 
-Or a Daru data frame
-
-```ruby
-df = Daru::DataFrame.from_csv("houses.csv")
-Eps::Model.new(df, target: "price")
-```
-
 When reading CSV files directly, be sure to convert numeric fields. The `table` method does this automatically.
 
 ```ruby

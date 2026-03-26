@@ -369,41 +369,6 @@ class LinearRegressionTest < Minitest::Test
     assert_in_delta (-1), metrics[:me]
   end
 
-  def test_daru
-    require "daru"
-
-    x = [1, 2, 3, 4, 5]
-    y = x.map { |v| 3 + v * 5 }
-    df = Daru::DataFrame.new(x: x, y: y)
-
-    model = Eps::LinearRegression.new(df, target: :y, split: false)
-    predictions = model.predict(Daru::DataFrame.new(x: [6, 7]))
-    coefficients = model.coefficients
-
-    assert_in_delta 33, predictions[0]
-    assert_in_delta 38, predictions[1]
-
-    assert_in_delta 3, coefficients[:_intercept]
-    assert_in_delta 5, coefficients[:x]
-  end
-
-  def test_evaluate_daru
-    require "daru"
-
-    x = [1, 2, 3, 4, 5]
-    y = x.map { |v| 3 + v * 5 }
-    df = Daru::DataFrame.new(x: x, y: y)
-
-    model = Eps::LinearRegression.new(df, target: :y, split: false)
-
-    test_df = Daru::DataFrame.new(x: [6, 7], y: [33, 36])
-    metrics = model.evaluate(test_df)
-
-    assert_in_delta 1.4142, metrics[:rmse]
-    assert_in_delta 1, metrics[:mae]
-    assert_in_delta (-1), metrics[:me]
-  end
-
   def test_summary
     data = [1, 2, 3, 4, 5].map { |xi| {x: xi, y: 3 + xi * 5} }
     model = Eps::LinearRegression.new(data, target: :y, split: false)
