@@ -15,7 +15,7 @@ Gem::Specification.new do |spec|
 
   spec.required_ruby_version = ">= 3.3"
 
-  spec.add_dependency "lightgbm", ">= 0.1.7"
+  spec.add_dependency "lightgbm", ">= 0.4"
   spec.add_dependency "matrix"
   spec.add_dependency "nokogiri"
 end
