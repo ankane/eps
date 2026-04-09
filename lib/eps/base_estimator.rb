@@ -27,8 +27,8 @@ module Eps
 
     def self.load_pmml(pmml)
       model = new
-      model.instance_variable_set("@evaluator", PMML.load(pmml))
-      model.instance_variable_set("@pmml", pmml.respond_to?(:to_xml) ? pmml.to_xml : pmml) # cache data
+      model.instance_variable_set(:@evaluator, PMML.load(pmml))
+      model.instance_variable_set(:@pmml, pmml.respond_to?(:to_xml) ? pmml.to_xml : pmml) # cache data
       model
     end
 

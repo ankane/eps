@@ -221,13 +221,13 @@ module Eps
 
     # total sum of squares
     def sst
-      @sst ||= @train_set.label.map { |y| (y - y_bar)**2 }.sum
+      @sst ||= @train_set.label.sum { |y| (y - y_bar)**2 }
     end
 
     # sum of squared errors of prediction
     # not to be confused with "explained sum of squares"
     def sse
-      @sse ||= @train_set.label.zip(y_hat).map { |y, yh| (y - yh)**2 }.sum
+      @sse ||= @train_set.label.zip(y_hat).sum { |y, yh| (y - yh)**2 }
     end
 
     def mst

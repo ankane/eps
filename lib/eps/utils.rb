@@ -3,14 +3,14 @@ module Eps
     def self.column_type(c, k)
       if !c
         raise ArgumentError, "Missing column: #{k}"
-      elsif c.all? { |v| v.nil? }
+      elsif c.all?(&:nil?)
         # goes here for empty as well
         nil
-      elsif c.any? { |v| v.nil? }
+      elsif c.any?(&:nil?)
         raise ArgumentError, "Missing values in column #{k}"
-      elsif c.all? { |v| v.is_a?(Numeric) }
+      elsif c.all?(Numeric)
         "numeric"
-      elsif c.all? { |v| v.is_a?(String) }
+      elsif c.all?(String)
         "categorical"
       elsif c.all? { |v| v == true || v == false }
         "categorical" # boolean

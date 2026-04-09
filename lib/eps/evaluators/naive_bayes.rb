@@ -14,7 +14,7 @@ module Eps
         probs = calculate_class_probabilities(x)
         probs.map do |xp|
           if probabilities
-            sum = xp.values.map { |v| Math.exp(v) }.sum.to_f
+            sum = xp.values.sum { |v| Math.exp(v) }.to_f
             xp.map { |k, v| [k, Math.exp(v) / sum] }.to_h
           else
             xp.sort_by { |k, v| [-v, k] }[0][0]
@@ -44,7 +44,7 @@ module Eps
 
                 # unknown value if not vc
                 if vc
-                  denom = probabilities[:conditional][k].map { |k, v| v[c] }.sum.to_f
+                  denom = probabilities[:conditional][k].sum { |k, v| v[c] }.to_f
                   p2 = vc[c].to_f / denom
 
                   # TODO use proper smoothing instead

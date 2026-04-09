@@ -151,7 +151,7 @@ module Eps
       end
 
       def linear_regression
-        predictors = model.instance_variable_get("@coefficients").dup
+        predictors = model.instance_variable_get(:@coefficients).dup
         intercept = predictors.delete("_intercept") || 0.0
 
         data_fields = {}
@@ -377,43 +377,43 @@ module Eps
       # TODO create instance methods on model for all of these features
 
       def features
-        model.instance_variable_get("@features")
+        model.instance_variable_get(:@features)
       end
 
       def text_features
-        model.instance_variable_get("@text_features")
+        model.instance_variable_get(:@text_features)
       end
 
       def text_encoders
-        model.instance_variable_get("@text_encoders")
+        model.instance_variable_get(:@text_encoders)
       end
 
       def feature_importance
-        model.instance_variable_get("@feature_importance")
+        model.instance_variable_get(:@feature_importance)
       end
 
       def labels
-        model.instance_variable_get("@labels")
+        model.instance_variable_get(:@labels)
       end
 
       def trees
-        model.instance_variable_get("@trees")
+        model.instance_variable_get(:@trees)
       end
 
       def target
-        model.instance_variable_get("@target")
+        model.instance_variable_get(:@target)
       end
 
       def label_encoders
-        model.instance_variable_get("@label_encoders")
+        model.instance_variable_get(:@label_encoders)
       end
 
       def objective
-        model.instance_variable_get("@objective")
+        model.instance_variable_get(:@objective)
       end
 
       def probabilities
-        model.instance_variable_get("@probabilities")
+        model.instance_variable_get(:@probabilities)
       end
 
       # end TODO

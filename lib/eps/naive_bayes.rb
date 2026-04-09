@@ -73,7 +73,7 @@ module Eps
           # smooth
           if smoothing
             labels.each do |label|
-              sum = prob.map { |k2, v2| v2[label] }.sum.to_f
+              sum = prob.sum { |k2, v2| v2[label] }.to_f
               prob.each do |k2, v|
                 v[label] = (v[label] + smoothing) * sum / (sum + (prob.size * smoothing))
               end
