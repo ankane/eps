@@ -1,4 +1,4 @@
-## 0.7.0 (unreleased)
+## 0.7.0 (2026-04-14)
 
 - Dropped support for Daru
 - Dropped support for Ruby < 3.3
