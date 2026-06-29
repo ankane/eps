@@ -407,7 +407,7 @@ Eps::Model.new(data, validation_set: validation_set)
 Split on a specific value
 
 ```ruby
-Eps::Model.new(data, split: {column: :listed_at, value: Date.parse("2025-01-01")})
+Eps::Model.new(data, split: {column: :listed_at, value: Date.parse("2026-01-01")})
 ```
 
 Specify the validation set size (the default is `0.25`, which is 25%)
