@@ -73,7 +73,7 @@ module Eps
           y = Matrix.column_vector(data.label)
 
           # weighted OLS
-          # http://www.real-statistics.com/multiple-regression/weighted-linear-regression/weighted-regression-basics/
+          # https://www.real-statistics.com/multiple-regression/weighted-linear-regression/weighted-regression-basics/
           w = Matrix.diagonal(*data.weight) if data.weight
 
           removed = []
