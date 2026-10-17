@@ -36,7 +36,7 @@ module Eps
     end
 
     def inverse_transform(y)
-      inverse = @labels.map(&:reverse).to_h
+      inverse = @labels.invert
       y.map do |yi|
         inverse[yi.to_i]
       end
