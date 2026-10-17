@@ -15,7 +15,7 @@ module Eps
         probs.map do |xp|
           if probabilities
             sum = xp.values.sum { |v| Math.exp(v) }.to_f
-            xp.map { |k, v| [k, Math.exp(v) / sum] }.to_h
+            xp.to_h { |k, v| [k, Math.exp(v) / sum] }
           else
             xp.sort_by { |k, v| [-v, k] }[0][0]
           end
